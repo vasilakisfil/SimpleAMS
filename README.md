@@ -15,6 +15,8 @@ I have been using this gem since September 2015. 12 months later it's still unst
 * wrong decisions: Namely the gem made jsonapi as first citizen. That's wrong and has affected pretty much everything in the code.
 * super complex. I understand that it tries to provide you with as much as possible options but unfortunately it fails.
 * very complex API, giving you many options which is confusing. From my experience in a Rails shop, giving many different options to a client is worse than giving 1 nice option that is flexible.
+* caching is implemented in the same gem. In my opinion this is not a good decision. The code for caching should be extracted in another gem (and it would be a greate gem!).
+* some decisions do not much the Ruby coding style (like include: 'a,string,of,resources', default_includes '**')
 
 Being something simple doesn't mean that it can't be used for building complex structures.
 
