@@ -1,0 +1,2 @@
+# SimpleAMS
+AMS made simple
