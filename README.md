@@ -15,4 +15,59 @@ I want this gem to be
 * expected behavior on the internals and how it works
 * easy to override if needed pretty much anything
 
-## Install
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'simple-ams'
+```
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install simple-ams
+
+## Usage
+The gem's API has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable and jsonapi-rb.
+
+```ruby
+SimpleAMS::Serializer.new(user, {
+  includes: [:posts, videos: [:comments]],
+  fields: [:id, :name, posts: {:id, :text}, videos: {:id, :title, comments: {:id, :text}}] #overrides includes when association is specified
+  serializer: UserSerializer,
+  adapter: {name: :ams, options: { root: true }}
+  expose: { url_helpers: SimpleHelpers.new },
+}).to_json
+
+class UserSerializer
+  include SimpleAMS
+
+  attributes :id, :name, :email, :birth_date, :links
+
+  has_many :videos, :comments, :posts
+  belongs_to :organization
+  has_one :profile
+
+  def name
+    "#{object.first_name} #{object.last_name}"
+  end
+
+  def links
+    url_helpers.as_json
+  end
+end
+```
+
+## Development
+
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+## Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/vasilakisfil/foo.
