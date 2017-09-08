@@ -44,13 +44,23 @@ SimpleAMS::Serializer.new(user, {
 }).to_json
 
 class UserSerializer
-  include SimpleAMS
+  include SimpleAMS.with({
+    adapter: :ams, options: {
+      root: true
+    }
+  })
 
   attributes :id, :name, :email, :birth_date, :links
 
   has_many :videos, :comments, :posts
   belongs_to :organization
-  has_one :profile
+  has_one :profile, {
+    includes: [:address],
+    fields: [:id, :settings, address: {:country}}] #overrides includes when association is specified
+    serializer: UserSerializer,
+    adapter: {name: :ams, options: { root: true }}
+    expose: { url_helpers: SimpleHelpers.new }
+  }
 
   def name
     "#{object.first_name} #{object.last_name}"

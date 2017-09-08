@@ -1,17 +1,17 @@
 # coding: utf-8
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "SimpleAMS/version"
+require "simple_ams/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "SimpleAMS"
+  spec.name          = "simple_ams"
   spec.version       = SimpleAMS::VERSION
   spec.authors       = ["Filippos Vasilakis"]
   spec.email         = ["vasilakisfil@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{ActiveModel Serializers, simplified.}
+  spec.description   = %q{ActiveModel Serializers, simplified.}
+  spec.homepage      = "https://github.com/vasilakisfil/simple-ams"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
