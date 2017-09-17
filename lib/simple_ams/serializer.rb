@@ -1,40 +1,80 @@
 require "simple_ams"
 
 class SimpleAMS::Serializer
-  attr_reader :serializer, :options
-
-  def initialize(serializer, options = {})
-    @serializer, @options = serializer, options
+  def initialize(resource, options = {})
+    @resource, @options = resource, Options.new(resource, options)
   end
 
-  def fields
-    return @fields if defined?(@fields)
+  def document
+    @document ||= SimpleAMS::Document.new(options)
+  end
 
-    @fields = serializer.class.attributes #allowed fields
-    instance_fields = options.fetch(:fields, {})
+  def as_json
+    options.adapter.new(SimpleAMS::Decorator.new(document, resource)).as_json
+  end
 
-    unless instance_fields.empty?
-      @fields = @fields & instance_fields
+  def to_json
+    as_json.to_json
+  end
+
+  private
+    attr_reader :resource, :options
+
+    class Options
+      def initialize(resource, options)
+        @resource, @options = resource, options
+      end
+
+      def fields
+        @fields ||= options.fetch(:fields, {})
+      end
+
+      def includes
+        @includes ||= options.fetch(:includes, {})
+      end
+
+      def links
+        @links ||= options.fetch(:links, {})
+      end
+
+      def meta
+        @meta ||= options.fetch(:meta, {})
+      end
+
+      def serializer
+        _serializer = options.fetch(:serializer)
+
+        @serializer ||= _serializer.new.extend(
+          SimpleAMS::Methy.of(
+            exposed.merge({
+              object: resource
+            })
+          )
+        )
+      end
+
+      def adapter
+        @adapter ||= begin
+          name = options.dig(:adapter, :name)
+          if name.nil?
+            SimpleAMS::Adapters::AMS
+          else
+            if name.is_a? Symbol
+              const_get("SimapleAMS::Adapters::#{name}")
+            elsif name.is_a? Class
+            else
+              raise 'Wrong adapter type ?'
+            end
+          end
+        end
+      end
+
+      # the following should be the same for all (nested) serializers of the same document
+      def exposed
+        @exposed ||= options.fetch(:expose, {})
+      end
+
+      private
+        attr_reader :options, :resource
     end
-
-    return @fields
-  end
-
-  def includes
-    return @includes if defined?(@includes)
-
-    @includes = serializer.class.relationships.map(&:name)
-
-    instance_includes = options.fetch(:includes, {})
-    unless instance_includes.empty? || instance_includes.nil?
-      @includes = @includes & instance_includes
-    end
-
-    return @includes
-  end
-
-  def adapter
-    SimpleAMS::Adapters::AMS
-  end
 end
-

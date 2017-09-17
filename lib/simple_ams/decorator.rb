@@ -1,27 +1,38 @@
 require "simple_ams"
 
 class SimpleAMS::Decorator
-  attr_reader :model, :resource
+  attr_reader :document, :resource
 
-  def initialize(model, resource)
-    @model, @resource = model, resource
+  def initialize(document, resource)
+    @document, @resource = document, resource
   end
 
   #maybe merge those 2 ?
-  def value_for_field(field)
-    if model.serializer.respond_to?(field)
-      serializer.send(field)
+  def field_value(name)
+    if document.serializer.respond_to?(name)
+      document.serializer.send(name)
     else
-      resource.send(field)
+      resource.send(name)
     end
   end
 
-  def value_for_relation(relation)
-    if model.serializer.respond_to?(relation)
-      serializer.send(relation)
-    else
-      resource.send(relation)
-    end
+  def relation(name)
+    SimpleAMS::Relationship.new(
+      SimpleAMS::Serializer.new(
+        _relation(name),
+        document.relationship_for(name).options.merge({
+          expose: document.options.exposed
+        })
+      ),
+      document.relationship_for(name)
+    )
   end
 
+  def _relation(name)
+    if document.serializer.respond_to?(name)
+      serializer.send(name)
+    else
+      resource.send(name)
+    end
+  end
 end

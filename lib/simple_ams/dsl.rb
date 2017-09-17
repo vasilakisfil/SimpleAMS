@@ -3,25 +3,6 @@ require "simple_ams"
 module SimpleAMS::DSL
   def self.included(host_class)
     host_class.extend ClassMethods
-    host_class.include InstanceMethods
-  end
-
-  module InstanceMethods
-    def initialize(resource, options = {})
-      @resource, @options = resource, options
-    end
-
-    def model
-      @model ||= SimpleAMS::Model.new(self, @options)
-    end
-
-    def as_json
-      model.adapter.new(SimpleAMS::Decorator.new(model, @resource)).as_json
-    end
-
-    def to_json
-      as_json.to_json
-    end
   end
 
   module ClassMethods
@@ -32,9 +13,10 @@ module SimpleAMS::DSL
 
       append_attributes(args)
     end
+    alias attribute attributes
 
     def relationship(name, relation, options)
-      SimpleAMS::Relationship.new(name, relation, options)
+      SimpleAMS::Relationship::Info.new(name, relation, options)
     end
 
     def has_many(name, options = {})

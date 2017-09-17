@@ -6,10 +6,6 @@ end
 class SimpleAMS::Adapters::AMS
   attr_reader :decorator
 
-  #add doclument (=model)
-  #add something else other than decorator, maybe model/instance/record?
-  #+links
-  #+meta
   def initialize(decorator)
     @decorator = decorator
   end
@@ -17,8 +13,8 @@ class SimpleAMS::Adapters::AMS
   def as_json
     hash = {}
 
-    decorator.model.fields.each{|field|
-      value = decorator.value_for_field(field)
+    decorator.document.fields.each{ |field|
+      value = decorator.field_value(field)
       if value.respond_to?(:as_json)
         hash[field] = value.as_json
       else
@@ -26,8 +22,8 @@ class SimpleAMS::Adapters::AMS
       end
     }
 
-    decorator.model.includes.each{|relation|
-      value = decorator.value_for_relation(relation)
+    decorator.document.includes.each{|relation|
+      value = decorator.relation(relation).value
 
       if value.respond_to?(:as_json)
         hash[relation] = value.as_json
