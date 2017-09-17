@@ -1,6 +1,4 @@
 require "simple_ams"
-require "simple_ams/relationship"
-require "simple_ams/renderer"
 
 module SimpleAMS::DSL
   def self.included(host_class)
@@ -10,16 +8,19 @@ module SimpleAMS::DSL
 
   module InstanceMethods
     def initialize(resource, options = {})
-      @resource = resource
-      @options = options
+      @resource, @options = resource, options
     end
 
     def model
-      SimpleAMS::Model.new(self, @options)
+      @model ||= SimpleAMS::Model.new(self, @options)
     end
 
     def as_json
-      model.adapter(@resource, model).as_json
+      model.adapter.new(SimpleAMS::Decorator.new(model, @resource)).as_json
+    end
+
+    def to_json
+      as_json.to_json
     end
   end
 
@@ -43,7 +44,7 @@ module SimpleAMS::DSL
     alias belongs_to has_many
 
     def relationships
-      @relationships
+      @relationships || []
     end
 
     private

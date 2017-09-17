@@ -14,6 +14,7 @@ I want this gem to be
 * tested
 * expected behavior on the internals and how it works
 * easy to override if needed pretty much anything
+* I don't think inheritence mode for adapters really works (from my experience in AMS)
 
 ## Installation
 
@@ -38,14 +39,16 @@ The gem's API has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable an
 SimpleAMS::Serializer.new(user, {
   includes: [:posts, videos: [:comments]],
   fields: [:id, :name, posts: {:id, :text}, videos: {:id, :title, comments: {:id, :text}}] #overrides includes when association is specified
-  serializer: UserSerializer,
-  adapter: {name: :ams, options: { root: true }}
+  serializer: UserSerializer, # can also be a lambda, ideal for polymorphic records
+  #serializer: ->(obj){ obj.type.employee? ? EmployeeSerializer : UserSerializer }
+  adapter: [name: :ams, options: { root: true }} #name can also accept the class itself, options are passed to the adapter
+  #adapter: [name: MyAdapter, options: { link: false }} #name can also accept the class itself
   expose: { url_helpers: SimpleHelpers.new },
 }).to_json
 
 class UserSerializer
   include SimpleAMS.with({
-    adapter: :ams, options: {
+    adapter: :ams, options: { #name can also accept the class itself
       root: true
     }
   })
@@ -62,13 +65,15 @@ class UserSerializer
     expose: { url_helpers: SimpleHelpers.new }
   }
 
+  #override an attribute
   def name
     "#{object.first_name} #{object.last_name}"
   end
 
-  def links
-    url_helpers.as_json
-  end
+  link :root, '/api/v1/'
+  link :self, ->(obj) { "/api/v1/users/#{obj.id}"}
+  link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/"}
+
 end
 ```
 

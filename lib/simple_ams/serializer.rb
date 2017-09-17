@@ -1,6 +1,6 @@
 require "simple_ams"
 
-class SimpleAMS::Model
+class SimpleAMS::Serializer
   attr_reader :serializer, :options
 
   def initialize(serializer, options = {})
@@ -37,3 +37,4 @@ class SimpleAMS::Model
     SimpleAMS::Adapters::AMS
   end
 end
+
