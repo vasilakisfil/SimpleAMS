@@ -41,16 +41,24 @@ SimpleAMS::Serializer.new(user, {
   fields: [:id, :name, posts: {:id, :text}, videos: {:id, :title, comments: {:id, :text}}] #overrides includes when association is specified
   serializer: UserSerializer, # can also be a lambda, ideal for polymorphic records
   #serializer: ->(obj){ obj.type.employee? ? EmployeeSerializer : UserSerializer }
-  adapter: [name: :ams, options: { root: true }} #name can also accept the class itself, options are passed to the adapter
+  adapter: [name: :ams, options: { root: true }] #name can also accept the class itself, options are passed to the adapter
   #adapter: [name: MyAdapter, options: { link: false }} #name can also accept the class itself
   expose: { url_helpers: SimpleHelpers.new },
+  links: {
+    root: { value: '/api/v1/', collection: true }
+    self: { value: ->(obj) { "/api/v1/users/#{obj.id}" } }
+    posts: { value: ->(obj) { "/api/v1/users/#{obj.id}/posts/" } }
+  }
 }).to_json
 
 class UserSerializer
-  include SimpleAMS.with({
-    adapter: :ams, options: { #name can also accept the class itself
-      root: true
-    }
+  include SimpleAMS.with({ #you can pass the same options as above ;)
+    adapter: [
+      name: :ams, options: { #name can also accept the class itself
+        root: true, id: :id, type: :user #arbiratry params targeted to adapter
+      }
+    ]
+    expose: { url_helpers: SimpleHelpers.new }
   })
 
   attributes :id, :name, :email, :birth_date, :links
@@ -70,9 +78,9 @@ class UserSerializer
     "#{object.first_name} #{object.last_name}"
   end
 
-  link :root, '/api/v1/'
-  link :self, ->(obj) { "/api/v1/users/#{obj.id}"}
-  link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/"}
+  link :root, '/api/v1/', collection: true
+  link :self, ->(obj) { "/api/v1/users/#{obj.id}" }
+  link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
 
 end
 ```

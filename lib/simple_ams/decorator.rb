@@ -24,7 +24,7 @@ class SimpleAMS::Decorator
           expose: document.options.exposed
         })
       ),
-      document.relationship_for(name)
+      document.relationship_info_for(name)
     )
   end
 

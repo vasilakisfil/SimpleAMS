@@ -46,7 +46,7 @@ class SimpleAMS::Document
     serializer.class.relationships
   end
 
-  def relationship_for(name)
+  def relationship_info_for(name)
     relationships.find{|i| i.name == name}
   end
 end
