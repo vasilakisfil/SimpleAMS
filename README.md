@@ -61,6 +61,7 @@ class UserSerializer
     expose: { url_helpers: SimpleHelpers.new }
   })
 
+  #but you can use instead the nice DSL that is included ;)
   attributes :id, :name, :email, :birth_date, :links
 
   has_many :videos, :comments, :posts
@@ -81,7 +82,6 @@ class UserSerializer
   link :root, '/api/v1/', collection: true
   link :self, ->(obj) { "/api/v1/users/#{obj.id}" }
   link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
-
 end
 ```
 
