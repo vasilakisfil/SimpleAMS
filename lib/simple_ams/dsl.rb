@@ -25,6 +25,10 @@ module SimpleAMS::DSL
     alias has_one has_many
     alias belongs_to has_many
 
+    def adapter(name = nil, options = {})
+      @adapter ||= {name: name, options: options}
+    end
+
     def relationships
       @relationships || []
     end

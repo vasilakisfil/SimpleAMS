@@ -4,32 +4,21 @@ module SimpleAMS::Adapters
 end
 
 class SimpleAMS::Adapters::AMS
-  attr_reader :decorator
+  attr_reader :document
 
-  def initialize(decorator)
-    @decorator = decorator
+  def initialize(document)
+    @document = document
   end
 
   def as_json
     hash = {}
 
-    decorator.document.fields.each{ |field|
-      value = decorator.field_value(field)
-      if value.respond_to?(:as_json)
-        hash[field] = value.as_json
-      else
-        hash[field] = value
-      end
+    document.fields.each{ |field|
+      hash[field.key] = field.value.as_json
     }
 
-    decorator.document.includes.each{|relation|
-      value = decorator.relation(relation).value
-
-      if value.respond_to?(:as_json)
-        hash[relation] = value.as_json
-      else
-        hash[relation] = value
-      end
+    document.relations.each{|relation|
+      hash[relation.info.name] = relation.value.as_json
     }
 
     return hash
