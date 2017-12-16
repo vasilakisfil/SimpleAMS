@@ -14,7 +14,9 @@ I want this gem to be
 * tested
 * expected behavior on the internals and how it works
 * easy to override if needed pretty much anything
-* I don't think inheritence mode for adapters really works (from my experience in AMS)
+* allow inheritence mode for adapters to actually work by exposing a simple yet power interface to the adapter **and**
+implementing a first class citizen adapter that splits responsibilities in small methods internally,
+considered as _public_ API ready to be overrided at any time
 
 ## Installation
 
