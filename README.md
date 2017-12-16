@@ -37,11 +37,12 @@ The gem's API has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable an
 
 ```ruby
 SimpleAMS::Serializer.new(user, {
+  primary_id: :id,
   includes: [:posts, videos: [:comments]],
   fields: [:id, :name, posts: {:id, :text}, videos: {:id, :title, comments: {:id, :text}}] #overrides includes when association is specified
   serializer: UserSerializer, # can also be a lambda, ideal for polymorphic records
   #serializer: ->(obj){ obj.type.employee? ? EmployeeSerializer : UserSerializer }
-  adapter: [name: :ams, options: { root: true }] #name can also accept the class itself, options are passed to the adapter
+  adapter: [:ams, options: { root: true }] #name can also accept the class itself, options are passed to the adapter
   #adapter: [name: MyAdapter, options: { link: false }} #name can also accept the class itself
   expose: { url_helpers: SimpleHelpers.new },
   links: {
@@ -52,14 +53,20 @@ SimpleAMS::Serializer.new(user, {
 }).to_json
 
 class UserSerializer
+  include SimpleAMS::DSL
+=begin
   include SimpleAMS.with({ #you can pass the same options as above ;)
-    adapter: [
+    primary_id: :id,
+    adapter: {
       name: :ams, options: { #name can also accept the class itself
         root: true, id: :id, type: :user #arbiratry params targeted to adapter
       }
-    ]
+    },
     expose: { url_helpers: SimpleHelpers.new }
   })
+=end
+  adapter :ams, options: {root: true}
+  primary_id :id
 
   #but you can use instead the nice DSL that is included ;)
   attributes :id, :name, :email, :birth_date, :links

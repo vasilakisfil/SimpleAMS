@@ -1,37 +1,23 @@
 require "simple_ams"
 
 class SimpleAMS::Document
-  attr_reader :serializer, :options
+  attr_reader :options, :serializer, :resource
 
   def initialize(options = {})
     @options = options
     @serializer = options.serializer
+    @resource = options.resource
   end
 
   def fields
-    return @fields if defined?(@fields)
-
-    @fields = serializer.class.attributes #allowed fields
-    instance_fields = options.fields
-
-    unless instance_fields.empty?
-      @fields = @fields & instance_fields
-    end
-
-    return @fields
+    return @fields ||= self.class::Fields.new(options)
   end
 
-  def includes
-    return @includes if defined?(@includes)
+  def relations
+    return @includes ||= self.class::Relations.new(options)
+  end
 
-    @includes = serializer.class.relationships.map(&:name)
-
-    instance_includes = options.includes
-    unless instance_includes.empty? || instance_includes.nil?
-      @includes = @includes & instance_includes
-    end
-
-    return @includes
+  def relation(name)
   end
 
   def links
@@ -40,13 +26,5 @@ class SimpleAMS::Document
 
   def meta
     {}
-  end
-
-  def relationships
-    serializer.class.relationships
-  end
-
-  def relationship_info_for(name)
-    relationships.find{|i| i.name == name}
   end
 end
