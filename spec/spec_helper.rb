@@ -1,5 +1,15 @@
 require "bundler/setup"
-require "SimpleAMS"
+require "simple_ams"
+require 'date'
+require 'securerandom'
+require 'faker'
+require 'pry'
+
+Dir[
+  Pathname(
+    File.expand_path(File.dirname(__FILE__))
+  ).join('support/**/*.rb')
+].each { |f| require f }
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -10,5 +20,11 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+end
+
+RSpec.configure do |config|
+  config.after(:each) do
+    Helpers.reset!(User)
   end
 end

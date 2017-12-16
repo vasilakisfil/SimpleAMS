@@ -6,9 +6,19 @@ module SimpleAMS::DSL
   end
 
   module ClassMethods
+    #TODO: raise error if options are given outside `options` key
+    #same for other ValueHashes
+    def adapter(name = nil, options = {})
+      @adapter ||= SimpleAMS::Options::Adapter.new(name || :ams, options)
+    end
+
+    def primary_id(value = nil)
+      @primary_id ||= SimpleAMS::Options::PrimaryId.new(value || :id)
+    end
+
     def attributes(*args)
       if args&.empty? || args.nil?
-        return @attributes
+        return @attributes ||= SimpleAMS::Options::Fields.new([])
       end
 
       append_attributes(args)
@@ -16,21 +26,48 @@ module SimpleAMS::DSL
     alias attribute attributes
 
     def relationship(name, relation, options)
-      SimpleAMS::Relationship::Info.new(name, relation, options)
+      SimpleAMS::Options::Relation.new(name, relation, options)
     end
 
     def has_many(name, options = {})
       append_relationship(relationship(name, __method__, options))
     end
-    alias has_one has_many
-    alias belongs_to has_many
 
-    def adapter(name = nil, options = {})
-      @adapter ||= {name: name, options: options}
+    def has_one(name, options = {})
+      append_relationship(relationship(name, __method__, options))
+    end
+
+    def belongs_to(name, options = {})
+      append_relationship(relationship(name, __method__, options))
     end
 
     def relationships
       @relationships || []
+    end
+
+    #TODO: no memoization here!
+    #Consider fixing it by employing an observer that will clean the instance var
+    #each time @relationships is updated
+    def includes
+      SimpleAMS::Options::Includes.new(relationships.map(&:name))
+    end
+
+    def link(name, value, options = {})
+      append_link(name => [value, options])
+    end
+
+    def meta(name = nil, value = nil, options = {})
+      if name == nil
+        return @meta
+      else
+        #TODO: should it check empty value ?
+        append_meta(name => [value, options])
+      end
+    end
+
+    #TODO: Add block version
+    def links
+      @links
     end
 
     private
@@ -41,9 +78,25 @@ module SimpleAMS::DSL
       end
 
       def append_attributes(*attrs)
-        @attributes = [] unless defined?(@attributes)
+        if not defined?(@attributes)
+          @attributes = SimpleAMS::Options::Fields.new([])
+        end
 
-        @attributes = (@attributes << attrs).flatten.compact
+        @attributes = SimpleAMS::Options::Fields.new(
+          (@attributes << attrs).flatten.compact
+        )
+      end
+
+      def append_link(link)
+        @links = [] unless defined?(@links)
+
+        @links << link
+      end
+
+      def append_meta(meta)
+        @meta = [] unless defined?(@meta)
+
+        @meta << meta
       end
   end
 end

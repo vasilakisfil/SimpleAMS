@@ -41,17 +41,31 @@ The gem's API has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable an
 SimpleAMS::Serializer.new(user, {
   primary_id: :id,
   includes: [:posts, videos: [:comments]],
-  fields: [:id, :name, posts: {:id, :text}, videos: {:id, :title, comments: {:id, :text}}] #overrides includes when association is specified
+  fields: [:id, :name, posts: [:id, :text], videos: [:id, :title, comments: [:id, :text]]] #overrides includes when association is specified
   serializer: UserSerializer, # can also be a lambda, ideal for polymorphic records
   #serializer: ->(obj){ obj.type.employee? ? EmployeeSerializer : UserSerializer }
   adapter: [:ams, options: { root: true }] #name can also accept the class itself, options are passed to the adapter
   #adapter: [name: MyAdapter, options: { link: false }} #name can also accept the class itself
-  expose: { url_helpers: SimpleHelpers.new },
   links: {
-    root: { value: '/api/v1/', collection: true }
-    self: { value: ->(obj) { "/api/v1/users/#{obj.id}" } }
-    posts: { value: ->(obj) { "/api/v1/users/#{obj.id}/posts/" } }
+    self: ->(obj) { "/api/v1/users/#{obj.id}" }
+    posts: [->(obj) { "/api/v1/users/#{obj.id}/posts/"}, options: {collection: true}}
+  },
+  meta: {
+    type: :user
+  },
+  collection: {
+    links: {
+      root: '/api/v1'
+    },
+    meta: {
+      pages: [->(obj) { obj.pages }, options: {collection: true}],
+      current_page: [->(obj) { obj.current_page }, options: {collection: true}],
+      previous_page: [->(obj) { obj.previous_page }, options: {collection: true}],
+      next_page: [->(obj) { obj.next_page }, options: {collection: true}],
+      max_per_page: 50,
+    },
   }
+  expose: { url_helpers: SimpleHelpers.new },
 }).to_json
 
 class UserSerializer
@@ -88,7 +102,7 @@ class UserSerializer
     "#{object.first_name} #{object.last_name}"
   end
 
-  link :root, '/api/v1/', collection: true
+  link :root, '/api/v1/', options: {collection: true}
   link :self, ->(obj) { "/api/v1/users/#{obj.id}" }
   link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
 end
