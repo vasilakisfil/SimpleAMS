@@ -6,7 +6,7 @@ module SimpleAMS
 
     def initialize(options)
       @options = options
-      @members = options.includes #[:field1, :field2]
+      @relations = options.relations
       @serializer = options.serializer
       @resource = options.resource
     end
@@ -18,31 +18,31 @@ module SimpleAMS
     def each(&block)
       return enum_for(:each) unless block_given?
 
-      members.each{ |name|
-        yield relation_for(name)
+      relations.each{ |relation|
+        yield relation_for(relation)
       }
 
       self
     end
 
     private
-      attr_reader :members, :options, :serializer, :resource
+      attr_reader :options, :relations, :serializer, :resource
 
-      def relation_for(name)
-        return {} unless relationship_info_for(name)
-
+      def relation_for(relation)
+        binding.pry
         SimpleAMS::Relationship.new(
           SimpleAMS::Serializer.new(
-            relation(name),
-            relationship_info_for(name).options.merge({
+            relation_value(relation.name),
+            relation.options.merge({
               expose: options.exposed
             })
           ),
-          relationship_info_for(name)
+          relation
         )
       end
 
-      def relation(name)
+      #TODO: rename that to relation and existing relation to relationship
+      def relation_value(name)
         if serializer.respond_to?(name)
           serializer.send(name)
         else
@@ -50,12 +50,9 @@ module SimpleAMS
         end
       end
 
-      def relationships
-        serializer.class.relationships
-      end
-
       def relationship_info_for(name)
-        relationships.find{|i| i.name == name}
+        binding.pry
+        relations.find{|i| i.name == name}
       end
   end
 end

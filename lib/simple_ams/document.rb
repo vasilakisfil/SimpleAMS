@@ -1,5 +1,6 @@
 require "simple_ams"
 
+#TODO: we also need the includes in here
 class SimpleAMS::Document
   attr_reader :options, :serializer, :resource
 
@@ -14,7 +15,7 @@ class SimpleAMS::Document
   end
 
   def relations
-    return @includes ||= self.class::Relations.new(options)
+    return @relations ||= self.class::Relations.new(options)
   end
 
   def relation(name)
