@@ -12,7 +12,7 @@ module SimpleAMS
     end
 
     def as_json
-      options.adapter.new(document).as_json
+      options.adapter.klass.new(document).as_json
     end
 
     def to_json

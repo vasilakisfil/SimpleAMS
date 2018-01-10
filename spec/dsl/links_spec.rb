@@ -1,36 +1,40 @@
 require "spec_helper"
 
-RSpec.describe SimpleAMS::DSL do
-  describe "links" do
-    context "with one link" do
-      before do
-        @link = Elements.link
-        User.link(*@link.as_input)
-      end
+RSpec.describe SimpleAMS::DSL, 'links' do
+  context "with no links" do
+    it "returns an empty array" do
+      expect(UserSerializer.links).to eq []
+    end
+  end
 
-      it "holds the specified options" do
-        expect(User.links.count).to eq 1
-        expect(User.links.first.keys.first).to eq @link.name
-        expect(User.links.first.values.first.first).to eq @link.value
-        expect(User.links.first.values.first.last).to eq @link.options
-      end
+  context "with one link" do
+    before do
+      @link = Elements.link
+      UserSerializer.link(*@link.as_input)
     end
 
-    context "with multiple links" do
-      before do
-        @links = (rand(10) + 2).times.map{ Elements.link }
-        @links.each{|link|
-          User.link(*link.as_input)
-        }
-      end
+    it "holds the specified link" do
+      expect(UserSerializer.links.count).to eq 1
+      expect(UserSerializer.links.first.name).to eq @link.name.to_sym
+      expect(UserSerializer.links.first.value).to eq @link.value
+      expect(UserSerializer.links.first.options).to eq @link.options
+    end
+  end
 
-      it "holds the specified options" do
-        expect(User.links.count).to eq @links.count
-        User.links.each_with_index do |link, index|
-          expect(link.keys.first).to eq @links[index].name
-          expect(link.values.first.first).to eq @links[index].value
-          expect(link.values.first.last).to eq @links[index].options
-        end
+  context "with multiple links" do
+    before do
+      @links = (rand(10) + 2).times.map{ Elements.link }
+      @links.each{|link|
+        UserSerializer.link(*link.as_input)
+      }
+    end
+
+    it "holds the specified links" do
+      expect(UserSerializer.links.count).to eq @links.count
+      UserSerializer.links.each_with_index do |link, index|
+        expect(link.name).to eq @links[index].name.to_sym
+        expect(link.value).to eq @links[index].value
+        expect(link.options).to eq @links[index].options
       end
     end
   end

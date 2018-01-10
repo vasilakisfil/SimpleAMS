@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 class User
-  include SimpleAMS::DSL
   class << self
     def model_attributes
       @attributes ||= User.instance_methods(false)

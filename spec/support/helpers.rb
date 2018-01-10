@@ -1,6 +1,6 @@
 module Helpers
   def self.reset!(resource)
-    [:@attributes, :@relationships, :@links, :@meta, :@adapter, :@primary_id].each do |var|
+    [:@attributes, :@relationships, :@links, :@metas, :@adapter, :@primary_id, :@type].each do |var|
       if resource.instance_variable_defined?(var)
         resource.remove_instance_variable(var)
       end
@@ -9,12 +9,13 @@ module Helpers
 
   def self.random_options
     {
+      type: :user,
       primary_id: Options.single,
       includes: Options.array,
       fields: Options.array,
       links: {
-        self: [->(obj) { "/api/v1/users/#{obj.id}" }],
-        posts: [->(obj) { "/api/v1/users/#{obj.id}/posts/"}]
+        self: "/api/v1/users/1",
+        posts: ["/api/v1/users/1/posts/", options: {collection: true}]
       },
       meta: Options.hash,
       collection: {
@@ -23,6 +24,24 @@ module Helpers
         },
         meta: Options.hash
       }
+    }
+  end
+
+  def self.random_options_with(opts = {})
+    options = random_options
+    return options.merge(opts)
+  end
+
+  #not that random..
+  def self.random_relations_with_types
+    {
+      microposts: :has_many,
+      followers: :has_many,
+      followings: :has_many,
+      unit: :belongs_to,
+      area: :belongs_to,
+      address: :has_one,
+      house: :has_one
     }
   end
 
@@ -94,4 +113,7 @@ module Helpers
         random_hash.merge(single => random_hash)
       end
   end
+
+  class Adapter1; end
+  class Adapter2; end
 end
