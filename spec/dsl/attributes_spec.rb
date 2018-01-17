@@ -1,15 +1,21 @@
 require "spec_helper"
 
-RSpec.describe SimpleAMS::DSL do
-  context "attributes" do
+RSpec.describe SimpleAMS::DSL, 'attributes' do
+  context "with no relations" do
+    it "returns an empty array" do
+      expect(UserSerializer.attributes).to eq []
+    end
+  end
+
+  context "with attributes specified" do
     before do
       @attrs = Helpers::Options.array
-      User.attributes(*@attrs)
+      UserSerializer.attributes(*@attrs)
     end
 
-    it "holds the specified options" do
-      expect(User.attributes).to eq @attrs
-      expect(User.relationships).to eq []
+    it "holds the attributes specified" do
+      expect(UserSerializer.attributes).to eq @attrs
+      expect(UserSerializer.relationships).to eq []
     end
   end
 end

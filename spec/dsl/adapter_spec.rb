@@ -1,37 +1,37 @@
 require "spec_helper"
 
-RSpec.describe SimpleAMS::DSL do
-  describe "adapter" do
-    context "without specifying adapter" do
-      before do
-      end
-
-      it "holds the specified options" do
-        expect(User.adapter.name).to eq :ams
-      end
+RSpec.describe SimpleAMS::DSL, 'adapter' do
+  context "without specifying adapter" do
+    before do
     end
 
-    context "plain" do
-      before do
-        @adapter_options = Elements.adapter(options: {})
-        User.adapter(*@adapter_options.as_input)
-      end
+    it "returns the default adapter (AMS)" do
+      expect(UserSerializer.adapter.name).to eq SimpleAMS::Adapters::AMS
+    end
+  end
 
-      it "holds the specified options" do
-        expect(User.adapter.name).to eq @adapter_options.name.to_sym
-      end
+  context "with plain adapter name" do
+    before do
+      @adapter_options = Elements.adapter(value: OpenStruct, options: {})
+      UserSerializer.adapter(*@adapter_options.as_input)
     end
 
-    context "with options" do
-      before do
-        @adapter_options = Elements.adapter
-        User.adapter(*@adapter_options.as_input)
-      end
+    it "holds the adapter name" do
+      expect(UserSerializer.adapter.name).to eq @adapter_options.name
+    end
+  end
 
-      it "holds the specified options" do
-        expect(User.adapter.name).to eq @adapter_options.name.to_sym
-        expect(User.adapter.options).to eq @adapter_options.options
-      end
+  context "with options for the adapter" do
+    before do
+      @adapter_options = Elements.adapter(
+        value: OpenStruct, options: Helpers::Options.hash
+      )
+      UserSerializer.adapter(*@adapter_options.as_input)
+    end
+
+    it "holds the specified options" do
+      expect(UserSerializer.adapter.name).to eq @adapter_options.name
+      expect(UserSerializer.adapter.options).to eq @adapter_options.options
     end
   end
 end

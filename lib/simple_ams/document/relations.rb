@@ -29,11 +29,17 @@ module SimpleAMS
       attr_reader :options, :relations, :serializer, :resource
 
       def relation_for(relation)
-        binding.pry
-        SimpleAMS::Relationship.new(
+        Relationship.new(
           SimpleAMS::Serializer.new(
             relation_value(relation.name),
-            relation.options.merge({
+            #TODO: this part here needs some work
+            #3 options are merged:
+            # *user injected when instantiating the SimpleAMS class
+            # *relation options injected from parent serializer
+            # *serializer class options
+            merged_options(
+              relation.options, options.injected_options_for(relation.name)
+            ).merge({
               expose: options.exposed
             })
           ),
@@ -51,8 +57,28 @@ module SimpleAMS
       end
 
       def relationship_info_for(name)
-        binding.pry
         relations.find{|i| i.name == name}
+      end
+
+      #merges the injected, along with the parent serializer injected options
+      #probably needs better work, maybe exploit existing Options class?
+      def merged_options(parent_options, injected_options)
+        elements = [:fields, :includes, :links, :metas, :type]
+        #does this really work for deep deep options?
+        _options = parent_options.dup
+
+        elements.each do |key|
+          _options[key] = (parent_options[key] || []) & (injected_options[key] || [])
+        end
+
+        return _options
+      end
+
+      #we might need to move this somewhere else
+      class Relationship
+        include SimpleAMS::Options::Concerns::ValueHash
+
+        alias_method :info, :options
       end
   end
 end

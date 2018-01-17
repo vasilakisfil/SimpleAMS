@@ -12,11 +12,14 @@ I want this gem to be
 * super clean code, sane metaprogramming
 * excellent documentation
 * tested
-* expected behavior on the internals and how it works
+* expected behavior on how the internals work
 * easy to override if needed pretty much anything
 * allow inheritence mode for adapters to actually work by exposing a simple yet power interface to the adapter **and**
 implementing a first class citizen adapter that splits responsibilities in small methods internally,
 considered as _public_ API ready to be overrided at any time
+
+It turned out that writting a serializers gem is a bit more complex than what I initially thought.
+However with initial well thought design, I managed to achieve my initial requirements and goals, mentioned above :)
 
 ## Installation
 
@@ -40,15 +43,16 @@ The gem's API has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable an
 ```ruby
 SimpleAMS::Serializer.new(user, {
   primary_id: :id,
+  type: :user,
   includes: [:posts, videos: [:comments]],
   fields: [:id, :name, posts: [:id, :text], videos: [:id, :title, comments: [:id, :text]]] #overrides includes when association is specified
   serializer: UserSerializer, # can also be a lambda, ideal for polymorphic records
   #serializer: ->(obj){ obj.type.employee? ? EmployeeSerializer : UserSerializer }
-  adapter: [:ams, options: { root: true }] #name can also accept the class itself, options are passed to the adapter
+  adapter: [SimpleAMS::Adapters::AMS, options: { root: true }] #name can also accept the class itself, options are passed to the adapter
   #adapter: [name: MyAdapter, options: { link: false }} #name can also accept the class itself
   links: {
     self: ->(obj) { "/api/v1/users/#{obj.id}" }
-    posts: [->(obj) { "/api/v1/users/#{obj.id}/posts/"}, options: {collection: true}}
+    posts: [->(obj) { "/api/v1/users/#{obj.id}/posts/"}, options: {collection: true}]
   },
   meta: {
     type: :user
@@ -70,26 +74,27 @@ SimpleAMS::Serializer.new(user, {
 
 class UserSerializer
   include SimpleAMS::DSL
-=begin
-  include SimpleAMS.with({ #you can pass the same options as above ;)
+
+  with_options({ #you can pass the same options as above ;)
     primary_id: :id,
     adapter: {
-      name: :ams, options: { #name can also accept the class itself
-        root: true, id: :id, type: :user #arbiratry params targeted to adapter
+      name: SimpleAMS::Adapters::AMS, options: {
+        root: true, #arbiratry params targeted to adapter
       }
     },
     expose: { url_helpers: SimpleHelpers.new }
   })
-=end
-  adapter :ams, options: {root: true}
+
+  #but you can use instead this nice DSL which is included for free ;)
+  adapter SimpleAMS::Adapters::AMS, options: {root: true}
+  type :user
   primary_id :id
 
-  #but you can use instead the nice DSL that is included ;)
   attributes :id, :name, :email, :birth_date, :links
 
   has_many :videos, :comments, :posts
   belongs_to :organization
-  has_one :profile, {
+  has_one :profile, options: { #again same options (except adapter)
     includes: [:address],
     fields: [:id, :settings, address: {:country}}] #overrides includes when association is specified
     serializer: UserSerializer,
@@ -107,6 +112,7 @@ class UserSerializer
   link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
 end
 ```
++Explain the logic behind it (why allowed properties + injected properties instead of an if inside serializers).
 
 ## Development
 
@@ -117,3 +123,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/vasilakisfil/foo.
+
+## TODO
++ add type param
++ finish options tests
++ review spec/support infrastructure
++ start document tests
