@@ -1,7 +1,7 @@
 require "spec_helper"
 
 #TODO: Add tests for injected relationships
-RSpec.describe "SimpleAMS::Options#includes" do
+RSpec.describe SimpleAMS::Options, "includes" do
   context "with no reations in general" do
     before do
       @options = SimpleAMS::Options.new(
@@ -77,9 +77,7 @@ RSpec.describe "SimpleAMS::Options#includes" do
       @allowed_relations.each do |rel, type|
         UserSerializer.send(type, rel, options: Helpers.random_options)
       end
-      @injected_relations = @allowed_relations.keys.sample(
-        0#rand(@allowed_relations.keys.length)
-      )
+      @injected_relations = Helpers.pick(@allowed_relations.keys)
       @options = SimpleAMS::Options.new(
         User.new,
         Helpers.random_options_with({
@@ -106,9 +104,7 @@ RSpec.describe "SimpleAMS::Options#includes" do
           UserSerializer.send(type, rel, options: Helpers.random_options)
         end
       }
-      @injected_relations = @allowed_relations.keys.sample(
-        0#rand(@allowed_relations.keys.length)
-      )
+      @injected_relations = Helpers.pick(@allowed_relations.keys)
       @options = SimpleAMS::Options.new(
         User.new,
         Helpers.random_options_with({

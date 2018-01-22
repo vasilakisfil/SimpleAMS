@@ -21,6 +21,8 @@ require "simple_ams/options/relation"
 
 require "simple_ams/document/fields"
 require "simple_ams/document/relations"
+require "simple_ams/document/links"
+require "simple_ams/document/metas"
 
 module SimpleAMS
 end

@@ -47,7 +47,7 @@ SimpleAMS::Serializer.new(user, {
   includes: [:posts, videos: [:comments]],
   fields: [:id, :name, posts: [:id, :text], videos: [:id, :title, comments: [:id, :text]]] #overrides includes when association is specified
   serializer: UserSerializer, # can also be a lambda, ideal for polymorphic records
-  #serializer: ->(obj){ obj.type.employee? ? EmployeeSerializer : UserSerializer }
+  #serializer: ->(obj){ obj.type.employee? ? EmployeeSerializer : UserSerializer } TODO: <-- this should move to collection serializer !!
   adapter: [SimpleAMS::Adapters::AMS, options: { root: true }] #name can also accept the class itself, options are passed to the adapter
   #adapter: [name: MyAdapter, options: { link: false }} #name can also accept the class itself
   links: {
@@ -61,7 +61,7 @@ SimpleAMS::Serializer.new(user, {
     links: {
       root: '/api/v1'
     },
-    meta: {
+    metas: {
       pages: [->(obj) { obj.pages }, options: {collection: true}],
       current_page: [->(obj) { obj.current_page }, options: {collection: true}],
       previous_page: [->(obj) { obj.previous_page }, options: {collection: true}],

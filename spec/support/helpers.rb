@@ -1,4 +1,17 @@
 module Helpers
+  def self.pick(array)
+    array.sample(rand(array.length))
+  end
+
+  def self.initialize_with_overrides(serializer_klass, allowed: nil)
+    model_klass = Object.const_get(serializer_klass.to_s.gsub("Serializer",""))
+    overrides = Helpers.pick(allowed || model_klass.model_attributes)
+    serializer_klass.with_overrides(overrides)
+    serializer_klass.attributes(*(allowed || model_klass.model_attributes))
+
+    return overrides
+  end
+
   def self.reset!(resource)
     [:@attributes, :@relationships, :@links, :@metas, :@adapter, :@primary_id, :@type].each do |var|
       if resource.instance_variable_defined?(var)
@@ -7,12 +20,13 @@ module Helpers
     end
   end
 
+  #not that random..
   def self.random_options
     {
       type: :user,
-      primary_id: Options.single,
-      includes: Options.array,
-      fields: Options.array,
+      primary_id: :id,
+      includes: Helpers.pick(User.relation_names),
+      fields: Helpers.pick(User.model_attributes),
       links: {
         self: "/api/v1/users/1",
         posts: ["/api/v1/users/1/posts/", options: {collection: true}]
@@ -34,14 +48,9 @@ module Helpers
 
   #not that random..
   def self.random_relations_with_types
-    {
-      microposts: :has_many,
-      followers: :has_many,
-      followings: :has_many,
-      unit: :belongs_to,
-      area: :belongs_to,
-      address: :has_one,
-      house: :has_one
+    User.relations.inject({}){|memo, relation|
+      memo[relation.name] = relation.type
+      memo
     }
   end
 

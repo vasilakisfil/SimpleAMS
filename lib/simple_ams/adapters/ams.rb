@@ -18,7 +18,7 @@ class SimpleAMS::Adapters::AMS
     }
 
     document.relations.each{|relation|
-      hash[relation.info.name] = relation.value.as_json
+      hash[relation.name] = relation.as_json
     }
 
     return hash

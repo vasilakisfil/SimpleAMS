@@ -1,19 +1,32 @@
 require "spec_helper"
 
 #TODO: add tests for block case in the serializer
-RSpec.describe SimpleAMS::Options, 'links' do
+RSpec.describe SimpleAMS::Document, 'links' do
   context "with no links in general" do
     before do
-      @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
-          serializer: UserSerializer,
-        }).tap{|h| h.delete(:links)}
+      @document = SimpleAMS::Document.new(
+          SimpleAMS::Options.new(
+          User.new,
+          Helpers.random_options_with({
+            serializer: UserSerializer,
+          }).tap{|h| h.delete(:links)}
+        )
       )
     end
 
-    it "returns empty links array" do
-      expect(@options.links).to eq []
+    describe "members" do
+      it "returns an empty array" do
+        expect(@document.links.members).to eq []
+      end
+    end
+
+    describe "values" do
+      it "returns an empty array" do
+        expect(@document.links).to respond_to(:each)
+        @document.links.each do |field|
+          fail('this should never happen as fields should be empty')
+        end
+      end
     end
   end
 
@@ -24,20 +37,28 @@ RSpec.describe SimpleAMS::Options, 'links' do
         UserSerializer.link(*link.as_input)
       end
 
-      @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
-          serializer: UserSerializer
-        }).tap{|h| h.delete(:links)}
+      @document = SimpleAMS::Document.new(
+        SimpleAMS::Options.new(
+          User.new,
+          Helpers.random_options_with({
+            serializer: UserSerializer
+          }).tap{|h| h.delete(:links)}
+        )
       )
 
       @uniq_allowed_links = @allowed_links.uniq{|l| l.name}
     end
 
+    describe "members" do
+      it "returns an empty array" do
+        expect(@document.links.members).not_to eq []
+      end
+    end
+
     it "returns the allowed ones" do
-      expect(@options.links.map(&:name)).to eq @uniq_allowed_links.map(&:name)
-      expect(@options.links.map(&:value)).to eq @uniq_allowed_links.map(&:value)
-      expect(@options.links.map(&:options)).to eq @uniq_allowed_links.map(&:options)
+      expect(@document.links.map(&:name)).to eq @uniq_allowed_links.map(&:name)
+      expect(@document.links.map(&:value)).to eq @uniq_allowed_links.map(&:value)
+      expect(@document.links.map(&:options)).to eq @uniq_allowed_links.map(&:options)
     end
   end
 
@@ -48,32 +69,58 @@ RSpec.describe SimpleAMS::Options, 'links' do
         UserSerializer.link(*link.as_input)
       end
 
-      @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
-          serializer: UserSerializer,
-          links: []
-        })
+      @document = SimpleAMS::Document.new(
+        SimpleAMS::Options.new(
+          User.new,
+          Helpers.random_options_with({
+            serializer: UserSerializer,
+            links: []
+          })
+        )
       )
     end
 
-    it "returns empty links array" do
-      expect(@options.links).to eq []
+    describe "members" do
+      it "returns an empty array" do
+        expect(@document.links.members).to eq []
+      end
+    end
+
+    describe "values" do
+      it "returns an empty array" do
+        expect(@document.links).to respond_to(:each)
+        @document.links.each do |field|
+          fail('this should never happen as fields should be empty')
+        end
+      end
     end
   end
 
   context "with no allowed links but injected ones" do
     before do
-      @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
-          serializer: UserSerializer,
-        })
+      @document = SimpleAMS::Document.new(
+        SimpleAMS::Options.new(
+          User.new,
+          Helpers.random_options_with({
+            serializer: UserSerializer,
+          })
+        )
       )
     end
 
-    it "returns empty links array" do
-      expect(@options.links).to eq []
+    describe "members" do
+      it "returns an empty array" do
+        expect(@document.links.members).to eq []
+      end
+    end
+
+    describe "values" do
+      it "returns an empty array" do
+        expect(@document.links).to respond_to(:each)
+        @document.links.each do |field|
+          fail('this should never happen as fields should be empty')
+        end
+      end
     end
   end
 
@@ -91,14 +138,16 @@ RSpec.describe SimpleAMS::Options, 'links' do
         serializer: UserSerializer,
         links: @injected_links
       })
-      @options = SimpleAMS::Options.new(
-        User.new,
-        injected_options
+      @document = SimpleAMS::Document.new(
+        SimpleAMS::Options.new(
+          User.new,
+          injected_options
+        )
       )
     end
 
     it "holds the uniq union of injected and allowed links" do
-      links_got = @options.links
+      links_got = @document.links
       links_expected = (@allowed_links + Elements.as_elements_for(
         @injected_links, klass: Elements::Link
       )).uniq{|q| q.name}.select{|l|
@@ -127,14 +176,16 @@ RSpec.describe SimpleAMS::Options, 'links' do
         serializer: UserSerializer,
         links: @injected_links
       })
-      @options = SimpleAMS::Options.new(
-        User.new,
-        injected_options
+      @document = SimpleAMS::Document.new(
+        SimpleAMS::Options.new(
+          User.new,
+          injected_options
+        )
       )
     end
 
     it "holds the uniq union of injected and allowed links" do
-      links_got = @options.links
+      links_got = @document.links
       links_expected = (@allowed_links + Elements.as_elements_for(
         @injected_links, klass: Elements::Link
       )).uniq{|q| q.name}.select{|l|
