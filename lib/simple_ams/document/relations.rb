@@ -62,8 +62,23 @@ module SimpleAMS
       #probably needs better work, maybe exploit existing Options class?
       def merged_options(parent_options, injected_options, relation_name)
         #does this really work for deep deep options?
-        _options = injected_options.dup.merge(parent_options.dup)
-        _options[:name] = (parent_options[:name] || relation_name || injected_options[:name])
+        _options = {}
+
+        (injected_options.keys + parent_options.keys).each do |key|
+          next if parent_options[key].nil? && injected_options[key].nil?
+
+          if parent_options[key].kind_of?(Hash) || injected_options[key].kind_of?(Hash)
+            _options[key] = (parent_options[key] || {}).merge(injected_options[key] || {})
+          elsif parent_options[key].kind_of?(Array) || injected_options[key].kind_of?(Array)
+            _options[key] = (parent_options[key] || []) & (injected_options[key] || [])
+            _options[key] = nil if _options[key].empty?
+          elsif key == :name
+            _options[key] = (parent_options[key] || relation_name || injected_options[key])
+          else
+            _options[key] = (parent_options[key] || injected_options[key])
+          end
+        end
+
         return _options
       end
   end
