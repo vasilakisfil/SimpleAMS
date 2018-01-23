@@ -11,8 +11,13 @@ RSpec.describe SimpleAMS::Options, 'type' do
       )
     end
 
-    it "returns the default type" do
-      expect(@options.type.name).to eq nil
+    it "defaults to class name" do
+      expect(@options.type.name).to eq User.to_s.downcase.to_sym
+      expect(@options.name).to eq @options.type.name
+    end
+
+    it "updates name correctly" do
+      expect(@options.name).to eq @options.type.name
     end
   end
 
@@ -32,6 +37,10 @@ RSpec.describe SimpleAMS::Options, 'type' do
     it "returns the type specified" do
       expect(@options.type.name).to eq :a_type
       expect(@options.type.options).to eq({foo: :bar})
+    end
+
+    it "updates name correctly" do
+      expect(@options.name).to eq @options.type.name
     end
   end
 
@@ -54,6 +63,10 @@ RSpec.describe SimpleAMS::Options, 'type' do
     it "returns the injected type specified" do
       expect(@options.type.name).to eq @type.value
       expect(@options.type.options).to eq(@type.options)
+    end
+
+    it "updates name correctly" do
+      expect(@options.name).to eq @options.type.name
     end
   end
 end

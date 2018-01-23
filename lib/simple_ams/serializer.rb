@@ -3,12 +3,17 @@ require "simple_ams"
 module SimpleAMS
   class Serializer
     def initialize(resource, options = {})
-      @resource, @options = resource, SimpleAMS::Options.new(resource, options)
+      @resource = resource
+      @options = SimpleAMS::Options.new(resource, options)
     end
 
     #resource decorator ?
     def document
       @document ||= SimpleAMS::Document.new(options)
+    end
+
+    def name
+      @options.name
     end
 
     def as_json

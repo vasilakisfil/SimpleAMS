@@ -18,14 +18,19 @@ class SimpleAMS::Document
     return @relations ||= self.class::Relations.new(options)
   end
 
-  def relation(name)
+  def name
+    options.name
+  end
+
+  def type
+    options.type
   end
 
   def links
-    {}
+    return @links ||= self.class::Links.new(options)
   end
 
-  def meta
-    {}
+  def metas
+    return @metas ||= self.class::Metas.new(options)
   end
 end

@@ -4,6 +4,8 @@ module SimpleAMS
   class Document::Fields
     include Enumerable
 
+    attr_reader :members
+
     def initialize(options)
       @options = options
       @members = options.fields #[:field1, :field2]
@@ -24,17 +26,17 @@ module SimpleAMS
     end
 
     private
-      attr_reader :members, :options
+      attr_reader :options
 
       def with_decorator(key)
-        Decorator.new(
+        Field.new(
           options.resource,
           options.serializer,
           key
         )
       end
 
-      class Decorator
+      class Field
         attr_reader :key
 
         #do we need to inject the whole options object?
