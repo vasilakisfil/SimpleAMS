@@ -4,7 +4,7 @@ require "simple_ams"
 class SimpleAMS::Document
   attr_reader :options, :serializer, :resource
 
-  def initialize(options = {})
+  def initialize(options = SimpleAMS::Options.new)
     @options = options
     @serializer = options.serializer
     @resource = options.resource

@@ -15,9 +15,7 @@ RSpec.describe SimpleAMS::DSL, 'meta' do
 
     it "holds the specified meta" do
       expect(UserSerializer.metas.count).to eq 1
-      expect(UserSerializer.metas.first.name).to eq @meta.name
-      expect(UserSerializer.metas.first.value).to eq @meta.value
-      expect(UserSerializer.metas.first.options).to eq @meta.options
+      expect(UserSerializer.metas.first).to eq @meta.as_input
     end
   end
 
@@ -32,9 +30,9 @@ RSpec.describe SimpleAMS::DSL, 'meta' do
     it "holds the specified metas" do
       expect(UserSerializer.metas.count).to eq @meta.count
       UserSerializer.metas.each_with_index do |meta, index|
-        expect(meta.name).to eq @meta[index].name
-        expect(meta.value).to eq @meta[index].value
-        expect(meta.options).to eq @meta[index].options
+        expect(meta).to eq @meta[index].as_input
+        #just in case
+        expect(meta).to eq [@meta[index].name, @meta[index].value, options: @meta[index].options]
       end
     end
   end

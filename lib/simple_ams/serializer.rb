@@ -4,7 +4,9 @@ module SimpleAMS
   class Serializer
     def initialize(resource, options = {})
       @resource = resource
-      @options = SimpleAMS::Options.new(resource, options)
+      @options = SimpleAMS::Options.new(
+        resource: resource, injected_options: options
+      )
     end
 
     #resource decorator ?
@@ -30,7 +32,9 @@ module SimpleAMS
 
   class ArraySerializer
     def initialize(collection, options = {})
-      @collection, @options = resource, SimpleAMS::Options.new(resource, options)
+      @collection, @options = resource, SimpleAMS::Options.new(
+        resource: resource, injected_options: options
+      )
     end
 
     def document

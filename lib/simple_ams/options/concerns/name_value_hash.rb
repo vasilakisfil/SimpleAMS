@@ -11,6 +11,10 @@ class SimpleAMS::Options
         @options = options[:options] || {}
       end
 
+      def raw
+        [name, value, {options: options}]
+      end
+
       private
         attr_writer :name, :value, :options
     end

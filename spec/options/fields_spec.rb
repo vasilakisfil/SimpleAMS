@@ -4,8 +4,8 @@ RSpec.describe SimpleAMS::Options, 'fields' do
   context "with no fields in general" do
     before do
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer
         }).tap{|h| h.delete(:fields)}
       )
@@ -21,8 +21,8 @@ RSpec.describe SimpleAMS::Options, 'fields' do
       @allowed_fields = Helpers::Options.array
       UserSerializer.attributes(*@allowed_fields)
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer
         }).tap{|h| h.delete(:fields)}
       )
@@ -38,8 +38,8 @@ RSpec.describe SimpleAMS::Options, 'fields' do
       @allowed_fields = Helpers::Options.array
       UserSerializer.attributes(*@allowed_fields)
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
           fields: []
         })
@@ -59,8 +59,8 @@ RSpec.describe SimpleAMS::Options, 'fields' do
         serializer: UserSerializer
       })
       @options = SimpleAMS::Options.new(
-        User.new,
-        @injected_options,
+        resource: User.new,
+        injected_options: @injected_options,
       )
     end
 
@@ -83,8 +83,8 @@ RSpec.describe SimpleAMS::Options, 'fields' do
         fields: injected_fields.concat(injected_fields)
       })
       @options = SimpleAMS::Options.new(
-        User.new,
-        @injected_options,
+        resource: User.new,
+        injected_options: @injected_options,
       )
     end
 

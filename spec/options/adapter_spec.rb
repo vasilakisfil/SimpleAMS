@@ -4,8 +4,8 @@ RSpec.describe SimpleAMS::Options, 'adapter' do
   context "with no adapter is specified" do
     before do
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
         }).tap{|h| h.delete(:adapter)}
       )
@@ -18,41 +18,43 @@ RSpec.describe SimpleAMS::Options, 'adapter' do
 
   context "with no injected adapter" do
     before do
-      @adapter = Elements.adapter(value: Helpers::Adapter1, options: {foo: :bar})
+      @adapter = Elements.adapter
       UserSerializer.adapter(*@adapter.as_input)
 
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
         }).tap{|h| h.delete(:adapter)}
       )
     end
 
     it "returns the adapter specified" do
-      expect(@options.adapter.name).to eq Helpers::Adapter1
-      expect(@options.adapter.options).to eq({foo: :bar})
+      expect(@options.adapter.name).to eq @adapter.name
+      expect(@options.adapter.options).to eq @adapter.options
     end
   end
 
   context "with injected adapter" do
     before do
       #TODO: add as_options method
-      @adapter = Elements.adapter(value: Helpers::Adapter1, options: {foo: :bar})
-      UserSerializer.adapter(*@adapter.as_input)
+      adapter = Elements.adapter(value: OpenStruct)
+      UserSerializer.adapter(*adapter.as_input)
+
+      @another_adapter = Elements.adapter
 
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
-          adapter: [Helpers::Adapter2, options: {injected: true}]
+          adapter: @another_adapter.as_input
         })
       )
     end
 
     it "returns the injected adapter specified" do
-      expect(@options.adapter.name).to eq Helpers::Adapter2
-      expect(@options.adapter.options).to eq({injected: true})
+      expect(@options.adapter.name).to eq @another_adapter.name
+      expect(@options.adapter.options).to eq @another_adapter.options
     end
   end
 end

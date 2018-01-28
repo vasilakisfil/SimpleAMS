@@ -5,8 +5,8 @@ RSpec.describe SimpleAMS::Options, "includes" do
   context "with no reations in general" do
     before do
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
         }).tap{|h|
           h.delete(:includes)
@@ -27,8 +27,8 @@ RSpec.describe SimpleAMS::Options, "includes" do
         UserSerializer.send(type, rel, options: Helpers.random_options)
       end
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
         }).tap{|h| h.delete(:includes)}
       )
@@ -50,8 +50,8 @@ RSpec.describe SimpleAMS::Options, "includes" do
         UserSerializer.send(type, rel, options: Helpers.random_options)
       end
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
           includes: []
         })
@@ -79,8 +79,8 @@ RSpec.describe SimpleAMS::Options, "includes" do
       end
       @injected_relations = Helpers.pick(@allowed_relations.keys)
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
           includes: @injected_relations
         })
@@ -106,8 +106,8 @@ RSpec.describe SimpleAMS::Options, "includes" do
       }
       @injected_relations = Helpers.pick(@allowed_relations.keys)
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
           includes: @injected_relations
         })

@@ -12,6 +12,10 @@ class SimpleAMS::Options
 
       alias_method :name, :value
 
+      def raw
+        [value, {options: options}]
+      end
+
       private
         attr_writer :value, :options
     end

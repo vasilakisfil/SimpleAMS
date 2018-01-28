@@ -52,7 +52,8 @@ SimpleAMS::Serializer.new(user, {
   #adapter: [name: MyAdapter, options: { link: false }} #name can also accept the class itself
   links: {
     self: ->(obj) { "/api/v1/users/#{obj.id}" }
-    posts: [->(obj) { "/api/v1/users/#{obj.id}/posts/"}, options: {collection: true}]
+    posts: [->(obj) { "/api/v1/users/#{obj.id}/posts/"}, options: {collection: true}],
+    root: '/api/v1'
   },
   meta: {
     type: :user

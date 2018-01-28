@@ -15,9 +15,7 @@ RSpec.describe SimpleAMS::DSL, 'links' do
 
     it "holds the specified link" do
       expect(UserSerializer.links.count).to eq 1
-      expect(UserSerializer.links.first.name).to eq @link.name.to_sym
-      expect(UserSerializer.links.first.value).to eq @link.value
-      expect(UserSerializer.links.first.options).to eq @link.options
+      expect(UserSerializer.links.first).to eq @link.as_input
     end
   end
 
@@ -32,9 +30,9 @@ RSpec.describe SimpleAMS::DSL, 'links' do
     it "holds the specified links" do
       expect(UserSerializer.links.count).to eq @links.count
       UserSerializer.links.each_with_index do |link, index|
-        expect(link.name).to eq @links[index].name.to_sym
-        expect(link.value).to eq @links[index].value
-        expect(link.options).to eq @links[index].options
+        expect(link).to eq @links[index].as_input
+        #just in case
+        expect(link).to eq [@links[index].name, @links[index].value, options: @links[index].options]
       end
     end
   end

@@ -30,8 +30,8 @@ RSpec.describe SimpleAMS::Document, "relations" do
     before do
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
           }).tap{|h|
             h.delete(:includes)
@@ -60,8 +60,8 @@ RSpec.describe SimpleAMS::Document, "relations" do
       end
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          @user,
-          Helpers.random_options_with({
+          resource: @user,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
           }).tap{|h| h.delete(:includes)}
         )
@@ -93,8 +93,8 @@ RSpec.describe SimpleAMS::Document, "relations" do
       end
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-        @user,
-          Helpers.random_options_with({
+          resource: @user,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
             includes: []
           })
@@ -127,8 +127,8 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @user = User.new
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          @user,
-          Helpers.random_options_with({
+          resource: @user,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
             includes: @injected_relations
           })
@@ -159,8 +159,8 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @user = User.new
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          @user,
-          Helpers.random_options_with({
+          resource: @user,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
             includes: @injected_relations
           })

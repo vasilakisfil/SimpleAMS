@@ -3,19 +3,21 @@ require "spec_helper"
 RSpec.describe SimpleAMS::DSL, 'type' do
   context "when NOT specified" do
     it "holds the default type key (nil)" do
-      expect(UserSerializer.type.value).to eq nil
+      expect(UserSerializer.type).to eq [:user, {}]
     end
   end
 
   context "when specified" do
     context "without options" do
       before do
-        @type = Helpers::Options.single
+        @type = Elements.type(
+          value: Helpers::Options.single, options: Helpers::Options.hash
+        )
         UserSerializer.type(@type)
       end
 
       it "holds the selected type key" do
-        expect(UserSerializer.type.value).to eq @type
+        expect(UserSerializer.type).to eq [@type, {}]
       end
     end
 
@@ -28,8 +30,8 @@ RSpec.describe SimpleAMS::DSL, 'type' do
       end
 
       it "holds the selected type key" do
-        expect(UserSerializer.type.value).to eq @type.name
-        expect(UserSerializer.type.options).to eq @type.options
+        expect(UserSerializer.type).to eq @type.as_input
+        expect(UserSerializer.type).to eq [@type.value, options: @type.options]
       end
     end
   end

@@ -5,8 +5,8 @@ RSpec.describe SimpleAMS::Options, 'name' do
   context "with no name specified // no name injected" do
     before do
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
         }).tap{|h|
           h.delete(:name)
@@ -24,8 +24,8 @@ RSpec.describe SimpleAMS::Options, 'name' do
       @name = Helpers::Options.single
 
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
           name: @name
         })

@@ -5,8 +5,8 @@ RSpec.describe SimpleAMS::Document, 'type' do
     before do
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
           }).tap{|h| h.delete(:type)}
         )
@@ -30,8 +30,8 @@ RSpec.describe SimpleAMS::Document, 'type' do
 
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
           }).tap{|h| h.delete(:type)}
         )
@@ -57,8 +57,8 @@ RSpec.describe SimpleAMS::Document, 'type' do
       @type = Elements.type(value: :another_type, options: {bar: :foo})
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
             type: @type.as_input
           })

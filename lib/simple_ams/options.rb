@@ -7,14 +7,12 @@ module SimpleAMS
     attr_reader :resource, :allowed_options, :injected_options
 
     #injected_options is always a Hash object
-    def initialize(resource, injected_options = {}, allowed_options = nil)
+    def initialize(resource:, injected_options: {}, allowed_options: nil, internal: {})
       @resource = resource
       @injected_options = injected_options
-      if allowed_options
-        @allowed_options = allowed_options
-      else
-        @allowed_options = injected_options.fetch(:serializer)
-      end
+      @allowed_options = allowed_options || injected_options.fetch(:serializer, nil)&.options
+      @allowed_options = infer_serializer_for(resource).options if @allowed_options.nil?
+      @internal = internal
     end
 
     def relation_options_for(relation_name)
@@ -24,29 +22,19 @@ module SimpleAMS
     def primary_id
       return @primary_id if defined?(@primary_id)
 
-      @primary_id = allowed_options.primary_id
-      _primary_id = injected_options.fetch(:primary_id, nil)
-      @primary_id = PrimaryId.new(*_primary_id) if _primary_id
+      _options = injected_options.fetch(:primary_id, nil)
+      _options = allowed_options.fetch(:primary_id, nil) unless _options
 
-      return @primary_id ||= PrimaryId.new(:id)
+      return @primary_id ||= PrimaryId.new(*_options)
     end
 
     def type
       return @type if defined?(@type)
 
-      @type = allowed_options.type
-      _type = injected_options.fetch(:type, nil)
-      @type = Type.new(*_type) if _type
-      #TODO: add tests for that
-      if @type.name.nil?
-        if resource.is_a?(Array)
-          @type = Type.new(resource.first.class.to_s.downcase)
-        else
-          @type = Type.new(resource.class.to_s.downcase)
-        end
-      end
+      _options = injected_options.fetch(:type, nil)
+      _options = allowed_options.fetch(:type, nil) unless _options
 
-      return @type
+      return @type ||= Type.new(*_options)
     end
 
     #that's handful
@@ -59,30 +47,36 @@ module SimpleAMS
       return @fields if defined?(@fields)
 
       injected = injected_options.fetch(:fields, nil)
-      return @fields = allowed_options.attributes.uniq if injected.nil?
-
-      return @fields = Fields.new(options_for(
-        injected: Fields.new(injected_options.fetch(:fields, nil)),
-        allowed: allowed_options.attributes
-      ).uniq)
+      injected = injected_options.fetch(:attributes, nil) unless injected
+      if injected.nil?
+        return @fields = Fields.new(allowed_options.fetch(:attributes).uniq)
+      else
+        return @fields = Fields.new(options_for(
+          injected: Fields.new(injected_options.fetch(:fields, nil)),
+          allowed: Fields.new(allowed_options.fetch(:attributes).uniq)
+        ).uniq)
+      end
     end
 
     def includes
       return @includes if defined?(@includes)
 
       injected = injected_options.fetch(:includes, nil)
-      return @includes = allowed_options.includes.uniq if injected.nil?
 
-      return @includes = Includes.new(options_for(
-        injected: Includes.new(injected_options.fetch(:includes, nil)),
-        allowed: allowed_options.includes
-      ).uniq)
+      if injected.nil?
+        return @includes = Includes.new(allowed_options.fetch(:includes).uniq)
+      else
+        return @includes = Includes.new(options_for(
+          injected: Includes.new(injected_options.fetch(:includes, nil)),
+          allowed: Includes.new(allowed_options.fetch(:includes).uniq)
+        ).uniq)
+      end
     end
 
     #TODO: correctly loop over injected relations, although should be a rarely used feature
     def relations
       return @relations if defined?(@relations) #||= options_for(
-        return @relations = allowed_options.relationships.select{
+      return @relations = allowed_options.fetch(:relationships).map{|rel| Relation.new(*rel)}.select{
           |relation| includes.include?(relation.name)
         }
     end
@@ -93,10 +87,12 @@ module SimpleAMS
       injected = injected_options.fetch(:links, nil)
       injected = Links.new(injected.map{|l| Links::Link.new(*l.flatten)}) if injected
 
+      allowed = Links.new(allowed_options.fetch(:links).map{|l| Links::Link.new(*l)})
+
       return @links = Links.new(options_for(
         #TODO: correctly loop over injected properties
         injected: injected,
-        allowed: allowed_options.links,
+        allowed: allowed,
       ).uniq{|link| link.name})
     end
 
@@ -105,11 +101,12 @@ module SimpleAMS
 
       injected = injected_options.fetch(:metas, nil)
       injected = Metas.new(injected.map{|l| Metas::Meta.new(*l.flatten)}) if injected
+      allowed = Metas.new(allowed_options.fetch(:metas).map{|l| Metas::Meta.new(*l)})
 
       return @metas = Metas.new(options_for(
         #TODO: correctly loop over injected properties
         injected: injected,
-        allowed: allowed_options.metas,
+        allowed: allowed,
       ).uniq{|meta| meta.name})
     end
 
@@ -131,11 +128,9 @@ module SimpleAMS
     def adapter
       return @adapter if defined?(@adapter)
 
-      if injected_options.dig(:adapter)
-        @adapter = Adapter.new(*injected_options.dig(:adapter))
-      end
-      @adapter = allowed_options.adapter if @adapter.nil?
-      @adapter = Adapter.new(SimpleAMS::Adapters::AMS) if @adapter.nil?
+      @adapter = Adapter.new(*injected_options.fetch(:adapter, [nil]))
+      @adapter = Adapter.new(*allowed_options.fetch(:adapter, [nil])) if @adapter.value.nil?
+      @adapter = Adapter.new(SimpleAMS::Adapters::AMS) if @adapter.value.nil?
 
       return @adapter
     end
@@ -145,7 +140,22 @@ module SimpleAMS
       @exposed ||= injected_options.fetch(:expose, {})
     end
 
+    def as_hash
+      {
+        adapter: adapter.raw,
+        primary_id: primary_id.raw,
+        type: type.raw,
+        attributes: fields.raw,
+        #relationships: relations.raw,
+        includes: includes.raw,
+        links: links.raw,
+        metas: metas.raw
+      }
+    end
+
     private
+      attr_reader :internal
+
       def options_for(allowed:, injected:)
         unless injected.nil?
           allowed = allowed & injected
@@ -169,6 +179,12 @@ module SimpleAMS
 
           memo
         }
+      end
+
+      def infer_serializer_for(resource)
+        @serializer ||= Object.const_get("#{resource.class.to_s}Serializer")
+      rescue NameError => _
+        raise "Could not infer serializer for #{resource.class}, maybe specify it? (tried #{resource.class.to_s}Serializer)"
       end
   end
 end

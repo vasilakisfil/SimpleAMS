@@ -5,8 +5,8 @@ RSpec.describe SimpleAMS::Options, 'metas' do
   context "with no metas in general" do
     before do
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
         }).tap{|h| h.delete(:metas)}
       )
@@ -25,8 +25,8 @@ RSpec.describe SimpleAMS::Options, 'metas' do
       end
 
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer
         }).tap{|h| h.delete(:metas)}
       )
@@ -49,8 +49,8 @@ RSpec.describe SimpleAMS::Options, 'metas' do
       end
 
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
           metas: []
         })
@@ -65,8 +65,8 @@ RSpec.describe SimpleAMS::Options, 'metas' do
   context "with no allowed metas but injected ones" do
     before do
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
         })
       )
@@ -92,8 +92,8 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         metas: @injected_metas
       })
       @options = SimpleAMS::Options.new(
-        User.new,
-        injected_options
+        resource: User.new,
+        injected_options: injected_options
       )
     end
 
@@ -125,8 +125,8 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         metas: @injected_metas
       })
       @options = SimpleAMS::Options.new(
-        User.new,
-        injected_options
+        resource: User.new,
+        injected_options: injected_options
       )
     end
 
