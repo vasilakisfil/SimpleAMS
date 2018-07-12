@@ -5,8 +5,8 @@ RSpec.describe SimpleAMS::Options, 'primary_id' do
   context "with no primary_id in general" do
     before do
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
         }).tap{|h| h.delete(:primary_id)}
       )
@@ -22,8 +22,8 @@ RSpec.describe SimpleAMS::Options, 'primary_id' do
       @primary_id = Elements.primary_id
       UserSerializer.primary_id(*@primary_id.as_input)
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
         }).tap{|h| h.delete(:primary_id)}
       )
@@ -31,17 +31,17 @@ RSpec.describe SimpleAMS::Options, 'primary_id' do
 
     it "returns the allowed ones" do
       expect(@options.primary_id.value).to eq @primary_id.value
+      expect(@options.primary_id.options).to eq @primary_id.options
     end
   end
-
   context "with injected primary_id" do
     before do
       UserSerializer.primary_id(*Elements.primary_id.as_input)
       @primary_id = Elements.primary_id
 
       @options = SimpleAMS::Options.new(
-        User.new,
-        Helpers.random_options_with({
+        resource: User.new,
+        injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
           primary_id: @primary_id.as_input
         })
@@ -50,6 +50,7 @@ RSpec.describe SimpleAMS::Options, 'primary_id' do
 
     it "returns the injected primary_id" do
       expect(@options.primary_id.value).to eq @primary_id.value
+      expect(@options.primary_id.options).to eq @primary_id.options
     end
   end
 end

@@ -37,11 +37,15 @@ module SimpleAMS
           # *user injected when instantiating the SimpleAMS class
           # *relation options injected from parent serializer
           # *serializer class options
-          merged_options(
-            relation.options, options.relation_options_for(relation.name), relation.name
-          ).merge({
-            expose: options.exposed
-          })
+          SimpleAMS::Options.new(
+            resource: relation_value(relation.name),
+            injected_options: (relation.options[:options] || {}).merge(
+              options.relation_options_for(relation.name).merge(options.exposed)
+            ),
+            internal: {
+              module: serializer.class.to_s.rpartition('::').first
+            }
+          ).as_hash
         )
       end
 
@@ -71,14 +75,14 @@ module SimpleAMS
             _options[key] = (parent_options[key] || {}).merge(injected_options[key] || {})
           elsif parent_options[key].kind_of?(Array) || injected_options[key].kind_of?(Array)
             _options[key] = (parent_options[key] || []) & (injected_options[key] || [])
-            _options[key] = nil if _options[key].empty?
           elsif key == :name
-            _options[key] = (parent_options[key] || relation_name || injected_options[key])
+            _options[key] = (parent_options[key] || injected_options[key])
           else
             _options[key] = (parent_options[key] || injected_options[key])
           end
         end
 
+        _options[:name] ||= relation_name
         return _options
       end
   end

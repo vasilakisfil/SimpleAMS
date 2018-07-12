@@ -28,8 +28,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
     before do
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer
           }).tap{|h| h.delete(:fields)}
         )
@@ -59,8 +59,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       @overrides = Helpers.initialize_with_overrides(UserSerializer)
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          @user,
-          Helpers.random_options_with({
+          resource: @user,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer
           }).tap{|h| h.delete(:fields)}
         )
@@ -87,8 +87,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       @overrides = Helpers.initialize_with_overrides(UserSerializer)
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
             fields: []
           })
@@ -118,8 +118,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       UserSerializer.attributes(*@allowed)
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          @user,
-          Helpers.random_options_with({
+          resource: @user,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
             fields: User.model_attributes
           })
@@ -149,8 +149,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       UserSerializer.attributes(*(@allowed + @allowed))
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          @user,
-          Helpers.random_options_with({
+          resource: @user,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
             fields: (User.model_attributes + User.model_attributes)
           })

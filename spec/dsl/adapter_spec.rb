@@ -6,7 +6,7 @@ RSpec.describe SimpleAMS::DSL, 'adapter' do
     end
 
     it "returns the default adapter (AMS)" do
-      expect(UserSerializer.adapter.name).to eq SimpleAMS::Adapters::AMS
+      expect(UserSerializer.adapter).to eq [SimpleAMS::Adapters::AMS, {}]
     end
   end
 
@@ -17,7 +17,7 @@ RSpec.describe SimpleAMS::DSL, 'adapter' do
     end
 
     it "holds the adapter name" do
-      expect(UserSerializer.adapter.name).to eq @adapter_options.name
+      expect(UserSerializer.adapter).to eq @adapter_options.as_input
     end
   end
 
@@ -30,8 +30,9 @@ RSpec.describe SimpleAMS::DSL, 'adapter' do
     end
 
     it "holds the specified options" do
-      expect(UserSerializer.adapter.name).to eq @adapter_options.name
-      expect(UserSerializer.adapter.options).to eq @adapter_options.options
+      expect(UserSerializer.adapter).to eq @adapter_options.as_input
+      #just in case
+      expect(UserSerializer.adapter).to eq [@adapter_options.value, options: @adapter_options.options]
     end
   end
 end

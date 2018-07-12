@@ -4,6 +4,7 @@ require "simple_ams/methy"
 require "simple_ams/document"
 require "simple_ams/dsl"
 require "simple_ams/adapters/ams"
+require "simple_ams/adapters"
 require "simple_ams/serializer"
 
 require "simple_ams/options"

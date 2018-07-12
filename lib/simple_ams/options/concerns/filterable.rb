@@ -32,6 +32,14 @@ class SimpleAMS::Options
           super
         end
       end
+
+      def raw
+        if self.first.respond_to?(:raw)
+          self.map(&:raw)
+        else
+          self.map{|i| i}
+        end
+      end
     end
   end
 end

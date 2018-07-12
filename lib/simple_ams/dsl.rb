@@ -10,42 +10,44 @@ module SimpleAMS::DSL
     #TODO: raise error if options are given outside `options` key
     #same for other ValueHashes
     def adapter(name = nil, options = {})
-      @adapter ||= SimpleAMS::Options::Adapter.new(
-        name || SimpleAMS::Adapters::AMS, options
-      )
+      @adapter ||= [SimpleAMS::Adapters::DEFAULT, {}]
+      return @adapter if name.nil?
+
+      @adapter = [name, options]
     end
 
     def primary_id(value = nil, options = {})
-      @primary_id ||= SimpleAMS::Options::PrimaryId.new(value || :id, options)
+      @primary_id ||= [:id, {}]
+      return @primary_id if value.nil?
+
+      @primary_id = [value || :id, options]
     end
 
     def type(value = nil, options = {})
-      @type ||= SimpleAMS::Options::Type.new(value, options)
+      @type ||= [self.to_s.gsub('Serializer','').downcase.split('::').last.to_sym, {}]
+      return @type if value.nil?
+
+      @type = [value, options]
     end
 
     def attributes(*args)
-      if args&.empty? || args.nil?
-        return @attributes ||= SimpleAMS::Options::Fields.new([])
-      end
+      @attributes ||= []
+      return @attributes if (args&.empty? || args.nil?)
 
       append_attributes(args)
     end
     alias attribute attributes
 
-    def relationship(name, relation, options = {})
-      SimpleAMS::Options::Relation.new(name, relation, options[:options] || {})
-    end
-
     def has_many(name, options = {})
-      append_relationship(relationship(name, __method__, options))
+      append_relationship([name, __method__, options])
     end
 
     def has_one(name, options = {})
-      append_relationship(relationship(name, __method__, options))
+      append_relationship([name, __method__, options])
     end
 
     def belongs_to(name, options = {})
-      append_relationship(relationship(name, __method__, options))
+      append_relationship([name, __method__, options])
     end
 
     def relationships
@@ -56,15 +58,15 @@ module SimpleAMS::DSL
     #Consider fixing it by employing an observer that will clean the instance var
     #each time @relationships is updated
     def includes
-      SimpleAMS::Options::Includes.new(relationships.map(&:name))
+      relationships.map(&:first)
     end
 
     def link(name, value, options = {})
-      append_link(SimpleAMS::Options::Links::Link.new(name, value, options))
+      append_link([name, value, options])
     end
 
     def meta(name = nil, value = nil, options = {})
-      append_meta(SimpleAMS::Options::Metas::Meta.new(name, value, options))
+      append_meta([name, value, options])
     end
 
     #TODO: Add block version
@@ -78,31 +80,40 @@ module SimpleAMS::DSL
       @metas || []
     end
 
+    def options
+      {
+        adapter: adapter,
+        primary_id: primary_id,
+        type: type,
+        attributes: attributes,
+        relationships: relationships,
+        includes: includes,
+        links: links,
+        metas: metas
+      }
+    end
+
     private
       def append_relationship(rel)
-        @relationships = [] unless defined?(@relationships)
+        @relationships ||= []
 
         @relationships << rel
       end
 
       def append_attributes(*attrs)
-        if not defined?(@attributes)
-          @attributes = SimpleAMS::Options::Fields.new([])
-        end
+        @attributes ||= []
 
-        @attributes = SimpleAMS::Options::Fields.new(
-          (@attributes << attrs).flatten.compact
-        )
+        @attributes = (@attributes << attrs).flatten.compact
       end
 
       def append_link(link)
-        @links = SimpleAMS::Options::Links.new unless defined?(@links)
+        @links ||= []
 
         @links << link
       end
 
       def append_meta(meta)
-        @metas = SimpleAMS::Options::Metas.new unless defined?(@metas)
+        @metas ||= []
 
         @metas << meta
       end

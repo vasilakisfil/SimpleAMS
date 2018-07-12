@@ -5,9 +5,9 @@ RSpec.describe SimpleAMS::Document, 'links' do
   context "with no links in general" do
     before do
       @document = SimpleAMS::Document.new(
-          SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+        SimpleAMS::Options.new(
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
           }).tap{|h| h.delete(:links)}
         )
@@ -39,8 +39,8 @@ RSpec.describe SimpleAMS::Document, 'links' do
 
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer
           }).tap{|h| h.delete(:links)}
         )
@@ -71,8 +71,8 @@ RSpec.describe SimpleAMS::Document, 'links' do
 
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
             links: []
           })
@@ -100,8 +100,8 @@ RSpec.describe SimpleAMS::Document, 'links' do
     before do
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          Helpers.random_options_with({
+          resource: User.new,
+          injected_options: Helpers.random_options_with({
             serializer: UserSerializer,
           })
         )
@@ -140,8 +140,8 @@ RSpec.describe SimpleAMS::Document, 'links' do
       })
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          injected_options
+          resource: User.new,
+          injected_options: injected_options
         )
       )
     end
@@ -178,8 +178,8 @@ RSpec.describe SimpleAMS::Document, 'links' do
       })
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
-          User.new,
-          injected_options
+          resource: User.new,
+          injected_options: injected_options
         )
       )
     end

@@ -96,7 +96,12 @@ class Elements
     end
   end
 
-  class Adapter < ValueHash; end
+  class Adapter < ValueHash
+    def initialize(value: nil, options: {})
+      @value = value || Helpers::Adapter1
+      super
+    end
+  end
 
   class PrimaryId < ValueHash; end
 

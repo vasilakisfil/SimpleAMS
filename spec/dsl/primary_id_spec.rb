@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe SimpleAMS::DSL, 'primary_id' do
   context "when NOT specified" do
     it "holds the default primary_id key (:id)" do
-      expect(UserSerializer.primary_id.value).to eq :id
+      expect(UserSerializer.primary_id).to eq [:id, {}]
     end
   end
 
@@ -15,7 +15,7 @@ RSpec.describe SimpleAMS::DSL, 'primary_id' do
       end
 
       it "holds the selected primary_id key" do
-        expect(UserSerializer.primary_id.value).to eq @id
+        expect(UserSerializer.primary_id).to eq [@id, {}]
       end
     end
 
@@ -28,8 +28,9 @@ RSpec.describe SimpleAMS::DSL, 'primary_id' do
       end
 
       it "holds the selected type key" do
-        expect(UserSerializer.primary_id.value).to eq @primary_id.name
-        expect(UserSerializer.primary_id.options).to eq @primary_id.options
+        expect(UserSerializer.primary_id).to eq @primary_id.as_input
+        #just in case
+        expect(UserSerializer.primary_id).to eq [@primary_id.value, options: @primary_id.options]
       end
     end
   end
