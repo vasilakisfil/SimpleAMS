@@ -40,24 +40,87 @@ Or install it yourself as:
 ## Usage
 The gem's API has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable and jsonapi-rb.
 
+### Simple case
+
+Usually you rarely need all the advanced options. Usually you will have something like that:
+
 ```ruby
-SimpleAMS::Serializer.new(user, {
+class UserSerializer
+  include SimpleAMS::DSL
+
+  adapter SimpleAMS::Adapters::AMS, options: {root: true}
+
+  attributes :id, :name, :email, :birth_date
+
+  has_many :videos, :comments, :posts
+  belongs_to :organization
+  has_one :profile
+
+  link :root, '/api/v1/', options: {collection: true}
+  link :self, ->(obj) { "/api/v1/users/#{obj.id}" }
+  link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
+
+  #override an attribute
+  def name
+    "#{object.first_name} #{object.last_name}"
+  end
+```
+
+Then you can just feed your serializer with data, along with some options:
+
+```ruby
+SimpleAMS::Renderer.new(user, fields: [:id, :name, :email], includes: [:videos]).to_json
+```
+`to_json` first calls `as_json`, which creates a ruby Hash and then `to_json` is called
+on top of that hash.
+
+
+#Advanced usage
+The DSL in the previous example is just suntactic sugar. In the basis, there is a very powerful
+hash-based DSL that can be used in 3 different places:
+
+* When initializing the `SimpleAMS::Renderer` class to render the data using specific serializer, adapter and options.
+* Inside a class that has the `SimpleAMS::DSL` included, using the `with_options({})` class method
+* Through the DSL, although the syntax is slightly different
+
++ Add explanatory blog post.
+
+In each case we have the following options:
+
+```ruby
+{
+  #the primary id of the record(s), used mostly by the underlying adapter (like JSONAPI)
   primary_id: :id,
+  #the type of the record, used mostly by the underlying adapter (like JSONAPI)
   type: :user,
+  #which relations should be included
   includes: [:posts, videos: [:comments]],
+  #which fields for each relation should be included
   fields: [:id, :name, posts: [:id, :text], videos: [:id, :title, comments: [:id, :text]]] #overrides includes when association is specified
-  serializer: UserSerializer, # can also be a lambda, ideal for polymorphic records
-  #serializer: ->(obj){ obj.type.employee? ? EmployeeSerializer : UserSerializer } TODO: <-- this should move to collection serializer !!
+  #the serializer that should be used
+  #makes sense to use it when initializing the Renderer
+  serializer: UserSerializer,
+  #can also be a lambda, in case of polymorphic records, ideal for ArrayRenderer
+  serializer: ->(obj){ obj.employee? ? EmployeeSerializer : UserSerializer }
+  #specifying the anderlying adapter. This cannot be a lambda in case of ArrayRenderer,
+  #but can take some usefull options that are passed down straignt to the adapter class.
   adapter: [SimpleAMS::Adapters::AMS, options: { root: true }] #name can also accept the class itself, options are passed to the adapter
-  #adapter: [name: MyAdapter, options: { link: false }} #name can also accept the class itself
+  #the links data
   links: {
-    self: ->(obj) { "/api/v1/users/#{obj.id}" }
-    posts: [->(obj) { "/api/v1/users/#{obj.id}/posts/"}, options: {collection: true}],
+    #can be a simple string
     root: '/api/v1'
+    #a string with some options (relation and target attributes as defined by RFC8288
+    #however, you can also pass adapter-specific attributes
+    posts: "/api/v1/posts/", options: {rel: :posts}],
+    #it can also be a lambda that takes the resource to be rendered as a param
+    #when the lambda is called, it should return the array structure above
+    self: ->(obj) { ["/api/v1/users/#{obj.id}", options: {rel: :user] }
   },
+  #the meta data, same as the links data (available in adapters even for sinlge records)
   meta: {
-    type: :user
+    type: ->(obj){ obj.employee? ? :employee : :user}
   },
+  #collection parameters
   collection: {
     links: {
       root: '/api/v1'
@@ -70,51 +133,40 @@ SimpleAMS::Serializer.new(user, {
       max_per_page: 50,
     },
   }
-  expose: { url_helpers: SimpleHelpers.new },
-}).to_json
+  #exposing helpers that will be available inside the seriralizer
+  expose: {
+    #a class
+    url_helpers: SimpleHelpers.new
+    #or a module
+    helpers: SimpleHelpersModule
+  },
+}
+```
 
+Now let those options be `OPTIONS`. These can be feeded to either the `SimpleAMS::Renderer`
+or to the serializer class itself using the `with_options` class method. Let's see how:
+
+```ruby
 class UserSerializer
   include SimpleAMS::DSL
 
-  with_options({ #you can pass the same options as above ;)
-    primary_id: :id,
-    adapter: {
-      name: SimpleAMS::Adapters::AMS, options: {
-        root: true, #arbiratry params targeted to adapter
-      }
-    },
-    expose: { url_helpers: SimpleHelpers.new }
-  })
-
-  #but you can use instead this nice DSL which is included for free ;)
-  adapter SimpleAMS::Adapters::AMS, options: {root: true}
-  type :user
-  primary_id :id
-
-  attributes :id, :name, :email, :birth_date, :links
-
-  has_many :videos, :comments, :posts
-  belongs_to :organization
-  has_one :profile, options: { #again same options (except adapter)
-    includes: [:address],
-    fields: [:id, :settings, address: {:country}}] #overrides includes when association is specified
-    serializer: UserSerializer,
-    adapter: {name: :ams, options: { root: true }}
-    expose: { url_helpers: SimpleHelpers.new }
-  }
+  with_options( #you can pass the same options as above ;)
+    OPTIONS
+  )
 
   #override an attribute
   def name
     "#{object.first_name} #{object.last_name}"
   end
-
-  link :root, '/api/v1/', options: {collection: true}
-  link :self, ->(obj) { "/api/v1/users/#{obj.id}" }
-  link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
 end
 ```
-+Explain the logic behind it (why allowed properties + injected properties instead of an if inside serializers).
 
+```ruby
+SimpleAMS::Serializer.new(user, {
+  expose: { url_helpers: SimpleHelpers },
+}).to_json
+
+```
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

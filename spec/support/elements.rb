@@ -67,6 +67,10 @@ class Elements
       [@name, @value, {options: @options}]
     end
 
+    def as_lambda_input
+      ->{ [@name, @value, {options: @options}] }
+    end
+
     #TODO: do we need that?
     def value_options
       [@value, {options: @options}]
@@ -93,6 +97,10 @@ class Elements
 
     def as_input
       [@value, {options: @options}]
+    end
+
+    def as_lambda_input
+      ->{ [@value, {options: @options}] }
     end
   end
 

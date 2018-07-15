@@ -1,7 +1,7 @@
 require "simple_ams"
 
 module SimpleAMS
-  class Serializer
+  class Renderer
     def initialize(resource, options = {})
       @resource = resource
       @options = SimpleAMS::Options.new(
@@ -30,7 +30,7 @@ module SimpleAMS
       attr_reader :resource, :options
   end
 
-  class ArraySerializer
+  class ArrayRenderer
     def initialize(collection, options = {})
       @collection, @options = resource, SimpleAMS::Options.new(
         resource: resource, injected_options: options

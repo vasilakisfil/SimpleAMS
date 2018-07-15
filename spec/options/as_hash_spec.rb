@@ -15,11 +15,12 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
           adapter: [SimpleAMS::Adapters::DEFAULT, {options: {}}],
           primary_id: [:id, {options: {}}],
           type: [:user, {options: {}}],
-          attributes: [],
+          fields: [],
           #relationships: [],
           includes: [],
           links: [],
           metas: [],
+          _internal: {},
         }
       )
     end
@@ -54,11 +55,12 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
           adapter: @adapter.as_input,
           primary_id: @primary_id.as_input,
           type: @type.as_input,
-          attributes: @attrs.uniq,
+          fields: @attrs.uniq,
           #relationships: [],
           includes: [],
           links: @links.map(&:as_input),
           metas: [@meta.as_input],
+          _internal: {},
         }
       )
     end

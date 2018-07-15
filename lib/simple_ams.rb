@@ -5,7 +5,7 @@ require "simple_ams/document"
 require "simple_ams/dsl"
 require "simple_ams/adapters/ams"
 require "simple_ams/adapters"
-require "simple_ams/serializer"
+require "simple_ams/renderer"
 
 require "simple_ams/options"
 require "simple_ams/options/concerns/filterable"

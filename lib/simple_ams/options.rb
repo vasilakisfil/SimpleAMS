@@ -7,12 +7,12 @@ module SimpleAMS
     attr_reader :resource, :allowed_options, :injected_options
 
     #injected_options is always a Hash object
-    def initialize(resource:, injected_options: {}, allowed_options: nil, internal: {})
+    def initialize(resource:, injected_options: {}, allowed_options: nil)
       @resource = resource
       @injected_options = injected_options
+      @_internal = injected_options[:_internal] || {}
       @allowed_options = allowed_options || injected_options.fetch(:serializer, nil)&.options
       @allowed_options = infer_serializer_for(resource).options if @allowed_options.nil?
-      @internal = internal
     end
 
     def relation_options_for(relation_name)
@@ -47,13 +47,13 @@ module SimpleAMS
       return @fields if defined?(@fields)
 
       injected = injected_options.fetch(:fields, nil)
-      injected = injected_options.fetch(:attributes, nil) unless injected
+
       if injected.nil?
-        return @fields = Fields.new(allowed_options.fetch(:attributes).uniq)
+        return @fields = Fields.new(allowed_options.fetch(:fields).uniq)
       else
         return @fields = Fields.new(options_for(
           injected: Fields.new(injected_options.fetch(:fields, nil)),
-          allowed: Fields.new(allowed_options.fetch(:attributes).uniq)
+          allowed: Fields.new(allowed_options.fetch(:fields).uniq)
         ).uniq)
       end
     end
@@ -145,16 +145,17 @@ module SimpleAMS
         adapter: adapter.raw,
         primary_id: primary_id.raw,
         type: type.raw,
-        attributes: fields.raw,
+        fields: fields.raw,
         #relationships: relations.raw,
         includes: includes.raw,
         links: links.raw,
-        metas: metas.raw
+        metas: metas.raw,
+        _internal: _internal
       }
     end
 
     private
-      attr_reader :internal
+      attr_reader :_internal
 
       def options_for(allowed:, injected:)
         unless injected.nil?
@@ -182,9 +183,10 @@ module SimpleAMS
       end
 
       def infer_serializer_for(resource)
-        @serializer ||= Object.const_get("#{resource.class.to_s}Serializer")
+        namespace = _internal[:module] ? "#{_internal[:module]}::" : ""
+        @serializer ||= Object.const_get("#{namespace}#{resource.class.to_s}Serializer")
       rescue NameError => _
-        raise "Could not infer serializer for #{resource.class}, maybe specify it? (tried #{resource.class.to_s}Serializer)"
+        raise "Could not infer serializer for #{resource.class}, maybe specify it? (tried #{namespace}#{resource.class.to_s}Serializer)"
       end
   end
 end

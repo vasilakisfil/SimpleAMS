@@ -30,7 +30,7 @@ module SimpleAMS
       attr_reader :options, :relations, :serializer, :resource
 
       def relation_for(relation)
-        SimpleAMS::Serializer.new(
+        SimpleAMS::Renderer.new(
           relation_value(relation.name),
           #TODO: this part here needs some work
           #3 options are merged:
@@ -41,10 +41,11 @@ module SimpleAMS
             resource: relation_value(relation.name),
             injected_options: (relation.options[:options] || {}).merge(
               options.relation_options_for(relation.name).merge(options.exposed)
-            ),
-            internal: {
-              module: serializer.class.to_s.rpartition('::').first
-            }
+            ).merge(
+              _internal: {
+                module: serializer.class.to_s.rpartition('::').first
+              }
+            )
           ).as_hash
         )
       end
@@ -62,6 +63,7 @@ module SimpleAMS
         relations.find{|i| i.name == name}
       end
 
+=begin
       #merges the injected, along with the parent serializer injected options
       #probably needs better work, maybe exploit existing Options class?
       def merged_options(parent_options, injected_options, relation_name)
@@ -85,5 +87,6 @@ module SimpleAMS
         _options[:name] ||= relation_name
         return _options
       end
+=end
   end
 end

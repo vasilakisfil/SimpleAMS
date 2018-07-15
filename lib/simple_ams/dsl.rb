@@ -7,7 +7,6 @@ module SimpleAMS::DSL
   end
 
   module ClassMethods
-    #TODO: raise error if options are given outside `options` key
     #same for other ValueHashes
     def adapter(name = nil, options = {})
       @adapter ||= [SimpleAMS::Adapters::DEFAULT, {}]
@@ -37,6 +36,7 @@ module SimpleAMS::DSL
       append_attributes(args)
     end
     alias attribute attributes
+    alias fields attributes
 
     def has_many(name, options = {})
       append_relationship([name, __method__, options])
@@ -85,7 +85,7 @@ module SimpleAMS::DSL
         adapter: adapter,
         primary_id: primary_id,
         type: type,
-        attributes: attributes,
+        fields: fields,
         relationships: relationships,
         includes: includes,
         links: links,

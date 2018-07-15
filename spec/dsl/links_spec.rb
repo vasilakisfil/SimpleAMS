@@ -19,6 +19,18 @@ RSpec.describe SimpleAMS::DSL, 'links' do
     end
   end
 
+  context "with lambda link" do
+    before do
+      @link = Elements.link
+      UserSerializer.link(*@link.as_input)
+    end
+
+    it "holds the specified link" do
+      expect(UserSerializer.links.count).to eq 1
+      expect(UserSerializer.links.first).to eq @link.as_input
+    end
+  end
+
   context "with multiple links" do
     before do
       @links = (rand(10) + 2).times.map{ Elements.link }
