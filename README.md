@@ -75,15 +75,13 @@ SimpleAMS::Renderer.new(user, fields: [:id, :name, :email], includes: [:videos])
 on top of that hash.
 
 
-#Advanced usage
+# Advanced usage
 The DSL in the previous example is just suntactic sugar. In the basis, there is a very powerful
 hash-based DSL that can be used in 3 different places:
 
 * When initializing the `SimpleAMS::Renderer` class to render the data using specific serializer, adapter and options.
 * Inside a class that has the `SimpleAMS::DSL` included, using the `with_options({})` class method
 * Through the DSL, although the syntax is slightly different
-
-+ Add explanatory blog post.
 
 In each case we have the following options:
 
