@@ -45,7 +45,7 @@ RSpec.describe SimpleAMS::DSL, 'meta' do
       UserSerializer.metas.each_with_index do |meta, index|
         expect(meta).to eq @meta[index].as_input
         #just in case
-        expect(meta).to eq [@meta[index].name, @meta[index].value, options: @meta[index].options]
+        expect(meta).to eq [@meta[index].name, @meta[index].value, @meta[index].options]
       end
     end
   end

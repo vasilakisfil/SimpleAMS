@@ -30,7 +30,7 @@ RSpec.describe SimpleAMS::DSL, 'primary_id' do
       it "holds the selected type key" do
         expect(UserSerializer.primary_id).to eq @primary_id.as_input
         #just in case
-        expect(UserSerializer.primary_id).to eq [@primary_id.value, options: @primary_id.options]
+        expect(UserSerializer.primary_id).to eq [@primary_id.value, @primary_id.options]
       end
     end
   end

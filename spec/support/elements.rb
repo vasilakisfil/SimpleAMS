@@ -34,14 +34,14 @@ class Elements
       klass.new({
         name: key,
         value: value.is_a?(Array) ? value.first : value,
-        options: value.is_a?(Array) ? value.last[:options] : {}
+        options: value.is_a?(Array) ? value.last : {}
       })
     }
   end
 
   def as_options_for(elements)
     elements.inject({}){|memo, element|
-      memo[element.name] = [element.value, {options: element.options}]
+      memo[element.name] = [element.value, element.options]
       memo
     }
   end
@@ -68,20 +68,20 @@ class Elements
     end
 
     def as_input
-      [@name, @value, {options: @options}]
+      [@name, @value, @options]
     end
 
     def as_lambda_input
       if @value.is_a?(Proc)
         [@name, @value]
       else
-        [@name, ->{ [@value, {options: @options}] } ]
+        [@name, ->{ [@value, @options] } ]
       end
     end
 
     #TODO: do we need that?
     def value_options
-      [@value, {options: @options}]
+      [@value, @options]
     end
   end
 
@@ -104,11 +104,11 @@ class Elements
     end
 
     def as_input
-      [@value, {options: @options}]
+      [@value, @options]
     end
 
     def as_lambda_input
-      ->{ [@value, {options: @options}] }
+      ->{ [@value, @options] }
     end
   end
 

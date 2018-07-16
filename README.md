@@ -48,7 +48,7 @@ Usually you rarely need all the advanced options. Usually you will have somethin
 class UserSerializer
   include SimpleAMS::DSL
 
-  adapter SimpleAMS::Adapters::AMS, options: {root: true}
+  adapter SimpleAMS::Adapters::AMS, root: true
 
   attributes :id, :name, :email, :birth_date
 
@@ -56,7 +56,7 @@ class UserSerializer
   belongs_to :organization
   has_one :profile
 
-  link :root, '/api/v1/', options: {rel: :user}
+  link :root, '/api/v1/', rel: :user
   link :self, ->(obj) { "/api/v1/users/#{obj.id}" }
   link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
 
@@ -102,17 +102,17 @@ In each case we have the following options:
   serializer: ->(obj){ obj.employee? ? EmployeeSerializer : UserSerializer }
   #specifying the anderlying adapter. This cannot be a lambda in case of ArrayRenderer,
   #but can take some usefull options that are passed down straignt to the adapter class.
-  adapter: [SimpleAMS::Adapters::AMS, options: { root: true }] #name can also accept the class itself, options are passed to the adapter
+  adapter: SimpleAMS::Adapters::AMS, root: true #name can also accept the class itself, options are passed to the adapter
   #the links data
   links: {
     #can be a simple string
     root: '/api/v1'
     #a string with some options (relation and target attributes as defined by RFC8288
     #however, you can also pass adapter-specific attributes
-    posts: "/api/v1/posts/", options: {rel: :posts}],
+    posts: "/api/v1/posts/", rel: :posts,
     #it can also be a lambda that takes the resource to be rendered as a param
     #when the lambda is called, it should return the array structure above
-    self: ->(obj) { ["/api/v1/users/#{obj.id}", options: {rel: :user] }
+    self: ->(obj) { ["/api/v1/users/#{obj.id}", rel: :user] }
   },
   #the meta data, same as the links data (available in adapters even for sinlge records)
   meta: {
@@ -124,10 +124,10 @@ In each case we have the following options:
       root: '/api/v1'
     },
     metas: {
-      pages: [->(obj) { obj.pages }, options: {collection: true}],
-      current_page: [->(obj) { obj.current_page }, options: {collection: true}],
-      previous_page: [->(obj) { obj.previous_page }, options: {collection: true}],
-      next_page: [->(obj) { obj.next_page }, options: {collection: true}],
+      pages: ->(obj) { [obj.pages, collection: true]},
+      current_page: ->(obj) { [obj.current_page, collection: true] },
+      previous_page: ->(obj) { [obj.previous_page, collection: true] },
+      next_page: ->(obj) { [obj.next_page, collection: true] },
       max_per_page: 50,
     },
   }

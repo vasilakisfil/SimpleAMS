@@ -102,14 +102,13 @@ RSpec.describe SimpleAMS::Options, 'links' do
       _injected_links = Elements.as_elements_for(
         @injected_links, klass: Elements::Link
       )
-      
+
       links_expected = (_injected_links.map(&:name) & @allowed_links.map(&:name)).map{|name|
         _injected_links.find{|l| l.name == name}
       }
 
       expect(links_got.map(&:name)).to eq(links_expected.map(&:name))
       expect(links_got.map(&:value)).to eq(links_expected.map(&:value))
-      binding.pry if links_got.map(&:options) != links_expected.map(&:options)
       expect(links_got.map(&:options)).to eq(links_expected.map(&:options))
     end
   end
@@ -141,7 +140,7 @@ RSpec.describe SimpleAMS::Options, 'links' do
       _injected_links = Elements.as_elements_for(
         @injected_links, klass: Elements::Link
       )
-      
+
       links_expected = (_injected_links.map(&:name) & @allowed_links.map(&:name)).map{|name|
         _injected_links.find{|l| l.name == name}
       }
@@ -159,7 +158,7 @@ RSpec.describe SimpleAMS::Options, 'links' do
         @allowed_links = [
           Elements::Link.new(
             name: :user, value: ->(obj){
-              ["api/v1/users/#{@user.id}", options: {rel: :user}]
+              ["api/v1/users/#{@user.id}", {rel: :user}]
             }
           ),
           Elements::Link.new(
@@ -183,7 +182,7 @@ RSpec.describe SimpleAMS::Options, 'links' do
 
         expect(@options.links.first.name).to eq(@allowed_links.first.name)
         expect(@options.links.first.value).to eq(@allowed_links.first.value.call(@user).first)
-        expect(@options.links.first.options).to eq(@allowed_links.first.value.call(@user).last[:options])
+        expect(@options.links.first.options).to eq(@allowed_links.first.value.call(@user).last)
 
         expect(@options.links.last.name).to eq(@allowed_links.last.name)
         expect(@options.links.last.value).to eq(@allowed_links.last.value)
@@ -201,7 +200,7 @@ RSpec.describe SimpleAMS::Options, 'links' do
 
         #@injected_links = Helpers.pick(@allowed_links).inject({}) { |memo, link|
         @injected_links = [@allowed_links.first].inject({}) { |memo, link|
-          memo[link.name] = ->(obj){ ["/api/v1/#{@user.id}/#{link.name}", options: {rel: link.name}] }
+          memo[link.name] = ->(obj){ ["/api/v1/#{@user.id}/#{link.name}", rel: link.name] }
           memo
         }
 

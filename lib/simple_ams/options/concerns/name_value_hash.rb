@@ -11,18 +11,18 @@ class SimpleAMS::Options
           _value = value.call(resource)
           @value = _value.first
           if _value.is_a?(Array) && _value.length > 1
-            @options = (_value.last[:options] || {}).merge(options[:options] || {})
+            @options = (_value.last || {}).merge(options || {})
           else
-            @options = options[:options] || {}
+            @options = options || {}
           end
         else
           @value = value
-          @options = options[:options] || {}
+          @options = options || {}
         end
       end
 
       def raw
-        [name, value, {options: options}]
+        [name, value, options]
       end
 
       private

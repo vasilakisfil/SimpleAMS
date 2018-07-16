@@ -56,7 +56,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @user = User.new
       @allowed_relations = User.relations
       @allowed_relations.each do |relation|
-        UserSerializer.send(relation.type, relation.name, options: relation.options)
+        UserSerializer.send(relation.type, relation.name, relation.options)
       end
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
@@ -89,7 +89,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @user = User.new
       @allowed_relations = User.relations
       @allowed_relations.each do |relation|
-        UserSerializer.send(relation.type, relation.name, options: relation.options)
+        UserSerializer.send(relation.type, relation.name, relation.options)
       end
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(
@@ -121,7 +121,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
     before do
       @allowed_relations = User.relations
       @allowed_relations.each do |relation|
-        UserSerializer.send(relation.type, relation.name, options: relation.options)
+        UserSerializer.send(relation.type, relation.name, relation.options)
       end
       @injected_relations = Helpers.pick(@allowed_relations)
       @user = User.new
@@ -152,7 +152,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @allowed_relations = User.relations
       2.times{
         @allowed_relations.each do |relation|
-          UserSerializer.send(relation.type, relation.name, options: relation.options)
+          UserSerializer.send(relation.type, relation.name, relation.options)
         end
       }
       @injected_relations = Helpers.pick(@allowed_relations)

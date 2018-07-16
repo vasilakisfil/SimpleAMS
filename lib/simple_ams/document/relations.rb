@@ -39,7 +39,7 @@ module SimpleAMS
           # *serializer class options
           SimpleAMS::Options.new(
             resource: relation_value(relation.name),
-            injected_options: (relation.options[:options] || {}).merge(
+            injected_options: (relation.options || {}).merge(
               options.relation_options_for(relation.name).merge(expose: options.expose)
             ).merge(
               _internal: {

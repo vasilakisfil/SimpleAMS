@@ -25,13 +25,13 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
     context "with options" do
       before do
         @options = Helpers.random_options
-        UserSerializer.has_many(:microposts, options: @options)
+        UserSerializer.has_many(:microposts, @options)
       end
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relationships.count).to eq 1
-        expect(UserSerializer.relationships.first).to eq [:microposts, :has_many, {options: @options}]
+        expect(UserSerializer.relationships.first).to eq [:microposts, :has_many, @options]
       end
     end
   end
@@ -52,13 +52,13 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
     context "with options" do
       before do
         @options = Helpers.random_options
-        UserSerializer.has_one(:follower, options: @options)
+        UserSerializer.has_one(:follower, @options)
       end
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relationships.count).to eq 1
-        expect(UserSerializer.relationships.first).to eq [:follower, :has_one, {options: @options}]
+        expect(UserSerializer.relationships.first).to eq [:follower, :has_one, @options]
       end
     end
   end
@@ -79,13 +79,13 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
     context "with options" do
       before do
         @options = Helpers.random_options
-        UserSerializer.belongs_to(:unit, options: @options)
+        UserSerializer.belongs_to(:unit, @options)
       end
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relationships.count).to eq 1
-        expect(UserSerializer.relationships.first).to eq [:unit, :belongs_to, {options: @options}]
+        expect(UserSerializer.relationships.first).to eq [:unit, :belongs_to, @options]
       end
     end
   end
@@ -95,9 +95,9 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
       before do
         @options = Helpers.random_options
 
-        UserSerializer.has_many(:microposts, options: @options)
-        UserSerializer.belongs_to(:unit, options: @options)
-        UserSerializer.has_one(:follower, options: @options)
+        UserSerializer.has_many(:microposts, @options)
+        UserSerializer.belongs_to(:unit, @options)
+        UserSerializer.has_one(:follower, @options)
       end
 
       it "holds the specified options" do
@@ -105,13 +105,13 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
         expect(UserSerializer.relationships.count).to eq 3
 
         relation = UserSerializer.relationships.find{|r| r.first == :microposts}
-        expect(relation).to eq [:microposts, :has_many, {options: @options}]
+        expect(relation).to eq [:microposts, :has_many, @options]
 
         relation = UserSerializer.relationships.find{|r| r.first == :unit}
-        expect(relation).to eq [:unit, :belongs_to, {options: @options}]
+        expect(relation).to eq [:unit, :belongs_to, @options]
 
         relation = UserSerializer.relationships.find{|r| r.first == :follower}
-        expect(relation).to eq [:follower, :has_one, {options: @options}]
+        expect(relation).to eq [:follower, :has_one, @options]
       end
     end
   end

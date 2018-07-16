@@ -45,7 +45,7 @@ RSpec.describe SimpleAMS::DSL, 'links' do
       UserSerializer.links.each_with_index do |link, index|
         expect(link).to eq @links[index].as_input
         #just in case
-        expect(link).to eq [@links[index].name, @links[index].value, options: @links[index].options]
+        expect(link).to eq [@links[index].name, @links[index].value, @links[index].options]
       end
     end
   end
