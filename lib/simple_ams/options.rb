@@ -128,11 +128,11 @@ module SimpleAMS
     def serializer
       return @serializer if defined?(@serializer)
 
-      _serializer = injected_options.fetch(:serializer)
+      _serializer = injected_options.fetch(:serializer, @serializer_class)
 
       return @serializer = _serializer.new.extend(
         SimpleAMS::Methy.of(
-          exposed.merge({
+          expose.merge({
             object: resource
           })
         )
@@ -150,8 +150,8 @@ module SimpleAMS
     end
 
     # the following should be the same for all (nested) serializers of the same document
-    def exposed
-      @exposed ||= injected_options.fetch(:expose, {})
+    def expose
+      @expose ||= injected_options.fetch(:expose, {})
     end
 
     def as_hash
@@ -164,6 +164,7 @@ module SimpleAMS
         includes: includes.raw,
         links: links.raw,
         metas: metas.raw,
+        expose: expose,
         _internal: _internal
       }
     end
@@ -198,7 +199,7 @@ module SimpleAMS
 
       def infer_serializer_for(resource)
         namespace = _internal[:module] ? "#{_internal[:module]}::" : ""
-        @serializer ||= Object.const_get("#{namespace}#{resource.class.to_s}Serializer")
+        @serializer_class ||= Object.const_get("#{namespace}#{resource.class.to_s}Serializer")
       rescue NameError => _
         raise "Could not infer serializer for #{resource.class}, maybe specify it? (tried #{namespace}#{resource.class.to_s}Serializer)"
       end

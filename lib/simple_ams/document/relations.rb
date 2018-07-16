@@ -33,14 +33,14 @@ module SimpleAMS
         SimpleAMS::Renderer.new(
           relation_value(relation.name),
           #TODO: this part here needs some work
-          #3 options are merged:
+          #4 options are merged:
           # *user injected when instantiating the SimpleAMS class
           # *relation options injected from parent serializer
           # *serializer class options
           SimpleAMS::Options.new(
             resource: relation_value(relation.name),
             injected_options: (relation.options[:options] || {}).merge(
-              options.relation_options_for(relation.name).merge(options.exposed)
+              options.relation_options_for(relation.name).merge(expose: options.expose)
             ).merge(
               _internal: {
                 module: serializer.class.to_s.rpartition('::').first

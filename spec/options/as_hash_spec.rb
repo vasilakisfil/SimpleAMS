@@ -20,6 +20,7 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
           includes: [],
           links: [],
           metas: [],
+          expose: {},
           _internal: {},
         }
       )
@@ -60,6 +61,7 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
           includes: [],
           links: @links.map(&:as_input),
           metas: [@meta.as_input],
+          expose: {},
           _internal: {},
         }
       )
