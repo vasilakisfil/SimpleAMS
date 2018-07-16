@@ -64,6 +64,7 @@ class UserSerializer
   def name
     "#{object.first_name} #{object.last_name}"
   end
+end
 ```
 
 Then you can just feed your serializer with data, along with some options:
@@ -102,7 +103,7 @@ In each case we have the following options:
   serializer: ->(obj){ obj.employee? ? EmployeeSerializer : UserSerializer }
   #specifying the anderlying adapter. This cannot be a lambda in case of ArrayRenderer,
   #but can take some usefull options that are passed down straignt to the adapter class.
-  adapter: SimpleAMS::Adapters::AMS, root: true #name can also accept the class itself, options are passed to the adapter
+  adapter: SimpleAMS::Adapters::AMS, root: true
   #the links data
   links: {
     #can be a simple string
@@ -117,6 +118,8 @@ In each case we have the following options:
   #the meta data, same as the links data (available in adapters even for sinlge records)
   meta: {
     type: ->(obj){ obj.employee? ? :employee : :user}
+    #meta can take arbiratry options as well
+    authorization: :oauth, type: :bearer_token
   },
   #collection parameters, used only in ArrayRenderer
   collection: {
@@ -134,9 +137,9 @@ In each case we have the following options:
   #exposing helpers that will be available inside the seriralizer
   expose: {
     #a class
-    url_helpers: SimpleHelpers.new
+    current_user: User.first
     #or a module
-    helpers: SimpleHelpersModule
+    helpers: CommonHelpers
   },
 }
 ```
