@@ -56,7 +56,7 @@ class UserSerializer
   belongs_to :organization
   has_one :profile
 
-  link :root, '/api/v1/', options: {collection: true}
+  link :root, '/api/v1/', options: {rel: :user}
   link :self, ->(obj) { "/api/v1/users/#{obj.id}" }
   link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
 
@@ -118,7 +118,7 @@ In each case we have the following options:
   meta: {
     type: ->(obj){ obj.employee? ? :employee : :user}
   },
-  #collection parameters
+  #collection parameters, used only in ArrayRenderer
   collection: {
     links: {
       root: '/api/v1'

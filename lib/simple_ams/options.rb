@@ -81,13 +81,20 @@ module SimpleAMS
         }
     end
 
+    #TODO: add method-based links, should boost performance
     def links
       return @links if defined?(@links)
 
       injected = injected_options.fetch(:links, nil)
-      injected = Links.new(injected.map{|l| Links::Link.new(*l.flatten)}) if injected
+      if injected
+        injected = Links.new(
+          injected.map{|l| Links::Link.new(*l.flatten, resource: resource)}
+        )
+      end
 
-      allowed = Links.new(allowed_options.fetch(:links).map{|l| Links::Link.new(*l)})
+      allowed = Links.new(
+        allowed_options.fetch(:links).map{|l| Links::Link.new(*l, resource: resource)}
+      )
 
       return @links = Links.new(options_for(
         #TODO: correctly loop over injected properties
@@ -96,12 +103,19 @@ module SimpleAMS
       ).uniq{|link| link.name})
     end
 
+    #TODO: add method-based metas, should boost performance
     def metas
       return @metas if defined?(@metas)
 
       injected = injected_options.fetch(:metas, nil)
-      injected = Metas.new(injected.map{|l| Metas::Meta.new(*l.flatten)}) if injected
-      allowed = Metas.new(allowed_options.fetch(:metas).map{|l| Metas::Meta.new(*l)})
+      if injected
+        injected = Metas.new(
+          injected.map{|l| Metas::Meta.new(*l.flatten, resource: resource)}
+        )
+      end
+      allowed = Metas.new(
+        allowed_options.fetch(:metas).map{|l| Metas::Meta.new(*l, resource: resource)}
+      )
 
       return @metas = Metas.new(options_for(
         #TODO: correctly loop over injected properties
@@ -158,8 +172,8 @@ module SimpleAMS
       attr_reader :_internal
 
       def options_for(allowed:, injected:)
-        unless injected.nil?
-          allowed = allowed & injected
+        if not injected.nil?
+          allowed = injected & allowed
         end
 
         return allowed

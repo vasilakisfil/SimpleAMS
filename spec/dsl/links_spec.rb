@@ -22,12 +22,13 @@ RSpec.describe SimpleAMS::DSL, 'links' do
   context "with lambda link" do
     before do
       @link = Elements.link
-      UserSerializer.link(*@link.as_input)
+      UserSerializer.link(*@link.as_lambda_input)
     end
 
     it "holds the specified link" do
       expect(UserSerializer.links.count).to eq 1
-      expect(UserSerializer.links.first).to eq @link.as_input
+      expect(UserSerializer.links.first[1].is_a?(Proc)).to eq true
+      expect(UserSerializer.links.first[1].call).to eq @link.as_input[1..-1]
     end
   end
 

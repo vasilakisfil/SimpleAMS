@@ -148,14 +148,15 @@ RSpec.describe SimpleAMS::Document, 'links' do
 
     it "holds the uniq union of injected and allowed links" do
       links_got = @document.links
-      links_expected = (@allowed_links + Elements.as_elements_for(
+      links_expected = (Elements.as_elements_for(
         @injected_links, klass: Elements::Link
-      )).uniq{|q| q.name}.select{|l|
+      ) + @allowed_links).uniq{|q| q.name}.select{|l|
         @allowed_links.map(&:name).include?(l.name) && @injected_links.keys.include?(l.name)
       }
 
       expect(links_got.map(&:name)).to eq(links_expected.map(&:name))
       expect(links_got.map(&:value)).to eq(links_expected.map(&:value))
+      expect(links_got.map(&:options).count).to eq(links_expected.map(&:options).count)
       expect(links_got.map(&:options)).to eq(links_expected.map(&:options))
     end
   end
@@ -186,10 +187,12 @@ RSpec.describe SimpleAMS::Document, 'links' do
 
     it "holds the uniq union of injected and allowed links" do
       links_got = @document.links
-      links_expected = (@allowed_links + Elements.as_elements_for(
+      _injected_links = Elements.as_elements_for(
         @injected_links, klass: Elements::Link
-      )).uniq{|q| q.name}.select{|l|
-        @allowed_links.map(&:name).include?(l.name) && @injected_links.keys.include?(l.name)
+      )
+      
+      links_expected = (_injected_links.map(&:name) & @allowed_links.map(&:name)).map{|name|
+        _injected_links.find{|l| l.name == name}
       }
 
       expect(links_got.map(&:name)).to eq(links_expected.map(&:name))
@@ -197,4 +200,5 @@ RSpec.describe SimpleAMS::Document, 'links' do
       expect(links_got.map(&:options)).to eq(links_expected.map(&:options))
     end
   end
+
 end

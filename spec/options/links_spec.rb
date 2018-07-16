@@ -99,14 +99,17 @@ RSpec.describe SimpleAMS::Options, 'links' do
 
     it "holds the uniq union of injected and allowed links" do
       links_got = @options.links
-      links_expected = (@allowed_links + Elements.as_elements_for(
+      _injected_links = Elements.as_elements_for(
         @injected_links, klass: Elements::Link
-      )).uniq{|q| q.name}.select{|l|
-        @allowed_links.map(&:name).include?(l.name) && @injected_links.keys.include?(l.name)
+      )
+      
+      links_expected = (_injected_links.map(&:name) & @allowed_links.map(&:name)).map{|name|
+        _injected_links.find{|l| l.name == name}
       }
 
       expect(links_got.map(&:name)).to eq(links_expected.map(&:name))
       expect(links_got.map(&:value)).to eq(links_expected.map(&:value))
+      binding.pry if links_got.map(&:options) != links_expected.map(&:options)
       expect(links_got.map(&:options)).to eq(links_expected.map(&:options))
     end
   end
@@ -135,15 +138,90 @@ RSpec.describe SimpleAMS::Options, 'links' do
 
     it "holds the uniq union of injected and allowed links" do
       links_got = @options.links
-      links_expected = (@allowed_links + Elements.as_elements_for(
+      _injected_links = Elements.as_elements_for(
         @injected_links, klass: Elements::Link
-      )).uniq{|q| q.name}.select{|l|
-        @allowed_links.map(&:name).include?(l.name) && @injected_links.keys.include?(l.name)
+      )
+      
+      links_expected = (_injected_links.map(&:name) & @allowed_links.map(&:name)).map{|name|
+        _injected_links.find{|l| l.name == name}
       }
 
       expect(links_got.map(&:name)).to eq(links_expected.map(&:name))
       expect(links_got.map(&:value)).to eq(links_expected.map(&:value))
       expect(links_got.map(&:options)).to eq(links_expected.map(&:options))
+    end
+  end
+
+  context "with lambda" do
+    context "allowed links" do
+      before do
+        @user = User.new
+        @allowed_links = [
+          Elements::Link.new(
+            name: :user, value: ->(obj){
+              ["api/v1/users/#{@user.id}", options: {rel: :user}]
+            }
+          ),
+          Elements::Link.new(
+            name: :root, value: "api/v1/root", options: {rel: :root}
+          ),
+        ]
+        @allowed_links.each do |link|
+          UserSerializer.link(*link.as_input)
+        end
+
+        @options = SimpleAMS::Options.new(
+          resource: @user,
+          injected_options: Helpers.random_options(with: {
+            serializer: UserSerializer
+          }, without: [:links])
+        )
+      end
+
+      it "holds the unwrapped links" do
+        expect(@options.links.count).to eq(2)
+
+        expect(@options.links.first.name).to eq(@allowed_links.first.name)
+        expect(@options.links.first.value).to eq(@allowed_links.first.value.call(@user).first)
+        expect(@options.links.first.options).to eq(@allowed_links.first.value.call(@user).last[:options])
+
+        expect(@options.links.last.name).to eq(@allowed_links.last.name)
+        expect(@options.links.last.value).to eq(@allowed_links.last.value)
+        expect(@options.links.last.options).to eq(@allowed_links.last.options)
+      end
+    end
+
+    context "injected links" do
+      before do
+        @user = User.new
+        @allowed_links = Elements.links
+        @allowed_links.each do |link|
+          UserSerializer.link(*link.as_input)
+        end
+
+        #@injected_links = Helpers.pick(@allowed_links).inject({}) { |memo, link|
+        @injected_links = [@allowed_links.first].inject({}) { |memo, link|
+          memo[link.name] = ->(obj){ ["/api/v1/#{@user.id}/#{link.name}", options: {rel: link.name}] }
+          memo
+        }
+
+        @options = SimpleAMS::Options.new(
+          resource: @user,
+          injected_options: Helpers.random_options(with: {
+            serializer: UserSerializer,
+            links: @injected_links
+          })
+        )
+      end
+
+      it "holds the injected lambda links" do
+        expect(@options.links.count).to eq(@injected_links.count)
+
+        @options.links.each do |link|
+          expect(link.name).to eq(@injected_links.find{|l| l.first == link.name}[0])
+          expect(link.value).to eq(@injected_links[link.name].call(@user).first)
+        end
+      end
     end
   end
 end

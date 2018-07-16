@@ -34,7 +34,7 @@ class Elements
       klass.new({
         name: key,
         value: value.is_a?(Array) ? value.first : value,
-        options: value.is_a?(Array) ? value.last : {}
+        options: value.is_a?(Array) ? value.last[:options] : {}
       })
     }
   end
@@ -57,10 +57,14 @@ class Elements
   class NameValueHash
     attr_reader :name, :value, :options
 
-    def initialize(name: nil, value: nil, options: {})
+    def initialize(name: nil, value: nil, options: nil)
       @name = name || Helpers::Options.single.to_sym
       @value = value || Faker::Lorem.word
-      @options = options == {} ? Helpers::Options.hash : options
+      if @value.is_a?(Proc)
+        @options = {}
+      else
+        @options = options == nil ? Helpers::Options.hash : options
+      end
     end
 
     def as_input
@@ -68,7 +72,11 @@ class Elements
     end
 
     def as_lambda_input
-      ->{ [@name, @value, {options: @options}] }
+      if @value.is_a?(Proc)
+        [@name, @value]
+      else
+        [@name, ->{ [@value, {options: @options}] } ]
+      end
     end
 
     #TODO: do we need that?

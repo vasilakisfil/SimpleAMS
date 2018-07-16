@@ -84,7 +84,7 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         UserSerializer.meta(*meta.as_input)
       end
       @injected_metas = Elements.as_options_for(
-        @allowed_metas.sample(rand(@allowed_metas.length) + 1)
+        Helpers.pick(@allowed_metas, length: rand(@allowed_metas.length) + 1)
       )
 
       injected_options = Helpers.random_options_with({
@@ -100,9 +100,9 @@ RSpec.describe SimpleAMS::Options, 'metas' do
     it "holds the uniq union of injected and allowed metas" do
       expect(@options.metas.map(&:name)).to(
         eq(
-          @allowed_metas.map(&:name) & Elements.as_elements_for(
+          Elements.as_elements_for(
             @injected_metas, klass: Elements::Meta
-          ).map(&:name)
+          ).map(&:name) & @allowed_metas.map(&:name)
         )
       )
     end
@@ -117,7 +117,7 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         end
       }
       @injected_metas = Elements.as_options_for(
-        @allowed_metas.sample(rand(@allowed_metas.length) + 1)
+        Helpers.pick(@allowed_metas, length: rand(@allowed_metas.length) + 1)
       )
 
       injected_options = Helpers.random_options_with({
@@ -133,11 +133,84 @@ RSpec.describe SimpleAMS::Options, 'metas' do
     it "holds the uniq union of injected and allowed metas" do
       expect(@options.metas.map(&:name)).to(
         eq(
-          @allowed_metas.map(&:name) & Elements.as_elements_for(
+          Elements.as_elements_for(
             @injected_metas, klass: Elements::Meta
-          ).map(&:name)
+          ).map(&:name) & @allowed_metas.map(&:name)
         )
       )
+    end
+  end
+
+  context "with lambda" do
+    context "allowed metas" do
+      before do
+        @user = User.new
+        @allowed_metas = [
+          Elements::Meta.new(
+            name: :user, value: ->(obj){
+              ["#{@user.id}", options: {collection: :yes}]
+            }
+          ),
+          Elements::Meta.new(
+            name: :root, value: "something", options: {collection: :no}
+          ),
+        ]
+        @allowed_metas.each do |meta|
+          UserSerializer.meta(*meta.as_input)
+        end
+
+        @options = SimpleAMS::Options.new(
+          resource: @user,
+          injected_options: Helpers.random_options(with: {
+            serializer: UserSerializer
+          }, without: [:metas])
+        )
+      end
+
+      it "holds the unwrapped metas" do
+        expect(@options.metas.count).to eq(2)
+
+        expect(@options.metas.first.name).to eq(@allowed_metas.first.name)
+        expect(@options.metas.first.value).to eq(@allowed_metas.first.value.call(@user).first)
+        expect(@options.metas.first.options).to eq(@allowed_metas.first.value.call(@user).last[:options])
+
+        expect(@options.metas.last.name).to eq(@allowed_metas.last.name)
+        expect(@options.metas.last.value).to eq(@allowed_metas.last.value)
+        expect(@options.metas.last.options).to eq(@allowed_metas.last.options)
+      end
+    end
+
+    context "injected metas" do
+      before do
+        @user = User.new
+        @allowed_metas = Elements.metas
+        @allowed_metas.each do |meta|
+          UserSerializer.meta(*meta.as_input)
+        end
+
+        #@injected_metas = Helpers.pick(@allowed_metas).inject({}) { |memo, meta|
+        @injected_metas = [@allowed_metas.first].inject({}) { |memo, meta|
+          memo[meta.name] = ->(obj){ ["#{@user.id}/#{meta.name}", options: {rel: meta.name}] }
+          memo
+        }
+
+        @options = SimpleAMS::Options.new(
+          resource: @user,
+          injected_options: Helpers.random_options(with: {
+            serializer: UserSerializer,
+            metas: @injected_metas
+          })
+        )
+      end
+
+      it "holds the injected lambda metas" do
+        expect(@options.metas.count).to eq(@injected_metas.count)
+
+        @options.metas.each do |meta|
+          expect(meta.name).to eq(@injected_metas.find{|l| l.first == meta.name}[0])
+          expect(meta.value).to eq(@injected_metas[meta.name].call(@user).first)
+        end
+      end
     end
   end
 end

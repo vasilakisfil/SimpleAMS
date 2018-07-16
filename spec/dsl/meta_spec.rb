@@ -19,6 +19,19 @@ RSpec.describe SimpleAMS::DSL, 'meta' do
     end
   end
 
+  context "with lambda meta" do
+    before do
+      @meta = Elements.meta
+      UserSerializer.meta(*@meta.as_lambda_input)
+    end
+
+    it "holds the specified meta" do
+      expect(UserSerializer.metas.count).to eq 1
+      expect(UserSerializer.metas.first[1].is_a?(Proc)).to eq true
+      expect(UserSerializer.metas.first[1].call).to eq @meta.as_input[1..-1]
+    end
+  end
+
   context "with multiple meta" do
     before do
       @meta = (rand(10) + 2).times.map{ Elements.meta }

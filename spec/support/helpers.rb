@@ -1,6 +1,7 @@
 module Helpers
-  def self.pick(array)
-    array.sample(rand(array.length))
+  def self.pick(array, length: nil)
+    _array = array.sample(length || rand(array.length))
+    _array.sort_by(&array.method(:index))
   end
 
   def self.initialize_with_overrides(serializer_klass, allowed: nil)
@@ -21,8 +22,8 @@ module Helpers
   end
 
   #not that random..
-  def self.random_options
-    {
+  def self.random_options(with: {}, without: [])
+    options = {
       type: :user,
       primary_id: :id,
       includes: Helpers.pick(User.relation_names),
@@ -38,9 +39,14 @@ module Helpers
         },
         meta: Options.hash
       }
-    }
+    }.merge(with)
+
+    without.each{|s| options.delete(s)}
+
+    return options
   end
 
+  #Deprecated
   def self.random_options_with(opts = {})
     options = random_options
     return options.merge(opts)
