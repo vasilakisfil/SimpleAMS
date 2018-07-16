@@ -10,7 +10,11 @@ class SimpleAMS::Options
         if value.is_a?(Proc)
           _value = value.call(resource)
           @value = _value.first
-          @options = _value.last[:options] || {}
+          if _value.is_a?(Array) && _value.length > 1
+            @options = (_value.last[:options] || {}).merge(options[:options] || {})
+          else
+            @options = options[:options] || {}
+          end
         else
           @value = value
           @options = options[:options] || {}
