@@ -20,7 +20,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
     before do
       @allowed_relations = Helpers.random_relations_with_types
       @allowed_relations.each do |rel, type|
-        UserSerializer.send(type, rel, options: Helpers.random_options)
+        UserSerializer.send(type, rel, Helpers.random_options)
       end
       @options = SimpleAMS::Options.new(
         resource: User.new,
@@ -39,7 +39,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
     before do
       @allowed_relations = Helpers.random_relations_with_types
       @allowed_relations.each do |rel, type|
-        UserSerializer.send(type, rel, options: Helpers.random_options)
+        UserSerializer.send(type, rel, Helpers.random_options)
       end
       @options = SimpleAMS::Options.new(
         resource: User.new,
@@ -78,7 +78,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
     before do
       @allowed_relations = Helpers.random_relations_with_types
       @allowed_relations.each do |rel, type|
-        UserSerializer.send(type, rel, options: Helpers.random_options)
+        UserSerializer.send(type, rel, Helpers.random_options)
       end
       @injected_relations = Helpers.pick(@allowed_relations.keys)
       @options = SimpleAMS::Options.new(
@@ -104,7 +104,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
       @allowed_relations = Helpers.random_relations_with_types
       2.times {
         @allowed_relations.each do |rel, type|
-          UserSerializer.send(type, rel, options: Helpers.random_options)
+          UserSerializer.send(type, rel, Helpers.random_options)
         end
       }
       @injected_relations = Helpers.pick(@allowed_relations.keys)

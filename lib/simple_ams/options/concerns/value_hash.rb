@@ -7,13 +7,13 @@ class SimpleAMS::Options
 
       def initialize(value, options = {})
         @value = value.is_a?(String) ? value.to_sym : value
-        @options = options.kind_of?(Hash) ? options[:options] || {} : options
+        @options = options.kind_of?(Hash) ? options || {} : options
       end
 
       alias_method :name, :value
 
       def raw
-        [value, {options: options}]
+        [value, options]
       end
 
       private

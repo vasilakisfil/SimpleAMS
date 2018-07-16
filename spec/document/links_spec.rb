@@ -190,7 +190,7 @@ RSpec.describe SimpleAMS::Document, 'links' do
       _injected_links = Elements.as_elements_for(
         @injected_links, klass: Elements::Link
       )
-      
+
       links_expected = (_injected_links.map(&:name) & @allowed_links.map(&:name)).map{|name|
         _injected_links.find{|l| l.name == name}
       }

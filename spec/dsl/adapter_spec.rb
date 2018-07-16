@@ -32,7 +32,7 @@ RSpec.describe SimpleAMS::DSL, 'adapter' do
     it "holds the specified options" do
       expect(UserSerializer.adapter).to eq @adapter_options.as_input
       #just in case
-      expect(UserSerializer.adapter).to eq [@adapter_options.value, options: @adapter_options.options]
+      expect(UserSerializer.adapter).to eq [@adapter_options.value, @adapter_options.options]
     end
   end
 end

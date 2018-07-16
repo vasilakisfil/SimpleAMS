@@ -31,7 +31,7 @@ RSpec.describe SimpleAMS::DSL, 'type' do
 
       it "holds the selected type key" do
         expect(UserSerializer.type).to eq @type.as_input
-        expect(UserSerializer.type).to eq [@type.value, options: @type.options]
+        expect(UserSerializer.type).to eq [@type.value, @type.options]
       end
     end
   end

@@ -30,7 +30,7 @@ module Helpers
       fields: Helpers.pick(User.model_attributes),
       links: {
         self: "/api/v1/users/1",
-        posts: ["/api/v1/users/1/posts/", options: {collection: true}]
+        posts: ["/api/v1/users/1/posts/", collection: true]
       },
       meta: Options.hash,
       collection: {
