@@ -24,6 +24,9 @@ Or install it yourself as:
 
 ## Usage
 The gem's interface has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable and jsonapi-rb.
+However, **it has been built for PORO and does not relate to Rails in any case** other than
+some nostalgia for the (advanced at that time) pre-0.10 ActiveModel Serialiers.
+
 
 ### Simple case
 
