@@ -1,7 +1,7 @@
 # SimpleAMS
 > "Simple things should be simple and complex things should be possible." Alan Kay.
 
-If we want to interact we modern APIs, we should start building modern, flexible libraries
+If we want to interact with modern APIs we should start building modern, flexible libraries
 that help developers to build such APIs.
 
 Modern Ruby serializers, as I always wanted them to be.
