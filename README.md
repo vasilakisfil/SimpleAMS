@@ -1,25 +1,10 @@
 # SimpleAMS
 > "Simple things should be simple and complex things should be possible." Alan Kay.
 
-I had been thinking for many months now: *How difficult could it be to write a serializer gem?*
-I have used other serializer gems and I always feel that the code is over complecated.
+If we want to interact we modern APIs, we should start building modern, flexible libraries
+that help developers to build such APIs.
 
-I want this gem to be
-* super simple, easy to use, injectable API, clean code. Have you seen pundit? I want a pundit for serializing Ruby objects
-* super flexible. Do you remember 0.9xx version of AMS? It was a joy to work with and you could do anything
-* not to preassume much, embrace *clear clean explicit code*
-* have AMS style as first class citizen (meaning: just attributes of hashes and arrays) and from that implement the rest serializers
-* super clean code, sane metaprogramming
-* excellent documentation
-* tested
-* expected behavior on how the internals work
-* easy to override if needed pretty much anything
-* allow inheritence mode for adapters to actually work by exposing a simple yet power interface to the adapter **and**
-implementing a first class citizen adapter that splits responsibilities in small methods internally,
-considered as _public_ API ready to be overrided at any time
-
-It turned out that writting a serializers gem is a bit more complex than what I initially thought.
-However with initial well thought design, I managed to achieve my initial requirements and goals, mentioned above :)
+Modern Ruby serializers, as I always wanted them to be.
 
 ## Installation
 
@@ -38,7 +23,7 @@ Or install it yourself as:
     $ gem install simple-ams
 
 ## Usage
-The gem's API has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable and jsonapi-rb.
+The gem's interface has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable and jsonapi-rb.
 
 ### Simple case
 
@@ -48,21 +33,46 @@ Usually you rarely need all the advanced options. Usually you will have somethin
 class UserSerializer
   include SimpleAMS::DSL
 
-  adapter SimpleAMS::Adapters::AMS, root: true
+  #specify the adapter, pass some options all the way down to the adapter
+  adapter SimpleAMS::Adapters::JSONAPI, root: true
 
+  #specify available attributes/fields
   attributes :id, :name, :email, :birth_date
 
+  #specify available relations
   has_many :videos, :comments, :posts
   belongs_to :organization
   has_one :profile
 
+  #specify some links
+  link :feed, '/api/v1/me/feed'
+  #links can also take other options, as specified by RFC 8288
   link :root, '/api/v1/', rel: :user
-  link :self, ->(obj) { "/api/v1/users/#{obj.id}" }
+  #links can be dynamic as well through lambdas
   link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
+  #if you also need options, you need to return an array from the lambda
+  link :followers, ->(obj) { ["/api/v1/users/#{obj.id}/followers/", rel: :followers] }
+
+  #same with metas: can be static, dynamic and accept arbiratry options
+  meta :environment, ->(obj) { Rails.env.to_s }
+
+  #collection accepts exactly the same aforementioned interface
+  #although you will rarely use it to full extend
+  #here we use only links and meta
+  collection do
+    link :root, '/api/v1/', rel: :user
+
+    meta :count, ->(collection) { collection.count }
+  end
 
   #override an attribute
   def name
     "#{object.first_name} #{object.last_name}"
+  end
+
+  #override a relation
+  def videos
+    Videos.where(user_id: object.id).published
   end
 end
 ```
@@ -82,9 +92,9 @@ hash-based DSL that can be used in 3 different places:
 
 * When initializing the `SimpleAMS::Renderer` class to render the data using specific serializer, adapter and options.
 * Inside a class that has the `SimpleAMS::DSL` included, using the `with_options({})` class method
-* Through the DSL, although the syntax is slightly different
+* Through the DSL, powed with some syntactic sugar
 
-In each case we have the following options:
+In any case, we have the following options:
 
 ```ruby
 {
@@ -151,20 +161,35 @@ or to the serializer class itself using the `with_options` class method. Let's s
 class UserSerializer
   include SimpleAMS::DSL
 
-  with_options( #you can pass the same options as above ;)
-    OPTIONS
-  )
+  with_options({ #you can pass the same options as above ;)
+    primary_id: :id,
+    #   ...
+    #   ...
+    #   ...
+  })
 
-  #override an attribute
   def name
     "#{object.first_name} #{object.last_name}"
+  end
+
+  def videos
+    Videos.where(user_id: object.id).published
   end
 end
 ```
 
+The same options can be passed when calling the `Renderer`. `Renderer` can override
+some properties that are unique, however in properties that return sets (like
+attributes/fields, includes, links etc.), specified serializer options take precendence over
+`Renderer` options.
+
 ```ruby
-SimpleAMS::Serializer.new(user, {
-  expose: { url_helpers: SimpleHelpers },
+SimpleAMS::Renderer.new(user, {
+  primary_id: :id,
+  serializer: UserSerializer,
+  #   ...
+  #   ...
+  #   ...
 }).to_json
 
 ```
@@ -178,8 +203,23 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/vasilakisfil/foo.
 
-## TODO
-+ add type param
-+ finish options tests
-+ review spec/support infrastructure
-+ start document tests
+## Why did I build this ?
+I had been thinking for many months now: *How difficult could it be to write a serializer gem?*
+I have used other serializer gems and I always feel that the code is over complecated.
+
+I want this gem to be
+* super simple, easy to use, injectable API, clean code. Have you seen pundit? I want a pundit for serializing Ruby objects
+* super flexible. Do you remember 0.9xx version of AMS? It was a joy to work with and you could do anything
+* not to preassume much, embrace *clear clean explicit code*
+* have AMS style as first class citizen (meaning: just attributes of hashes and arrays) and from that implement the rest serializers
+* super clean code, sane metaprogramming
+* excellent documentation
+* tested
+* expected behavior on how the internals work
+* easy to override if needed pretty much anything
+* allow inheritence mode for adapters to actually work by exposing a simple yet power interface to the adapter **and**
+implementing a first class citizen adapter that splits responsibilities in small methods internally,
+considered as _public_ API ready to be overrided at any time
+
+It turned out that writting a serializers gem is a bit more complex than what I initially thought.
+Still though, I think it worthed the effort :)
