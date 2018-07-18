@@ -2,9 +2,7 @@
 > "Simple things should be simple and complex things should be possible." Alan Kay.
 
 If we want to interact with modern APIs we should start building modern, flexible libraries
-that help developers to build such APIs.
-
-Modern Ruby serializers, as I always wanted them to be.
+that help developers to build such APIs. Modern Ruby serializers, as I always wanted them to be.
 
 ## Installation
 
@@ -23,7 +21,7 @@ Or install it yourself as:
     $ gem install simple-ams
 
 ## Usage
-The gem's interface has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable and jsonapi-rb.
+The gem's interface has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable, jsonapi-rb and Ember Data.
 However, **it has been built for POROs and does not relate to Rails in any case** other than
 some nostalgia for the (advanced at that time) pre-0.10 ActiveModel Serialiers.
 
