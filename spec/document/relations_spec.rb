@@ -1,7 +1,7 @@
 require "spec_helper"
 
 #these tests have real relations compared to options/dsl that have random inputs
-#TODO: Add tests for injected relationships
+#TODO: Add tests for injected relations
 RSpec.describe SimpleAMS::Document, "relations" do
   let(:document_expecations) {
     ->(document, overrides, model, allowed = nil) {
@@ -70,16 +70,16 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns the allowed relations" do
-        expect(@document.relations).to respond_to(:each)
-        expect(@document.relations.map(&:name)).to(
-          eq(
-            @allowed_relations.map(&:name)
+          expect(@document.relations).to respond_to(:each)
+          expect(@document.relations.map(&:name)).to(
+            eq(
+              @allowed_relations.map(&:name)
+            )
           )
-        )
-        @document.relations.each_with_index do |relation, index|
-          expect(relation.name).to eq(@allowed_relations[index].name)
-          expect(relation.document.name).to eq(@allowed_relations[index].name)
-        end
+          @document.relations.each_with_index do |relation, index|
+            expect(relation.name).to eq(@allowed_relations[index].name)
+            expect(relation.document.name).to eq(@allowed_relations[index].name)
+          end
       end
     end
   end

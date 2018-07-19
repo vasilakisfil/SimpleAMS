@@ -2,17 +2,20 @@ require "simple_ams"
 
 class SimpleAMS::Options
   class Relation
-    include SimpleAMS::Options::Concerns::NameValueHash
-
-    def initialize(name, value, options = {})
+    attr_reader :type, :name, :options
+    def initialize(type, name, options = {})
+      @type = type.to_sym
       @name = name.is_a?(String) ? name.to_sym : name
-      @value = value.to_sym
       @options = options
 
       @many = relation == :has_many ? true : false
     end
 
-    alias_method :relation, :value
+    alias relation name
+
+    def raw
+      [type, name, options]
+    end
 
     def array?
       @many
@@ -21,5 +24,8 @@ class SimpleAMS::Options
     def single?
       !array
     end
+
+    private
+      attr_writer :type, :name, :options
   end
 end

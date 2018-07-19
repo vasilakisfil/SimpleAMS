@@ -1,7 +1,6 @@
 require "spec_helper"
 
-#TODO: Add tests for injected relationships
-RSpec.describe SimpleAMS::Options, "includes" do
+RSpec.describe SimpleAMS::Options, "relations" do
   context "with no reations in general" do
     before do
       @options = SimpleAMS::Options.new(
@@ -20,7 +19,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
     end
   end
 
-  context "with no injected includes" do
+  context "with no injected relations" do
     before do
       @allowed_relations = Helpers.random_relations_with_types
       @allowed_relations.each do |rel, type|
@@ -43,7 +42,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
     end
   end
 
-  context "with empty injected includes" do
+  context "with empty injected relations" do
     before do
       @allowed_relations = Helpers.random_relations_with_types
       @allowed_relations.each do |rel, type|
@@ -53,7 +52,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
         resource: User.new,
         injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
-          includes: []
+          relations: []
         })
       )
     end
@@ -67,59 +66,104 @@ RSpec.describe SimpleAMS::Options, "includes" do
     end
   end
 
-  context "with no allowed relations but injected ones" do
-    pending('Needs implementation')
-  end
-
-  context "with various includes" do
+  context "with injected relations but empty includes" do
     before do
-      @allowed_relations = Helpers.random_relations_with_types
-      @allowed_relations.each do |rel, type|
-        UserSerializer.send(type, rel, Helpers.random_options)
+      @injected_relations = User.relations.map do |relation|
+        [relation.type, relation.name, Helpers.random_options]
       end
-      @injected_relations = Helpers.pick(@allowed_relations.keys)
       @options = SimpleAMS::Options.new(
         resource: User.new,
         injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
-          includes: @injected_relations
+          relations: @injected_relations
         })
       )
     end
 
     it "holds the specified options" do
-      expect(@options.relations.map(&:name)).to(
+      expect(@options.relations).to(
         eq(
-          @allowed_relations.keys & @injected_relations
+          []
         )
       )
     end
   end
 
-  context "with repeated includes" do
+  context "with injected relations and related includes but no allowed includes" do
     before do
-      @allowed_relations = Helpers.random_relations_with_types
-      2.times {
-        @allowed_relations.each do |rel, type|
-          UserSerializer.send(type, rel, Helpers.random_options)
-        end
-      }
-      @injected_relations = Helpers.pick(@allowed_relations.keys)
+      @injected_relations = User.relations.map do |relation|
+        [relation.type, relation.name, Helpers.random_options]
+      end
       @options = SimpleAMS::Options.new(
         resource: User.new,
         injected_options: Helpers.random_options_with({
           serializer: UserSerializer,
-          includes: @injected_relations
+          relations: @injected_relations,
+          includes: @injected_relations.map{|relation| relation[1]}
         })
       )
     end
 
-    it "holds the uniq union of injected and allowed includes" do
-      expect(@options.includes).to(
-        eq(
-          (@allowed_relations.keys & @injected_relations).uniq
-        )
+    it "holds the specified options" do
+      expect(@options.relations).to(
+        eq([])
+      )
+    end
+  end
+
+  context "with injected relations that override allowed relations" do
+    before do
+      @injected_relation_options = Helpers.random_options
+      @injected_relations = User.relations.map do |relation|
+        [relation.type, relation.name, @injected_relation_options]
+      end
+      @injected_relations.each do |relation_array|
+        type = relation_array[0]
+        name = relation_array[1]
+        UserSerializer.send(type, name, Helpers.random_options)
+      end
+      @options = SimpleAMS::Options.new(
+        resource: User.new,
+        injected_options: Helpers.random_options(with: {
+          serializer: UserSerializer,
+          relations: @injected_relations,
+        }, without: [:includes])
+      )
+    end
+
+    it "holds the specified options" do
+      expect(@options.relations.map(&:raw)).to(
+        eq(@injected_relations)
+      )
+    end
+  end
+
+  context "with injected relations that override allowed relations but empty injected includes" do
+    before do
+      @injected_relation_options = Helpers.random_options
+      @injected_relations = User.relations.map do |relation|
+        [relation.type, relation.name, @injected_relation_options]
+      end
+      @injected_relations.each do |relation_array|
+        type = relation_array[0]
+        name = relation_array[1]
+        UserSerializer.send(type, name, Helpers.random_options)
+      end
+      @options = SimpleAMS::Options.new(
+        resource: User.new,
+        injected_options: Helpers.random_options(with: {
+          serializer: UserSerializer,
+          relations: @injected_relations,
+          includes: []
+        })
+      )
+    end
+
+    it "holds the specified options" do
+      expect(@options.relations).to(
+        eq([])
       )
     end
   end
 end
+

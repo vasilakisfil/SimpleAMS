@@ -4,6 +4,17 @@ module Helpers
     _array.sort_by(&array.method(:index))
   end
 
+  def self.recursive_sort(array)
+    array.sort_by{|element|
+      if element.is_a?(Hash)
+        element = {element.keys.first => recursive_sort(element.values)}
+        element.keys.first
+      else
+        element
+      end
+    }
+  end
+
   def self.initialize_with_overrides(serializer_klass, allowed: nil)
     model_klass = Object.const_get(serializer_klass.to_s.gsub("Serializer",""))
     overrides = Helpers.pick(allowed || model_klass.model_attributes)
@@ -14,7 +25,7 @@ module Helpers
   end
 
   def self.reset!(resource)
-    [:@attributes, :@relationships, :@links, :@metas, :@adapter, :@primary_id, :@type].each do |var|
+    [:@attributes, :@relations, :@links, :@metas, :@adapter, :@primary_id, :@type].each do |var|
       if resource.instance_variable_defined?(var)
         resource.remove_instance_variable(var)
       end
@@ -29,10 +40,13 @@ module Helpers
       includes: Helpers.pick(User.relation_names),
       fields: Helpers.pick(User.model_attributes),
       links: {
-        self: "/api/v1/users/1",
-        posts: ["/api/v1/users/1/posts/", collection: true]
+        self: "/api/v1/#{Faker::Lorem.word}/#{rand(1000)}",
+        posts: [
+          "/api/v1/#{Faker::Lorem.word}/#{rand(1000)}/#{Faker::Lorem.word}/",
+          collection: [false, true].sample
+        ]
       },
-      meta: Options.hash,
+      metas: Options.hash,
       collection: {
         links: {
           root: '/api/v1/'
@@ -52,7 +66,6 @@ module Helpers
     return options.merge(opts)
   end
 
-  #not that random..
   def self.random_relations_with_types
     User.relations.inject({}){|memo, relation|
       memo[relation.name] = relation.type
