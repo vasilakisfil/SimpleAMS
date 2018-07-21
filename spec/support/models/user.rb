@@ -88,4 +88,7 @@ class User
   def address
     @address ||= Address.new
   end
+
+  class SubUser < self
+  end
 end

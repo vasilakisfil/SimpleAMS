@@ -178,4 +178,55 @@ RSpec.describe SimpleAMS::Document, "relations" do
       end
     end
   end
+
+  context "with overriden relation values" do
+    before do
+      @user = User.new
+      @allowed_relations = User.relations
+      @allowed_relations.each do |relation|
+        UserSerializer.send(
+          relation.type,
+          relation.name,
+          relation.options
+        )
+      end
+      @allowed_relations.each do |relation|
+        UserSerializer.send(:define_method, relation.name) do
+          Object.const_get("#{relation.name.capitalize}::Sub#{relation.name.capitalize}").new
+        end
+      end
+      @document = SimpleAMS::Document.new(
+        SimpleAMS::Options.new(
+          resource: @user,
+          injected_options: Helpers.random_options_with({
+            serializer: UserSerializer,
+          }).tap{|h| h.delete(:includes)}
+        )
+      )
+    end
+
+    after do
+      @allowed_relations.each do |relation|
+        UserSerializer.send(:undef_method, relation.name)
+      end
+    end
+
+    context "values" do
+      it "returns the allowed relations" do
+          expect(@document.relations).to respond_to(:each)
+          expect(@document.relations.map(&:name)).to(
+            eq(
+              @allowed_relations.map(&:name)
+            )
+          )
+          @document.relations.each_with_index do |relation, index|
+            expect(relation.name).to eq(@allowed_relations[index].name)
+            expect(relation.document.name).to eq(@allowed_relations[index].name)
+            expect(relation.send(:resource).class).to(
+              eq(Object.const_get("#{relation.name.capitalize}::Sub#{relation.name.capitalize}"))
+            )
+          end
+      end
+    end
+  end
 end

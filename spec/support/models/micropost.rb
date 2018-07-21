@@ -30,4 +30,7 @@ class Micropost
   def likes_count
     @likes_count ||= rand(100)
   end
+
+  class SubMicropost < self
+  end
 end

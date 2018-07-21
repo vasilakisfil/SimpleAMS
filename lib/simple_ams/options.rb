@@ -164,6 +164,7 @@ module SimpleAMS
         primary_id: primary_id.raw,
         type: type.raw,
         fields: fields.raw,
+        serializer: serializer.class,
         #relations: relations.raw, #TODO: why have I commented that out ?
         includes: includes.raw,
         links: links.raw,

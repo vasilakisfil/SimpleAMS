@@ -188,4 +188,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       end
     end
   end
+
+  context "with overriden fields by methods" do
+    skip("this is already tested by #with_overrides method")
+  end
 end

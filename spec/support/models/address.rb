@@ -42,4 +42,7 @@ class Address
   def updated_at
     @updated_at ||= Faker::Date.between(created_at, Date.today)
   end
+
+  class SubAddress < self
+  end
 end
