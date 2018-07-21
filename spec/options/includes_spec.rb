@@ -1,18 +1,20 @@
 require "spec_helper"
 
 RSpec.describe SimpleAMS::Options, "includes" do
-  context "with no includes in general" do
+  context "with no reations in general" do
     before do
       @options = SimpleAMS::Options.new(
         resource: User.new,
         injected_options: Helpers.random_options_with({
-          serializer: UserSerializer
-        }).tap{|h| h.delete(:includes)}
+          serializer: UserSerializer,
+        }).tap{|h|
+          h.delete(:includes)
+        }
       )
     end
 
-    it "returns an empty array" do
-      expect(@options.includes).to eq []
+    it "returns empty array" do
+      expect(@options.relations).to eq []
     end
   end
 
@@ -31,7 +33,11 @@ RSpec.describe SimpleAMS::Options, "includes" do
     end
 
     it "holds the specified options" do
-      expect(@options.includes).to eq @allowed_relations.keys.uniq
+      expect(@options.relations.map(&:name)).to(
+        eq(
+          @allowed_relations.keys
+        )
+      )
     end
   end
 
@@ -51,7 +57,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
     end
 
     it "holds the specified options" do
-      expect(@options.includes).to(
+      expect(@options.relations).to(
         eq(
           []
         )
@@ -59,22 +65,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
     end
   end
 
-  context "with no allowed includes but injected ones" do
-    before do
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
-          serializer: UserSerializer,
-        })
-      )
-    end
-
-    it "returns empty links array" do
-      expect(@options.includes).to eq []
-    end
-  end
-
-  context "with various injected includes" do
+  context "with various includes" do
     before do
       @allowed_relations = Helpers.random_relations_with_types
       @allowed_relations.each do |rel, type|
@@ -91,9 +82,9 @@ RSpec.describe SimpleAMS::Options, "includes" do
     end
 
     it "holds the specified options" do
-      expect(@options.includes).to(
+      expect(@options.relations.map(&:name)).to(
         eq(
-          (@allowed_relations.keys & @injected_relations).uniq
+          @allowed_relations.keys & @injected_relations
         )
       )
     end

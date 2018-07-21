@@ -49,10 +49,10 @@ class UserSerializer
   link :feed, '/api/v1/me/feed'
   #links can also take other options, as specified by RFC 8288
   link :root, '/api/v1/', rel: :user
-  #links can be dynamic as well through lambdas
-  link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }
-  #if you also need options, you need to return an array from the lambda
-  link :followers, ->(obj) { ["/api/v1/users/#{obj.id}/followers/", rel: :followers] }
+  #link values can be dynamic as well through lambdas
+  link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }, rel: :user
+  #if you also need dynamic options, you can return an array from the lambda
+  link :followers, ->(obj) { ["/api/v1/users/#{obj.id}/followers/", rel: obj.type] }
 
   #same with metas: can be static, dynamic and accept arbiratry options
   meta :environment, ->(obj) { Rails.env.to_s }
@@ -107,6 +107,17 @@ In any case, we have the following options:
   includes: [:posts, videos: [:comments]],
   #which fields for each relation should be included
   fields: [:id, :name, posts: [:id, :text], videos: [:id, :title, comments: [:id, :text]]] #overrides includes when association is specified
+  relations: [
+    [:belongs_to, :company, {
+      serializer: CompanySerializer,
+      fields: Company.column_names.map(&:to_sym)
+      }
+    ],
+    [:has_many, :followers, {
+      serializer: UserSerializer,
+      fields: User.column_names.map(&:to_sym)
+    ],
+  ]
   #the serializer that should be used
   #makes sense to use it when initializing the Renderer
   serializer: UserSerializer,

@@ -67,6 +67,10 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       )
     end
 
+    after do
+      UserSerializer.undefine_all
+    end
+
     context "members" do
       it "holds the allowed fields only" do
         expect(@document.fields.members).to eq User.model_attributes
@@ -95,6 +99,11 @@ RSpec.describe SimpleAMS::Document, 'fields' do
         )
       )
     end
+
+    after do
+      UserSerializer.undefine_all
+    end
+
 
     describe "members" do
       it "holds the allowed fields only" do
@@ -127,6 +136,10 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       )
     end
 
+    after do
+      UserSerializer.undefine_all
+    end
+
     describe "members" do
       it "holds the allowed fields only" do
         expect(@document.fields.members).to eq @allowed
@@ -156,6 +169,10 @@ RSpec.describe SimpleAMS::Document, 'fields' do
           })
         )
       )
+    end
+
+    after do
+      UserSerializer.undefine_all
     end
 
     describe "members" do

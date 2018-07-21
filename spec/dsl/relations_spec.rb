@@ -4,7 +4,7 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
   context "with no relations" do
     it "returns an empty array" do
       expect(UserSerializer.attributes).to eq []
-        expect(UserSerializer.relationships).to eq []
+        expect(UserSerializer.relations).to eq []
     end
   end
 
@@ -17,8 +17,8 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
-        expect(UserSerializer.relationships.count).to eq 1
-        expect(UserSerializer.relationships.first).to eq [:microposts, :has_many, {}]
+        expect(UserSerializer.relations.count).to eq 1
+        expect(UserSerializer.relations.first).to eq [:has_many, :microposts, {}]
       end
     end
 
@@ -30,8 +30,8 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
-        expect(UserSerializer.relationships.count).to eq 1
-        expect(UserSerializer.relationships.first).to eq [:microposts, :has_many, @options]
+        expect(UserSerializer.relations.count).to eq 1
+        expect(UserSerializer.relations.first).to eq [:has_many, :microposts, @options]
       end
     end
   end
@@ -44,8 +44,8 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
-        expect(UserSerializer.relationships.count).to eq 1
-        expect(UserSerializer.relationships.first).to eq [:follower, :has_one, {}]
+        expect(UserSerializer.relations.count).to eq 1
+        expect(UserSerializer.relations.first).to eq [:has_one, :follower, {}]
       end
     end
 
@@ -57,8 +57,8 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
-        expect(UserSerializer.relationships.count).to eq 1
-        expect(UserSerializer.relationships.first).to eq [:follower, :has_one, @options]
+        expect(UserSerializer.relations.count).to eq 1
+        expect(UserSerializer.relations.first).to eq [:has_one, :follower, @options]
       end
     end
   end
@@ -71,8 +71,8 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
-        expect(UserSerializer.relationships.count).to eq 1
-        expect(UserSerializer.relationships.first).to eq [:unit, :belongs_to, {}]
+        expect(UserSerializer.relations.count).to eq 1
+        expect(UserSerializer.relations.first).to eq [:belongs_to, :unit, {}]
       end
     end
 
@@ -84,8 +84,8 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
-        expect(UserSerializer.relationships.count).to eq 1
-        expect(UserSerializer.relationships.first).to eq [:unit, :belongs_to, @options]
+        expect(UserSerializer.relations.count).to eq 1
+        expect(UserSerializer.relations.first).to eq [:belongs_to, :unit, @options]
       end
     end
   end
@@ -102,16 +102,16 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
 
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
-        expect(UserSerializer.relationships.count).to eq 3
+        expect(UserSerializer.relations.count).to eq 3
 
-        relation = UserSerializer.relationships.find{|r| r.first == :microposts}
-        expect(relation).to eq [:microposts, :has_many, @options]
+        relation = UserSerializer.relations.find{|r| r[1] == :microposts}
+        expect(relation).to eq [:has_many, :microposts, @options]
 
-        relation = UserSerializer.relationships.find{|r| r.first == :unit}
-        expect(relation).to eq [:unit, :belongs_to, @options]
+        relation = UserSerializer.relations.find{|r| r[1] == :unit}
+        expect(relation).to eq [:belongs_to, :unit, @options]
 
-        relation = UserSerializer.relationships.find{|r| r.first == :follower}
-        expect(relation).to eq [:follower, :has_one, @options]
+        relation = UserSerializer.relations.find{|r| r[1] == :follower}
+        expect(relation).to eq [:has_one, :follower, @options]
       end
     end
   end

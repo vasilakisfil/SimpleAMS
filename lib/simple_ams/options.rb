@@ -76,7 +76,11 @@ module SimpleAMS
     #TODO: correctly loop over injected relations, although should be a rarely used feature
     def relations
       return @relations if defined?(@relations) #||= options_for(
-      return @relations = allowed_options.fetch(:relationships).map{|rel| Relation.new(*rel)}.select{
+
+      relations = injected_options.fetch(:relations, nil)
+      relations = allowed_options.fetch(:relations, []) if relations.nil?
+
+      return @relations = relations.map{|rel| Relation.new(*rel)}.select{
           |relation| includes.include?(relation.name)
         }
     end
@@ -160,7 +164,7 @@ module SimpleAMS
         primary_id: primary_id.raw,
         type: type.raw,
         fields: fields.raw,
-        #relationships: relations.raw,
+        #relations: relations.raw, #TODO: why have I commented that out ?
         includes: includes.raw,
         links: links.raw,
         metas: metas.raw,

@@ -11,4 +11,4 @@
 .envrc
 # rspec failure tracking
 .rspec_status
-.todo
+.todo.md
