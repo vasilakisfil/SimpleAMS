@@ -3,12 +3,11 @@ require "spec_helper"
 RSpec.describe SimpleAMS::Options, 'adapter' do
   context "with no adapter is specified" do
     before do
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
         }).tap{|h| h.delete(:adapter)}
-      )
+      })
     end
 
     it "returns the default adapter" do
@@ -21,12 +20,11 @@ RSpec.describe SimpleAMS::Options, 'adapter' do
       @adapter = Elements.adapter
       UserSerializer.adapter(*@adapter.as_input)
 
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
         }).tap{|h| h.delete(:adapter)}
-      )
+      })
     end
 
     it "returns the adapter specified" do
@@ -43,13 +41,12 @@ RSpec.describe SimpleAMS::Options, 'adapter' do
 
       @another_adapter = Elements.adapter
 
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
           adapter: @another_adapter.as_input
         })
-      )
+      })
     end
 
     it "returns the injected adapter specified" do

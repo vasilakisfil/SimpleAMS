@@ -4,9 +4,7 @@ module SimpleAMS
   class Renderer
     def initialize(resource, options = {})
       @resource = resource
-      @options = SimpleAMS::Options.new(
-        resource: resource, injected_options: options
-      )
+      @options = SimpleAMS::Options.new(resource, injected_options: options)
     end
 
     #resource decorator ?
@@ -26,36 +24,30 @@ module SimpleAMS
       as_json.to_json
     end
 
+    class Collection
+      def initialize(collection, options = {})
+        @collection = collection
+        @options = SimpleAMS::Options.new(collection, injected_options: options)
+      end
+
+      def folder
+        @folder ||= SimpleAMS::Document::Collection.new(options)
+      end
+
+      def as_json
+        options.adapter.klass::Collection.new(folder).as_json
+      end
+
+      def to_json
+        as_json.to_json
+      end
+
+      private
+        attr_reader :collection, :options
+    end
+
     private
       attr_reader :resource, :options
   end
 
-  class ArrayRenderer
-    def initialize(collection, options = {})
-      @collection, @options = resource, SimpleAMS::Options.new(
-        resource: resource, injected_options: options
-      )
-    end
-
-    def document
-      @document ||= SimpleAMS::Document.new(options)
-    end
-
-    #TODO: is #each enough interface?
-    #Add collection-related attributes
-    def as_json
-      return @as_json if defined?(@as_json)
-
-      return @as_json = @collection.map do |resource|
-        options.adapter.new(SimpleAMS::Decorator.new(document, resource)).as_json
-      end
-    end
-
-    def to_json
-      as_json.to_json
-    end
-
-    private
-      attr_reader :collection, :options
-  end
 end

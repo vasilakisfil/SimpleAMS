@@ -13,6 +13,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           includes: [],
           links: [],
           metas: [],
+          collection: nil,
         }
       )
     end
@@ -33,6 +34,13 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           expect(UserSerializer.options.send(:[], key)).to eq([value, {}])
         when :links, :metas
           expect(UserSerializer.options.send(:[], key)).to eq(value.map{|k, v| [k, v].flatten(1)})
+        when :collection
+          expect(UserSerializer.options[:collection]).to(
+            eq(UserSerializer::Collection)
+          )
+          expect(UserSerializer.options[:collection].links).to(
+            eq(value[:links].map{|k, v| [k,v].flatten(1)})
+          )
         else
           expect(UserSerializer.options.send(:[], key)).to eq(value)
         end

@@ -37,8 +37,7 @@ module SimpleAMS
           # *user injected when instantiating the SimpleAMS class
           # *relation options injected from parent serializer
           # *serializer class options
-          SimpleAMS::Options.new(
-            resource: relation_value(relation.name),
+          SimpleAMS::Options.new(relation_value(relation.name), {
             injected_options: (relation.options || {}).merge(
               options.relation_options_for(relation.name).merge(expose: options.expose)
             ).merge(
@@ -46,7 +45,7 @@ module SimpleAMS
                 module: serializer.class.to_s.rpartition('::').first
               }
             )
-          ).as_hash
+          }).as_hash
         )
       end
 

@@ -1,6 +1,5 @@
 require "simple_ams"
 
-#TODO: we also need the includes in here
 class SimpleAMS::Document
   attr_reader :options, :serializer, :resource
 
@@ -26,11 +25,38 @@ class SimpleAMS::Document
     options.type
   end
 
+  def adapter
+    options.adapter
+  end
+
   def links
     return @links ||= self.class::Links.new(options)
   end
 
   def metas
     return @metas ||= self.class::Metas.new(options)
+  end
+
+  class Collection < self
+    attr_reader :collection
+
+    def initialize(options)
+      @options = options
+      @collection = options.resource
+    end
+
+    def documents
+      @documents = collection.map do |resource|
+        SimpleAMS::Document.new(options_for(resource))
+      end
+    end
+
+    private
+      def options_for(resource)
+        SimpleAMS::Options.new(resource, {
+          injected_options: options.injected_options,
+          allowed_options: options.allowed_options
+        })
+      end
   end
 end

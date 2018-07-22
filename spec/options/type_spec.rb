@@ -3,12 +3,11 @@ require "spec_helper"
 RSpec.describe SimpleAMS::Options, 'type' do
   context "with no type is specified" do
     before do
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
         }).tap{|h| h.delete(:type)}
-      )
+      })
     end
 
     it "defaults to class name" do
@@ -26,12 +25,11 @@ RSpec.describe SimpleAMS::Options, 'type' do
       @type = Elements.type
       UserSerializer.type(*@type.as_input)
 
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
         }).tap{|h| h.delete(:type)}
-      )
+      })
     end
 
     it "returns the type specified" do
@@ -51,13 +49,12 @@ RSpec.describe SimpleAMS::Options, 'type' do
       UserSerializer.type(*type.as_input)
 
       @type = Elements.type
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
           type: @type.as_input
         })
-      )
+      })
     end
 
     it "returns the injected type specified" do

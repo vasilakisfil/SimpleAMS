@@ -2,18 +2,19 @@ require "simple_ams"
 
 module SimpleAMS
   class Options
-    ELEMENTS = [:fields, :includes, :links, :metas, :type, :name].freeze
+    class Collection < self; end
 
     attr_reader :resource, :allowed_options, :injected_options
 
     #injected_options is always a Hash object
-    def initialize(resource:, injected_options: {}, allowed_options: nil)
+    def initialize(resource, injected_options: {}, allowed_options: nil)
       @resource = resource
-      @injected_options = injected_options
-      @_internal = injected_options[:_internal] || {}
-      @allowed_options = allowed_options || injected_options.fetch(:serializer, nil)&.options
+      @injected_options = injected_options || {}
+      @_internal = @injected_options[:_internal] || {}
+      @allowed_options = allowed_options || @injected_options.fetch(:serializer, nil)&.options
       @allowed_options = infer_serializer_for(resource).options if @allowed_options.nil?
     end
+    alias collection resource
 
     def relation_options_for(relation_name)
       return _relation_options[relation_name] || {}
@@ -172,6 +173,18 @@ module SimpleAMS
         expose: expose,
         _internal: _internal
       }
+    end
+
+    def collection_options
+      _injected_options = @injected_options.fetch(:collection, nil)
+      _allowed_options = @allowed_options.fetch(:collection, nil)
+      return nil unless _injected_options || _allowed_options
+
+      self.class::Collection.new(
+        resource,
+        injected_options: _injected_options,
+        allowed_options: _allowed_options&.options
+      )
     end
 
     private

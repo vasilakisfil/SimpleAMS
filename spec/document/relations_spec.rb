@@ -29,15 +29,14 @@ RSpec.describe SimpleAMS::Document, "relations" do
   context "with no reations in general" do
     before do
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
           }).tap{|h|
             h.delete(:includes)
             h.delete(:relations)
           }
-        )
+        })
       )
     end
 
@@ -59,12 +58,11 @@ RSpec.describe SimpleAMS::Document, "relations" do
         UserSerializer.send(relation.type, relation.name, relation.options)
       end
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: @user,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
           }).tap{|h| h.delete(:includes)}
-        )
+        })
       )
     end
 
@@ -92,13 +90,12 @@ RSpec.describe SimpleAMS::Document, "relations" do
         UserSerializer.send(relation.type, relation.name, relation.options)
       end
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: @user,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             includes: []
           })
-        )
+        })
       )
     end
 
@@ -126,13 +123,12 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @injected_relations = Helpers.pick(@allowed_relations)
       @user = User.new
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: @user,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             includes: @injected_relations
           })
-        )
+        })
       )
     end
 
@@ -158,13 +154,12 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @injected_relations = Helpers.pick(@allowed_relations)
       @user = User.new
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: @user,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             includes: @injected_relations
           })
-        )
+        })
       )
     end
 
@@ -196,12 +191,11 @@ RSpec.describe SimpleAMS::Document, "relations" do
         end
       end
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: @user,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
           }).tap{|h| h.delete(:includes)}
-        )
+        })
       )
     end
 
