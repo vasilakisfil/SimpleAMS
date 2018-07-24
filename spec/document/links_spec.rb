@@ -5,12 +5,11 @@ RSpec.describe SimpleAMS::Document, 'links' do
   context "with no links in general" do
     before do
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
           }).tap{|h| h.delete(:links)}
-        )
+        })
       )
     end
 
@@ -38,12 +37,11 @@ RSpec.describe SimpleAMS::Document, 'links' do
       end
 
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer
           }).tap{|h| h.delete(:links)}
-        )
+        })
       )
 
       @uniq_allowed_links = @allowed_links.uniq{|l| l.name}
@@ -70,13 +68,12 @@ RSpec.describe SimpleAMS::Document, 'links' do
       end
 
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             links: []
           })
-        )
+        })
       )
     end
 
@@ -99,12 +96,11 @@ RSpec.describe SimpleAMS::Document, 'links' do
   context "with no allowed links but injected ones" do
     before do
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
           })
-        )
+        })
       )
     end
 
@@ -134,15 +130,12 @@ RSpec.describe SimpleAMS::Document, 'links' do
         Helpers.pick(@allowed_links)
       )
 
-      injected_options = Helpers.random_options_with({
+      injected_options = Helpers.random_options(with: {
         serializer: UserSerializer,
         links: @injected_links
       })
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: injected_options
-        )
+        SimpleAMS::Options.new(User.new, injected_options: injected_options)
       )
     end
 
@@ -173,15 +166,12 @@ RSpec.describe SimpleAMS::Document, 'links' do
         Helpers.pick(@allowed_links)
       )
 
-      injected_options = Helpers.random_options_with({
+      injected_options = Helpers.random_options(with: {
         serializer: UserSerializer,
         links: @injected_links
       })
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: injected_options
-        )
+        SimpleAMS::Options.new(User.new, injected_options: injected_options)
       )
     end
 

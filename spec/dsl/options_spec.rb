@@ -13,6 +13,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           includes: [],
           links: [],
           metas: [],
+          collection: nil
         }
       )
     end
@@ -47,6 +48,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           includes: [],
           links: @links.map(&:as_input),
           metas: [@meta.as_input],
+          collection: nil
         }
       )
     end

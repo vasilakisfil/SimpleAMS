@@ -4,12 +4,11 @@ RSpec.describe SimpleAMS::Document, 'type' do
   context "with no type is specified" do
     before do
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
           }).tap{|h| h.delete(:type)}
-        )
+        })
       )
     end
 
@@ -29,12 +28,11 @@ RSpec.describe SimpleAMS::Document, 'type' do
       UserSerializer.type(*@type.as_input)
 
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
           }).tap{|h| h.delete(:type)}
-        )
+        })
       )
     end
 
@@ -56,13 +54,12 @@ RSpec.describe SimpleAMS::Document, 'type' do
 
       @type = Elements.type(value: :another_type, options: {bar: :foo})
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             type: @type.as_input
           })
-        )
+        })
       )
     end
 

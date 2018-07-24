@@ -5,12 +5,11 @@ RSpec.describe SimpleAMS::Document, 'metas' do
   context "with no metas in general" do
     before do
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
           }).tap{|h| h.delete(:metas)}
-        )
+        })
       )
     end
 
@@ -38,12 +37,11 @@ RSpec.describe SimpleAMS::Document, 'metas' do
       end
 
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer
           }).tap{|h| h.delete(:metas)}
-        )
+        })
       )
 
       @uniq_allowed_metas = @allowed_metas.uniq{|l| l.name}
@@ -70,13 +68,12 @@ RSpec.describe SimpleAMS::Document, 'metas' do
       end
 
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             metas: []
           })
-        )
+        })
       )
     end
 
@@ -99,12 +96,11 @@ RSpec.describe SimpleAMS::Document, 'metas' do
   context "with no allowed metas but injected ones" do
     before do
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
           })
-        )
+        })
       )
     end
 
@@ -134,15 +130,12 @@ RSpec.describe SimpleAMS::Document, 'metas' do
         Helpers.pick(@allowed_metas)
       )
 
-      injected_options = Helpers.random_options_with({
+      injected_options = Helpers.random_options(with: {
         serializer: UserSerializer,
         metas: @injected_metas
       })
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: injected_options
-        )
+        SimpleAMS::Options.new(User.new, injected_options: injected_options)
       )
     end
 
@@ -172,15 +165,12 @@ RSpec.describe SimpleAMS::Document, 'metas' do
         Helpers.pick(@allowed_metas)
       )
 
-      injected_options = Helpers.random_options_with({
+      injected_options = Helpers.random_options(with: {
         serializer: UserSerializer,
         metas: @injected_metas
       })
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: injected_options
-        )
+        SimpleAMS::Options.new(User.new, injected_options: injected_options)
       )
     end
 

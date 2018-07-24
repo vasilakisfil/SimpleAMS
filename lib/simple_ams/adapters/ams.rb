@@ -23,4 +23,24 @@ class SimpleAMS::Adapters::AMS
 
     return hash
   end
+
+  class Collection
+    attr_reader :folder, :adapter
+
+    def initialize(folder)
+      @folder = folder
+      @adapter = folder.adapter.value
+    end
+
+    def as_json
+      documents
+    end
+
+    def documents
+      return folder.documents.map{|document|
+        adapter.new(document).as_json
+      } || []
+    end
+
+  end
 end

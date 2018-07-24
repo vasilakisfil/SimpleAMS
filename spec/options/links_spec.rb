@@ -4,12 +4,11 @@ require "spec_helper"
 RSpec.describe SimpleAMS::Options, 'links' do
   context "with no links in general" do
     before do
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
         }).tap{|h| h.delete(:links)}
-      )
+      })
     end
 
     it "returns empty links array" do
@@ -24,12 +23,11 @@ RSpec.describe SimpleAMS::Options, 'links' do
         UserSerializer.link(*link.as_input)
       end
 
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer
         }).tap{|h| h.delete(:links)}
-      )
+      })
 
       @uniq_allowed_links = @allowed_links.uniq{|l| l.name}
     end
@@ -48,13 +46,12 @@ RSpec.describe SimpleAMS::Options, 'links' do
         UserSerializer.link(*link.as_input)
       end
 
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
           links: []
         })
-      )
+      })
     end
 
     it "returns empty links array" do
@@ -64,12 +61,11 @@ RSpec.describe SimpleAMS::Options, 'links' do
 
   context "with no allowed links but injected ones" do
     before do
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
         })
-      )
+      })
     end
 
     it "returns empty links array" do
@@ -87,14 +83,13 @@ RSpec.describe SimpleAMS::Options, 'links' do
         Helpers.pick(@allowed_links)
       )
 
-      injected_options = Helpers.random_options_with({
+      injected_options = Helpers.random_options(with:{
         serializer: UserSerializer,
         links: @injected_links
       })
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
+      @options = SimpleAMS::Options.new(User.new, {
         injected_options: injected_options
-      )
+      })
     end
 
     it "holds the uniq union of injected and allowed links" do
@@ -125,14 +120,13 @@ RSpec.describe SimpleAMS::Options, 'links' do
         Helpers.pick(@allowed_links)
       )
 
-      injected_options = Helpers.random_options_with({
+      injected_options = Helpers.random_options(with:{
         serializer: UserSerializer,
         links: @injected_links
       })
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
+      @options = SimpleAMS::Options.new(User.new, {
         injected_options: injected_options
-      )
+      })
     end
 
     it "holds the uniq union of injected and allowed links" do
@@ -169,12 +163,11 @@ RSpec.describe SimpleAMS::Options, 'links' do
           UserSerializer.link(*link.as_input)
         end
 
-        @options = SimpleAMS::Options.new(
-          resource: @user,
+        @options = SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer
           }, without: [:links])
-        )
+        })
       end
 
       it "holds the unwrapped links" do
@@ -204,13 +197,12 @@ RSpec.describe SimpleAMS::Options, 'links' do
           memo
         }
 
-        @options = SimpleAMS::Options.new(
-          resource: @user,
+        @options = SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             links: @injected_links
           })
-        )
+        })
       end
 
       it "holds the injected lambda links" do

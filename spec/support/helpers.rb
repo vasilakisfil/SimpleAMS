@@ -25,9 +25,9 @@ module Helpers
   end
 
   def self.reset!(resource)
-    [:@attributes, :@relations, :@links, :@metas, :@adapter, :@primary_id, :@type].each do |var|
-      if resource.instance_variable_defined?(var)
-        resource.remove_instance_variable(var)
+    [:attributes, :relations, :links, :metas, :adapter, :primary_id, :type, :collection].each do |var|
+      if resource.instance_variable_defined?("@_#{var}")
+        resource.remove_instance_variable("@_#{var}")
       end
     end
   end
@@ -58,12 +58,6 @@ module Helpers
     without.each{|s| options.delete(s)}
 
     return options
-  end
-
-  #Deprecated
-  def self.random_options_with(opts = {})
-    options = random_options
-    return options.merge(opts)
   end
 
   def self.random_relations_with_types
@@ -144,4 +138,18 @@ module Helpers
 
   class Adapter1; end
   class Adapter2; end
+
+  #no idea why Singleton is not working, but probably has to do with RSpec
+  #(NameError: uninitialized constant Singleton)
+  def self.define_singleton_for(name, opts = {})
+    _klass = Class.new(Object) do
+      opts.keys.each do |key|
+        define_singleton_method(key) do
+          opts[key]
+        end
+      end
+    end
+
+    const_set(name, _klass)
+  end
 end

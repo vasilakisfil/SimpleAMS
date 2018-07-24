@@ -4,12 +4,11 @@ require "spec_helper"
 RSpec.describe SimpleAMS::Options, 'metas' do
   context "with no metas in general" do
     before do
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
         }).tap{|h| h.delete(:metas)}
-      )
+      })
     end
 
     it "returns empty metas array" do
@@ -24,12 +23,11 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         UserSerializer.meta(*meta.as_input)
       end
 
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer
         }).tap{|h| h.delete(:metas)}
-      )
+      })
 
       @uniq_allowed_metas = @allowed_metas.uniq{|l| l.name}
     end
@@ -48,13 +46,12 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         UserSerializer.meta(*meta.as_input)
       end
 
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
           metas: []
         })
-      )
+      })
     end
 
     it "returns empty metas array" do
@@ -64,12 +61,11 @@ RSpec.describe SimpleAMS::Options, 'metas' do
 
   context "with no allowed metas but injected ones" do
     before do
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
         })
-      )
+      })
     end
 
     it "returns empty metas array" do
@@ -87,14 +83,13 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         Helpers.pick(@allowed_metas, length: rand(@allowed_metas.length) + 1)
       )
 
-      injected_options = Helpers.random_options_with({
+      injected_options = Helpers.random_options(with:{
         serializer: UserSerializer,
         metas: @injected_metas
       })
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
+      @options = SimpleAMS::Options.new(User.new, {
         injected_options: injected_options
-      )
+      })
     end
 
     it "holds the uniq union of injected and allowed metas" do
@@ -120,14 +115,13 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         Helpers.pick(@allowed_metas, length: rand(@allowed_metas.length) + 1)
       )
 
-      injected_options = Helpers.random_options_with({
+      injected_options = Helpers.random_options(with:{
         serializer: UserSerializer,
         metas: @injected_metas
       })
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
+      @options = SimpleAMS::Options.new(User.new, {
         injected_options: injected_options
-      )
+      })
     end
 
     it "holds the uniq union of injected and allowed metas" do
@@ -159,12 +153,11 @@ RSpec.describe SimpleAMS::Options, 'metas' do
           UserSerializer.meta(*meta.as_input)
         end
 
-        @options = SimpleAMS::Options.new(
-          resource: @user,
+        @options = SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer
           }, without: [:metas])
-        )
+        })
       end
 
       it "holds the unwrapped metas" do
@@ -194,13 +187,12 @@ RSpec.describe SimpleAMS::Options, 'metas' do
           memo
         }
 
-        @options = SimpleAMS::Options.new(
-          resource: @user,
+        @options = SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             metas: @injected_metas
           })
-        )
+        })
       end
 
       it "holds the injected lambda metas" do

@@ -27,12 +27,11 @@ RSpec.describe SimpleAMS::Document, 'fields' do
   context "with no fields in general" do
     before do
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer
           }).tap{|h| h.delete(:fields)}
-        )
+        })
       )
     end
 
@@ -58,12 +57,11 @@ RSpec.describe SimpleAMS::Document, 'fields' do
 
       @overrides = Helpers.initialize_with_overrides(UserSerializer)
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: @user,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer
           }).tap{|h| h.delete(:fields)}
-        )
+        })
       )
     end
 
@@ -90,13 +88,12 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       @user = User.new
       @overrides = Helpers.initialize_with_overrides(UserSerializer)
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: User.new,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(User.new, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             fields: []
           })
-        )
+        })
       )
     end
 
@@ -126,13 +123,12 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       @overrides = Helpers.initialize_with_overrides(UserSerializer, allowed: @allowed)
       UserSerializer.attributes(*@allowed)
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: @user,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             fields: User.model_attributes
           })
-        )
+        })
       )
     end
 
@@ -161,13 +157,12 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       @overrides = Helpers.initialize_with_overrides(UserSerializer, allowed: @allowed)
       UserSerializer.attributes(*(@allowed + @allowed))
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(
-          resource: @user,
-          injected_options: Helpers.random_options_with({
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             fields: (User.model_attributes + User.model_attributes)
           })
-        )
+        })
       )
     end
 

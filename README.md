@@ -138,7 +138,7 @@ In any case, we have the following options:
     self: ->(obj) { ["/api/v1/users/#{obj.id}", rel: :user] }
   },
   #the meta data, same as the links data (available in adapters even for sinlge records)
-  meta: {
+  metas: {
     type: ->(obj){ obj.employee? ? :employee : :user}
     #meta can take arbiratry options as well
     authorization: :oauth, type: :bearer_token

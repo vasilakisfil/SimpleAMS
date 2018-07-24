@@ -3,14 +3,13 @@ require "spec_helper"
 RSpec.describe SimpleAMS::Options, "includes" do
   context "with no reations in general" do
     before do
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
         }).tap{|h|
           h.delete(:includes)
         }
-      )
+      })
     end
 
     it "returns empty array" do
@@ -24,12 +23,11 @@ RSpec.describe SimpleAMS::Options, "includes" do
       @allowed_relations.each do |rel, type|
         UserSerializer.send(type, rel, Helpers.random_options)
       end
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
         }).tap{|h| h.delete(:includes)}
-      )
+      })
     end
 
     it "holds the specified options" do
@@ -47,13 +45,12 @@ RSpec.describe SimpleAMS::Options, "includes" do
       @allowed_relations.each do |rel, type|
         UserSerializer.send(type, rel, Helpers.random_options)
       end
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
           includes: []
         })
-      )
+      })
     end
 
     it "holds the specified options" do
@@ -72,13 +69,12 @@ RSpec.describe SimpleAMS::Options, "includes" do
         UserSerializer.send(type, rel, Helpers.random_options)
       end
       @injected_relations = Helpers.pick(@allowed_relations.keys)
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
           includes: @injected_relations
         })
-      )
+      })
     end
 
     it "holds the specified options" do
@@ -99,13 +95,12 @@ RSpec.describe SimpleAMS::Options, "includes" do
         end
       }
       @injected_relations = Helpers.pick(@allowed_relations.keys)
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
-        injected_options: Helpers.random_options_with({
+      @options = SimpleAMS::Options.new(User.new, {
+        injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
           includes: @injected_relations
         })
-      )
+      })
     end
 
     it "holds the uniq union of injected and allowed includes" do

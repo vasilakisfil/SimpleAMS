@@ -3,10 +3,9 @@ require "spec_helper"
 RSpec.describe SimpleAMS::Options, 'as_hash' do
   context "with no options" do
     before do
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
+      @options = SimpleAMS::Options.new(User.new, {
         injected_options: {serializer: UserSerializer}
-      )
+      })
     end
 
     it "returns the default" do
@@ -45,10 +44,9 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
       @meta = Elements.meta
       UserSerializer.meta(*@meta.as_input)
 
-      @options = SimpleAMS::Options.new(
-        resource: User.new,
+      @options = SimpleAMS::Options.new(User.new, {
         injected_options: {serializer: UserSerializer}
-      )
+      })
     end
 
     it "holds the specified options" do
