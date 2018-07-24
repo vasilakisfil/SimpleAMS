@@ -93,7 +93,7 @@ hash-based DSL that can be used in 3 different places:
 
 * When initializing the `SimpleAMS::Renderer` class to render the data using specific serializer, adapter and options.
 * Inside a class that has the `SimpleAMS::DSL` included, using the `with_options({})` class method
-* Through the DSL, powed with some syntactic sugar
+* Through the DSL, powered with some syntactic sugar
 
 In any case, we have the following options:
 
@@ -191,8 +191,8 @@ end
 ```
 
 The same options can be passed when calling the `Renderer`. `Renderer` can override
-some properties that are unique, however in properties that return sets (like
-attributes/fields, includes, links etc.), specified serializer options take precendence over
+some properties, however in all properties that act as sets/arrays (like
+attributes/fields, includes, links etc.), **specified serializer options take precendence** over
 `Renderer` options.
 
 ```ruby
