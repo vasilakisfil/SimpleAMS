@@ -22,13 +22,13 @@ Or install it yourself as:
 
 ## Usage
 The gem's interface has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable, jsonapi-rb and Ember Data.
-However, **it has been built for POROs and does not relate to Rails in any case** other than
+However, **it has been built for POROs, does not rely in any dependency and does not relate to Rails in any case** other than
 some nostalgia for the (advanced at that time) pre-0.10 ActiveModel Serialiers.
 
 
 ### Simple case
 
-Usually you rarely need all the advanced options. Usually you will have something like that:
+You will rarely need all the advanced options. Usually you will have something like that:
 
 ```ruby
 class UserSerializer
