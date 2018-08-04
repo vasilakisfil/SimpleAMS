@@ -1,15 +1,32 @@
 require "simple_ams"
 
-#TODO: add initializer to initialize instance vars ?
 module SimpleAMS::DSL
   def self.included(host_class)
     host_class.extend ClassMethods
+
+    _klass = Class.new(Object).extend(ClassMethods)
+    _klass.instance_eval do
+      def options
+        {
+          adapter: adapter,
+          primary_id: primary_id,
+          type: type,
+          fields: fields,
+          relations: relations,
+          includes: includes,
+          links: links,
+          metas: metas,
+        }
+      end
+    end
+
+    host_class.const_set('Collection', _klass)
   end
 
   module ClassMethods
     def default_options
       @_default_options ||= {
-        adapter: [SimpleAMS::Adapters::DEFAULT, {}],
+        adapter: [SimpleAMS::Adapters::AMS, {}],
         primary_id: [:id, {}],
         type: [self.to_s.gsub('Serializer','').downcase.split('::').last.to_sym, {}]
       }
@@ -21,7 +38,7 @@ module SimpleAMS::DSL
         if key.to_sym == :collection
           self.send(:collection){}.with_options(value)
         elsif meths.include?(key)
-          self.send(key, *value) if value.is_a?(Array)
+          self.send(key, value) if value.is_a?(Array)
           self.send(key, value)
         else
           #TODO: Add a proper logger
@@ -108,16 +125,13 @@ module SimpleAMS::DSL
 
     def collection(&block)
       if block
-        @_collection = Class.new(Object) do
-          include SimpleAMS::DSL
-
+        self::Collection.class_eval do
           instance_exec(&block)
-        end
 
-        self.const_set('Collection', @_collection)
+        end
       end
 
-      return @_collection
+      return self::Collection
     end
 
     def options
@@ -157,6 +171,9 @@ module SimpleAMS::DSL
         @_metas ||= []
 
         @_metas << meta
+      end
+
+      def empty_options
       end
   end
 end

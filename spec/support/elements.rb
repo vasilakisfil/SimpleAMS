@@ -25,6 +25,15 @@ class Elements
     (rand(10) + 3).times.map{Link.new}
   end
 
+  def fields
+    (rand(10) + 3).times.map{Field.new}
+  end
+  alias attributes fields
+
+  def includes
+    (rand(10) + 3).times.map{Include.new}
+  end
+
   def metas
     (rand(10) + 3).times.map{Meta.new}
   end
@@ -53,6 +62,19 @@ class Elements
   def adapter(*args)
     Adapter.new(*args)
   end
+
+  class Field
+    attr_reader :name
+
+    def initialize(name: nil)
+      @name = name || Faker::Lorem.word
+    end
+
+    def as_input
+      name
+    end
+  end
+  class Include < Field; end
 
   class NameValueHash
     attr_reader :name, :value, :options

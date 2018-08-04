@@ -11,9 +11,10 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
     it "returns the default" do
       expect(@options.as_hash).to eq (
         {
-          adapter: [SimpleAMS::Adapters::DEFAULT, {}],
+          adapter: [SimpleAMS::Adapters::AMS, {}],
           primary_id: [:id, {}],
           type: [:user, {}],
+          name: :user,
           fields: [],
           serializer: UserSerializer,
           #relations: [],
@@ -55,6 +56,7 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
           adapter: @adapter.as_input,
           primary_id: @primary_id.as_input,
           type: @type.as_input,
+          name: @type.name,
           fields: @attrs.uniq,
           serializer: UserSerializer,
           #relations: [],

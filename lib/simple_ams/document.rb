@@ -37,12 +37,14 @@ class SimpleAMS::Document
     return @metas ||= self.class::Metas.new(options)
   end
 
-  class Collection < self
+  class Folder < self
     attr_reader :collection
 
     def initialize(options)
-      @options = options
-      @collection = options.resource
+      @_options = options
+      @options = @_options.collection_options
+
+      @collection = options.collection
     end
 
     def documents
@@ -51,11 +53,17 @@ class SimpleAMS::Document
       end
     end
 
+    def resource_options
+      _options
+    end
+
     private
+      attr_reader :_options
+
       def options_for(resource)
         SimpleAMS::Options.new(resource, {
-          injected_options: options.injected_options,
-          allowed_options: options.allowed_options
+          injected_options: resource_options.injected_options,
+          allowed_options: resource_options.allowed_options
         })
       end
   end

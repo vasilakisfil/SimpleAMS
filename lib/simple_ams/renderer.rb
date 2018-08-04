@@ -31,7 +31,7 @@ module SimpleAMS
       end
 
       def folder
-        @folder ||= SimpleAMS::Document::Collection.new(options)
+        @folder ||= SimpleAMS::Document::Folder.new(options)
       end
 
       def as_json

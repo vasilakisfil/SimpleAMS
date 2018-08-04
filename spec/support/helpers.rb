@@ -24,10 +24,18 @@ module Helpers
     return overrides
   end
 
-  def self.reset!(resource)
-    [:attributes, :relations, :links, :metas, :adapter, :primary_id, :type, :collection].each do |var|
-      if resource.instance_variable_defined?("@_#{var}")
-        resource.remove_instance_variable("@_#{var}")
+  def self.reset!(resources = [])
+    resources = [resources].flatten
+
+    resources.each do |resource|
+      [:attributes, :relations, :links, :metas, :adapter, :primary_id, :type, :collection].each do |var|
+        if resource.instance_variable_defined?("@_#{var}")
+          resource.remove_instance_variable("@_#{var}")
+        end
+        
+        if resource::Collection.instance_variable_defined?("@_#{var}")
+          resource::Collection.remove_instance_variable("@_#{var}")
+        end
       end
     end
   end
@@ -49,7 +57,9 @@ module Helpers
       metas: Options.hash,
       collection: {
         links: {
-          root: '/api/v1/'
+          root: '/api/v1/',
+          documentation: '/api/documentation', foobar: [:yes, :no].sample,
+          status: ->(obj){["/status/#{obj.hash}"]}
         },
         meta: Options.hash
       }

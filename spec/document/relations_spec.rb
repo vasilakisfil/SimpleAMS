@@ -187,7 +187,8 @@ RSpec.describe SimpleAMS::Document, "relations" do
       end
       @allowed_relations.each do |relation|
         UserSerializer.send(:define_method, relation.name) do
-          Object.const_get("#{relation.name.capitalize}::Sub#{relation.name.capitalize}").new
+          name = relation.options[:serializer].to_s.gsub('Serializer', '')
+          Object.const_get("#{name.capitalize}::Sub#{name.capitalize}").new
         end
       end
       @document = SimpleAMS::Document.new(
@@ -216,8 +217,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
           @document.relations.each_with_index do |relation, index|
             expect(relation.name).to eq(@allowed_relations[index].name)
             expect(relation.document.name).to eq(@allowed_relations[index].name)
-            expect(relation.send(:resource).class).to(
-              eq(Object.const_get("#{relation.name.capitalize}::Sub#{relation.name.capitalize}"))
+            expect(relation.send(:resource).class).to(eq(relation.send(:options).resource.class)
             )
           end
       end
