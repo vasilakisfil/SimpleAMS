@@ -28,8 +28,23 @@ module SimpleAMS::DSL
       @_default_options ||= {
         adapter: [SimpleAMS::Adapters::AMS, {}],
         primary_id: [:id, {}],
-        type: [self.to_s.gsub('Serializer','').downcase.split('::').last.to_sym, {}]
+        type: [_default_type_name, {}]
       }
+    end
+
+    #TODO: Add tests !!
+    def _default_type_name
+      if self.to_s.end_with?('::Collection')
+        _name = self.to_s.gsub(
+          'Serializer',''
+        ).gsub(
+          '::Collection', ''
+        ).downcase.split('::').last
+
+        return "#{_name}_collection".to_sym
+      else
+        return self.to_s.gsub('Serializer','').downcase.split('::').last.to_sym
+      end
     end
     def with_options(options = {})
       @_options = options

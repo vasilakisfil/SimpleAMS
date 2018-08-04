@@ -56,16 +56,18 @@ class SetupHelper
       fields: Helpers.pick(resource_allowed.fields),
       includes: Elements.includes,
       links: Helpers.pick(resource_allowed.links),
-      metas: Helpers.pick(resource_allowed.metas)
+      metas: Helpers.pick(resource_allowed.metas),
+      adapter: Elements.adapter
     })
   end
 
   def injected_options
     @injected_options ||= Helpers.random_options(with: {
       fields: resource_injected.fields,
-      includes: resource_injected.includes,
+      includes: resource_injected.includes(&:as_input),
       links: resource_injected.links.map(&:as_input),
       metas: resource_injected.metas.map(&:as_input),
+      adapter: resource_injected.adapter.as_input,
       serializer: serializer,
       collection: {
         fields: collection_injected.fields,
@@ -77,6 +79,10 @@ class SetupHelper
 
   def expected_relations_count
     (resource_allowed.relations.map(&:name) & resource_injected.includes).count
+  end
+
+  def expected_relations_names
+    (resource_allowed.relations.map(&:name) & resource_injected.includes)
   end
 
   private
