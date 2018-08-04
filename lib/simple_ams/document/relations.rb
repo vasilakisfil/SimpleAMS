@@ -39,8 +39,13 @@ module SimpleAMS
           # *serializer class options
           SimpleAMS::Options.new(relation_value(relation.name), {
             injected_options: (relation.options || {}).merge(
-              options.relation_options_for(relation.name).merge(expose: options.expose)
+              options.relation_options_for(
+                relation.name
+              ).merge(
+                expose: options.expose
+              )
             ).merge(
+              name: relation.name,
               _internal: {
                 module: serializer.class.to_s.rpartition('::').first
               }

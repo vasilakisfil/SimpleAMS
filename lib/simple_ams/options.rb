@@ -11,8 +11,7 @@ module SimpleAMS
       @resource = resource
       @injected_options = injected_options || {}
       @_internal = @injected_options[:_internal] || {}
-      @allowed_options = allowed_options || @injected_options.fetch(:serializer, nil)&.options
-      @allowed_options = infer_serializer_for(resource).options if @allowed_options.nil?
+      @allowed_options = allowed_options || fetch_allowed_options
     end
     alias collection resource
 
@@ -40,7 +39,7 @@ module SimpleAMS
 
     #that's handful
     def name
-      @name ||= injected_options[:name] || type.name
+      @name ||= injected_options[:name] || allowed_options[:name] || type.name
     end
 
     #TODO: optimize for nested fields?
@@ -164,6 +163,7 @@ module SimpleAMS
         adapter: adapter.raw,
         primary_id: primary_id.raw,
         type: type.raw,
+        name: name,
         fields: fields.raw,
         serializer: serializer.class,
         #relations: relations.raw, #TODO: why have I commented that out ?
@@ -176,14 +176,17 @@ module SimpleAMS
     end
 
     def collection_options
-      _injected_options = @injected_options.fetch(:collection, nil)
-      _allowed_options = @allowed_options.fetch(:collection, nil)
-      return nil unless _injected_options || _allowed_options
+      return @collection_options if defined?(@collection_options)
 
-      self.class::Collection.new(
+      _injected_options = @injected_options.fetch(:collection, {}).merge({
+        serializer: serializer.class
+      })
+      _allowed_options = @allowed_options.fetch(:collection).options
+
+      return @collection_options = self.class::Collection.new(
         resource,
         injected_options: _injected_options,
-        allowed_options: _allowed_options&.options
+        allowed_options: _allowed_options
       )
     end
 
@@ -213,6 +216,13 @@ module SimpleAMS
 
           memo
         }
+      end
+
+      def fetch_allowed_options
+        _allowed_options = injected_options.fetch(:serializer, nil)&.options
+        return _allowed_options unless _allowed_options.nil?
+
+        return infer_serializer_for(resource).options
       end
 
       def infer_serializer_for(resource)

@@ -60,7 +60,7 @@ class UserSerializer
   #collection accepts exactly the same aforementioned interface
   #although you will rarely use it to full extend
   #here we use only links and meta
-  collection do
+  collection :users do
     link :root, '/api/v1/', rel: :user
 
     meta :count, ->(collection) { collection.count }

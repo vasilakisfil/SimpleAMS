@@ -2,8 +2,8 @@ require "spec_helper"
 
 RSpec.describe SimpleAMS::DSL, 'collection' do
   context "with no collection options" do
-    it "returns a nil collection value" do
-      expect(UserSerializer.collection).to eq nil
+    it "returns a Collection class nested to the serializer" do
+      expect(UserSerializer.collection).to eq UserSerializer::Collection
     end
   end
 

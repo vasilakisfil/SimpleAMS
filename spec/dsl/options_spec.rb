@@ -5,7 +5,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
     it "returns the default" do
       expect(UserSerializer.options).to eq (
         {
-          adapter: [SimpleAMS::Adapters::DEFAULT, {}],
+          adapter: [SimpleAMS::Adapters::AMS, {}],
           primary_id: [:id, {}],
           type: [:user, {}],
           fields: [],
@@ -13,7 +13,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           includes: [],
           links: [],
           metas: [],
-          collection: nil
+          collection: UserSerializer::Collection
         }
       )
     end
@@ -43,12 +43,12 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           adapter: @adapter.as_input,
           primary_id: @primary_id.as_input,
           type: @type.as_input,
-          fields: @attrs,
+          fields: @attrs.uniq,
           relations: [],
           includes: [],
           links: @links.map(&:as_input),
           metas: [@meta.as_input],
-          collection: nil
+          collection: UserSerializer::Collection
         }
       )
     end

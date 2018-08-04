@@ -14,7 +14,7 @@ RSpec.describe SimpleAMS::DSL, 'attributes' do
     end
 
     it "holds the attributes specified" do
-      expect(UserSerializer.attributes).to eq @attrs
+      expect(UserSerializer.attributes).to eq @attrs.uniq
       expect(UserSerializer.relations).to eq []
     end
   end

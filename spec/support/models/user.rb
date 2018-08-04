@@ -12,7 +12,6 @@ class User
 
     def relations
       [
-=begin
         OpenStruct.new(
           type: :has_many, name: :microposts, options: {serializer: MicropostSerializer}
         ),
@@ -22,7 +21,6 @@ class User
         OpenStruct.new(
           type: :has_many, name: :followings, options: {serializer: UserSerializer}
         ),
-=end
         OpenStruct.new(
           type: :has_one, name: :address, options: {serializer: AddressSerializer}
         )

@@ -13,7 +13,7 @@ RSpec.describe SimpleAMS::Options, 'collection' do
     end
 
     it "defaults to nil" do
-      expect(@options.collection_options).to eq nil
+      expect(@options.collection_options.fields).to eq []
     end
   end
 

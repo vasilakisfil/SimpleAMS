@@ -147,6 +147,7 @@ RSpec.describe SimpleAMS::Document, 'metas' do
         @allowed_metas.map(&:name).include?(l.name) && @injected_metas.keys.include?(l.name)
       }
 
+      #TODO: Debug why some tests fail here
       expect(metas_got.map(&:name)).to eq(metas_expected.map(&:name))
       expect(metas_got.map(&:value)).to eq(metas_expected.map(&:value))
       expect(metas_got.map(&:options)).to eq(metas_expected.map(&:options))
@@ -182,7 +183,7 @@ RSpec.describe SimpleAMS::Document, 'metas' do
         @allowed_metas.map(&:name).include?(l.name) && @injected_metas.keys.include?(l.name)
       }
 
-      expect(metas_got.map(&:name)).to eq(metas_expected.map(&:name))
+      expect(metas_got.map(&:name).sort).to eq(metas_expected.map(&:name).sort)
       expect(metas_got.map(&:value)).to eq(metas_expected.map(&:value))
       expect(metas_got.map(&:options)).to eq(metas_expected.map(&:options))
     end

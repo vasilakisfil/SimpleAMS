@@ -1,8 +1,5 @@
 require "simple_ams"
 
-module SimpleAMS::Adapters
-end
-
 class SimpleAMS::Adapters::AMS
   attr_reader :document
 
