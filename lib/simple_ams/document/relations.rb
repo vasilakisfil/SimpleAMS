@@ -12,8 +12,11 @@ module SimpleAMS
       @resource = options.resource
     end
 
-    def [](name)
-      return relation_for(name)
+    def [](key)
+      found = relations.find{|relation| relation.name == key}
+      return nil unless found
+
+      return relation_for(found)
     end
 
     def each(&block)
@@ -63,33 +66,9 @@ module SimpleAMS
         end
       end
 
+=begin TODO: Add that as public method, should help performance in edge cases
       def relationship_info_for(name)
         relations.find{|i| i.name == name}
-      end
-
-=begin
-      #merges the injected, along with the parent serializer injected options
-      #probably needs better work, maybe exploit existing Options class?
-      def merged_options(parent_options, injected_options, relation_name)
-        #does this really work for deep deep options?
-        _options = {}
-
-        (injected_options.keys + parent_options.keys).each do |key|
-          next if parent_options[key].nil? && injected_options[key].nil?
-
-          if parent_options[key].kind_of?(Hash) || injected_options[key].kind_of?(Hash)
-            _options[key] = (parent_options[key] || {}).merge(injected_options[key] || {})
-          elsif parent_options[key].kind_of?(Array) || injected_options[key].kind_of?(Array)
-            _options[key] = (parent_options[key] || []) & (injected_options[key] || [])
-          elsif key == :name
-            _options[key] = (parent_options[key] || injected_options[key])
-          else
-            _options[key] = (parent_options[key] || injected_options[key])
-          end
-        end
-
-        _options[:name] ||= relation_name
-        return _options
       end
 =end
   end

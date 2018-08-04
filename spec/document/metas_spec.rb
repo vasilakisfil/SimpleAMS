@@ -188,5 +188,40 @@ RSpec.describe SimpleAMS::Document, 'metas' do
       expect(metas_got.map(&:options)).to eq(metas_expected.map(&:options))
     end
   end
+
+  context "accessing a meta through Document::Meta class" do
+    before do
+      @allowed_metas = Elements.metas
+      @allowed_metas.each do |meta|
+        UserSerializer.meta(*meta.as_input)
+      end
+      @injected_metas = Elements.as_options_for(
+        Helpers.pick(@allowed_metas)
+      )
+
+      injected_options = Helpers.random_options(with: {
+        serializer: UserSerializer,
+        metas: @injected_metas
+      })
+      @meta_klass = SimpleAMS::Document::Metas.new(
+        SimpleAMS::Options.new(User.new, injected_options: injected_options)
+      )
+    end
+
+    it "holds the uniq union of injected and allowed metas" do
+      metas_expected = (Elements.as_elements_for(
+        @injected_metas, klass: Elements::Meta
+      ) + @allowed_metas).uniq{|q| q.name}.select{|l|
+        @allowed_metas.map(&:name).include?(l.name) && @injected_metas.keys.include?(l.name)
+      }
+
+      metas_expected.each do |meta_expected|
+        meta_got = @meta_klass[meta_expected.name]
+        expect(meta_got.name).to eq(meta_expected.name)
+        expect(meta_got.value).to eq(meta_expected.value)
+        expect(meta_got.options).to eq(meta_expected.options)
+      end
+    end
+  end
 end
 

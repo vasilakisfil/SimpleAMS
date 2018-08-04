@@ -191,4 +191,38 @@ RSpec.describe SimpleAMS::Document, 'links' do
     end
   end
 
+  context "accessing a link through Document::Link class" do
+    before do
+      @allowed_links = Elements.links
+      @allowed_links.each do |link|
+        UserSerializer.link(*link.as_input)
+      end
+      @injected_links = Elements.as_options_for(
+        Helpers.pick(@allowed_links)
+      )
+
+      injected_options = Helpers.random_options(with: {
+        serializer: UserSerializer,
+        links: @injected_links
+      })
+      @link_klass = SimpleAMS::Document::Links.new(
+        SimpleAMS::Options.new(User.new, injected_options: injected_options)
+      )
+    end
+
+    it "holds the uniq union of injected and allowed links" do
+      links_expected = (Elements.as_elements_for(
+        @injected_links, klass: Elements::Link
+      ) + @allowed_links).uniq{|q| q.name}.select{|l|
+        @allowed_links.map(&:name).include?(l.name) && @injected_links.keys.include?(l.name)
+      }
+
+      links_expected.each do |link_expected|
+        link_got = @link_klass[link_expected.name]
+        expect(link_got.name).to eq(link_expected.name)
+        expect(link_got.value).to eq(link_expected.value)
+        expect(link_got.options).to eq(link_expected.options)
+      end
+    end
+  end
 end

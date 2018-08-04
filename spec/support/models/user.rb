@@ -80,7 +80,7 @@ class User
   end
 
   def followings
-    @followings ||= rand(10).times.map{User.new}
+    @followings ||= [0, rand(10)].sample.times.map{User.new}
   end
 
   def address

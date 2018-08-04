@@ -187,4 +187,43 @@ RSpec.describe SimpleAMS::Document, 'fields' do
   context "with overriden fields by methods" do
     skip("this is already tested by #with_overrides method")
   end
+
+  context "accessing a field through Document::Field class" do
+    before do
+      @user = User.new
+      @allowed = User.model_attributes
+      @overrides = Helpers.initialize_with_overrides(UserSerializer, allowed: @allowed)
+      UserSerializer.attributes(*@allowed)
+      @field_klass = SimpleAMS::Document::Fields.new(
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
+            serializer: UserSerializer,
+            fields: User.model_attributes
+          })
+        })
+      )
+    end
+
+    after do
+      UserSerializer.undefine_all
+    end
+
+    describe "members" do
+      it "holds the allowed fields only" do
+        fields = (@allowed - User.relations.map(&:name))
+
+        fields.each do |field|
+          if @overrides.include?(field)
+            if @user.send(field).respond_to?('*')
+              expect(@field_klass[field].value).to eq(@user.send(field) * 2)
+            else
+              expect(@field_klass[field].value).to eq('Something else')
+            end
+          else
+            expect(@field_klass[field].value).to eq(@user.send(field))
+          end
+        end
+      end
+    end
+  end
 end

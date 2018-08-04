@@ -12,7 +12,10 @@ module SimpleAMS
     end
 
     def [](key)
-      return with_decorator(key)
+      found = members.find{|field| field == key}
+      return nil unless found
+
+      return with_decorator(found)
     end
 
     def each(&block)

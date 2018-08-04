@@ -208,6 +208,49 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns the allowed relations" do
+        expect(@document.relations).to respond_to(:each)
+        expect(@document.relations.map(&:name)).to(
+          eq(
+            @allowed_relations.map(&:name)
+          )
+        )
+        @document.relations.each_with_index do |relation, index|
+          expect(relation.name).to eq(@allowed_relations[index].name)
+          expect(relation.document.name).to eq(@allowed_relations[index].name)
+          expect(relation.send(:resource).class).to(
+            eq(relation.send(:options).resource.class)
+          )
+        end
+
+        @allowed_relations.each do |relation|
+          expect(@document.relations[relation.name].name).to eq(relation.name)
+          expect(@document.relations[relation.name].document.name).to eq(relation.name)
+          expect(@document.relations[relation.name].send(:resource).class).to(
+            eq(@document.relations[relation.name].send(:options).resource.class)
+          )
+        end
+      end
+    end
+  end
+
+  context "with namespaced serializer" do
+    before do
+      @user = User.new
+      @allowed_relations = User.relations
+      @allowed_relations.each do |relation|
+        Api::V1::UserSerializer.send(relation.type, relation.name)
+      end
+      @document = SimpleAMS::Document.new(
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
+            serializer: Api::V1::UserSerializer,
+          }).tap{|h| h.delete(:includes)}
+        })
+      )
+    end
+
+    context "values" do
+      it "returns the allowed relations" do
           expect(@document.relations).to respond_to(:each)
           expect(@document.relations.map(&:name)).to(
             eq(
@@ -217,9 +260,34 @@ RSpec.describe SimpleAMS::Document, "relations" do
           @document.relations.each_with_index do |relation, index|
             expect(relation.name).to eq(@allowed_relations[index].name)
             expect(relation.document.name).to eq(@allowed_relations[index].name)
-            expect(relation.send(:resource).class).to(eq(relation.send(:options).resource.class)
-            )
           end
+      end
+    end
+  end
+
+  context "with namespaced serializer that can't be found" do
+    before do
+      @user = User.new
+      @allowed_relations = User.relations
+      @allowed_relations.each do |relation|
+        Api::V1::UserSerializer.send(relation.type, relation.name)
+      end
+      Api::V1::UserSerializer.has_one :id #obviously it doesn't make any sense
+      @document = SimpleAMS::Document.new(
+        SimpleAMS::Options.new(@user, {
+          injected_options: Helpers.random_options(with: {
+            serializer: Api::V1::UserSerializer,
+          }).tap{|h| h.delete(:includes)}
+        })
+      )
+    end
+
+    context "values" do
+      it "returns the allowed relations" do
+          expect(@document.relations).to respond_to(:each)
+          expect{@document.relations.map(&:name)}.to raise_error(
+            RuntimeError, /Could not infer serializer/
+          )
       end
     end
   end

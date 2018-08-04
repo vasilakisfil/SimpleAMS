@@ -45,7 +45,7 @@ end
 
 RSpec.configure do |config|
   config.after(:each) do
-    Helpers.reset!(UserSerializer)
+    Helpers.reset!(UserSerializer, Api::V1::UserSerializer)
   end
 
   config.include RSpec::Repeat

@@ -30,3 +30,16 @@ class UserSerializer
 end
 class MicropostSerializer < UserSerializer; end
 class AddressSerializer < UserSerializer; end
+
+class Api
+  class V1
+    class UserSerializer < UserSerializer
+    end
+
+    class MicropostSerializer < MicropostSerializer
+    end
+
+    class AddressSerializer < AddressSerializer
+    end
+  end
+end

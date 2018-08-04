@@ -16,7 +16,7 @@ class SimpleAMS::Options
     def raw
       [type, name, options]
     end
-
+=begin #TODO: is this really needed?
     def array?
       @many
     end
@@ -24,6 +24,7 @@ class SimpleAMS::Options
     def single?
       !array
     end
+=end
 
     private
       attr_writer :type, :name, :options

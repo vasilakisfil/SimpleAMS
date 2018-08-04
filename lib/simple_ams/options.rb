@@ -209,7 +209,7 @@ module SimpleAMS
         return @_relation_options = elements.inject({}){|memo, element|
           injected_options.fetch(element, {}).select{|relation_options|
             relation_options.is_a?(Hash)
-          }.reduce({}, :update).each { |key, value|
+          }.reduce({}, :update).each { |key, value| #WTF is that ?
             memo[key] = {} if memo[key].nil?
             memo[key][element] = value
           }
@@ -227,9 +227,18 @@ module SimpleAMS
 
       def infer_serializer_for(resource)
         namespace = _internal[:module] ? "#{_internal[:module]}::" : ""
-        @serializer_class ||= Object.const_get("#{namespace}#{resource.class.to_s}Serializer")
+        resource_klass = resource.kind_of?(Array) ? resource.first.class : resource.class
+        if resource_klass == NilClass
+          return @serializer_class ||= EmptySerializer
+        else
+          return @serializer_class ||= Object.const_get("#{namespace}#{resource_klass.to_s}Serializer")
+        end
       rescue NameError => _
-        raise "Could not infer serializer for #{resource.class}, maybe specify it? (tried #{namespace}#{resource.class.to_s}Serializer)"
+        raise "Could not infer serializer for #{resource.class}, maybe specify it? (tried #{namespace}#{resource_klass.to_s}Serializer)"
+      end
+
+      class EmptySerializer
+        include SimpleAMS::DSL
       end
   end
 end

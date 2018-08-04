@@ -12,7 +12,10 @@ module SimpleAMS
     end
 
     def [](key)
-      return with_decorator(options.links[key])
+      found = members.find{|link| link.name == key}
+      return nil unless found
+
+      return with_decorator(found)
     end
 
     def each(&block)

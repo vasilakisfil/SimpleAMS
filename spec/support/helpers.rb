@@ -24,7 +24,7 @@ module Helpers
     return overrides
   end
 
-  def self.reset!(resources = [])
+  def self.reset!(*resources)
     resources = [resources].flatten
 
     resources.each do |resource|
