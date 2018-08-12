@@ -60,11 +60,22 @@ class SimpleAMS::Document
     private
       attr_reader :_options
 
+      #TODO: OBS! here we have extra cost for nothing
+      #can't we just pass the resource_option with different resource?
       def options_for(resource)
         SimpleAMS::Options.new(resource, {
-          injected_options: resource_options.injected_options,
+          injected_options: resource_options.injected_options.merge({
+            serializer: serializer_for(resource)
+          }),
           allowed_options: resource_options.allowed_options
         })
+      end
+
+      def serializer_for(resource)
+        _serializer = resource_options.serializer_class
+        _serializer = _serializer.call(resource) if _serializer.respond_to?(:call)
+
+        return _serializer
       end
   end
 end

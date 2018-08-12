@@ -28,6 +28,12 @@ class User
     end
   end
 
+  def initialize(opts = {})
+    opts.keys.each do |key|
+      self.instance_variable_set("@#{key}", opts[key])
+    end
+  end
+
   def id
     @id ||= rand(100000)
   end
