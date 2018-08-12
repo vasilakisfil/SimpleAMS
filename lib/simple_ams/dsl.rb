@@ -142,7 +142,6 @@ module SimpleAMS::DSL
       if block
         self::Collection.class_eval do
           instance_exec(&block)
-
         end
       end
 

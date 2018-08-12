@@ -132,7 +132,7 @@ module SimpleAMS
     def serializer
       return @serializer if defined?(@serializer)
 
-      _serializer = injected_options.fetch(:serializer, @serializer_class)
+      _serializer = injected_options.fetch(:serializer, serializer_class)
 
       return @serializer = _serializer.new.extend(
         SimpleAMS::Methy.of(
@@ -165,7 +165,7 @@ module SimpleAMS
         type: type.raw,
         name: name,
         fields: fields.raw,
-        serializer: serializer.class,
+        serializer: serializer_class,
         #relations: relations.raw, #TODO: why have I commented that out ?
         includes: includes.raw,
         links: links.raw,
@@ -178,8 +178,9 @@ module SimpleAMS
     def collection_options
       return @collection_options if defined?(@collection_options)
 
+      #TODO: Do we need that merge ?
       _injected_options = @injected_options.fetch(:collection, {}).merge({
-        serializer: serializer.class
+        serializer: collection_serializer_class
       })
       _allowed_options = @allowed_options.fetch(:collection).options
 
@@ -190,8 +191,39 @@ module SimpleAMS
       )
     end
 
+    def serializer_class
+      return @serializer_class if defined?(@serializer_class)
+
+      @serializer_class = injected_options.fetch(:serializer, nil)
+
+      return @serializer_class if @serializer_class 
+
+      return @serializer_class = infer_serializer
+    end
+
+    #TODO: maybe have that inside :collection? (isomorphism)
+    def collection_serializer_class
+      return @collection_serializer_class if defined?(@collection_serializer_class)
+
+      if serializer_class.is_a?(Proc)
+        @collection_serializer_class = injected_options[:collection_serializer]
+        if @collection_serializer_class.nil?
+          raise "In case of a proc serializer, you need to specify a collection_serializer"
+        end
+      else
+        @collection_serializer_class = serializer_class
+      end
+
+      return @collection_serializer_class
+    end
+
     private
       attr_reader :_internal
+=begin
+      def is_collection?
+        _internal[:is_collection] == true
+      end
+=end
 
       def options_for(allowed:, injected:)
         if not injected.nil?
@@ -218,20 +250,25 @@ module SimpleAMS
         }
       end
 
+      #TODO: raise exception if both are nil!
       def fetch_allowed_options
-        _allowed_options = injected_options.fetch(:serializer, nil)&.options
-        return _allowed_options unless _allowed_options.nil?
+        _serializer_class = self.serializer_class
+        if _serializer_class.is_a?(Proc)
+          _serializer_class = self.collection_serializer_class
+        end
 
-        return infer_serializer_for(resource).options
+        _allowed_options = _serializer_class&.options
+
+        return _allowed_options
       end
 
-      def infer_serializer_for(resource)
+      def infer_serializer
         namespace = _internal[:module] ? "#{_internal[:module]}::" : ""
         resource_klass = resource.kind_of?(Array) ? resource.first.class : resource.class
         if resource_klass == NilClass
-          return @serializer_class ||= EmptySerializer
+          return EmptySerializer
         else
-          return @serializer_class ||= Object.const_get("#{namespace}#{resource_klass.to_s}Serializer")
+          return Object.const_get("#{namespace}#{resource_klass.to_s}Serializer")
         end
       rescue NameError => _
         raise "Could not infer serializer for #{resource.class}, maybe specify it? (tried #{namespace}#{resource_klass.to_s}Serializer)"

@@ -27,7 +27,9 @@ module SimpleAMS
     class Collection
       def initialize(collection, options = {})
         @collection = collection
-        @options = SimpleAMS::Options.new(collection, injected_options: options)
+        @options = SimpleAMS::Options.new(collection, {
+          injected_options: options.merge(_internal: is_collection)
+        })
       end
 
       def folder
@@ -44,6 +46,10 @@ module SimpleAMS
 
       private
         attr_reader :collection, :options
+
+        def is_collection
+          { is_collection: true }
+        end
     end
 
     private
