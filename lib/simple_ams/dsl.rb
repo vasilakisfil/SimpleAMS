@@ -138,12 +138,14 @@ module SimpleAMS::DSL
       @_metas || []
     end
 
-    def collection(&block)
+    def collection(name = nil, &block)
       if block
         self::Collection.class_eval do
           instance_exec(&block)
         end
       end
+
+      self::Collection.type(name) if name
 
       return self::Collection
     end

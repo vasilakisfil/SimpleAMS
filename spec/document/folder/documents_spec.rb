@@ -38,7 +38,6 @@ RSpec.describe SimpleAMS::Document::Folder, 'documents' do
         expect(document.metas.map(&:name)).to eq @setup_helper.injected_options[:metas].map(&:first).uniq
         expect(document.metas.map(&:value)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map{|l| l[1]}
         expect(document.metas.map(&:options)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map(&:last)
-
       end
     end
   end
