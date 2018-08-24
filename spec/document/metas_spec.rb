@@ -141,15 +141,15 @@ RSpec.describe SimpleAMS::Document, 'metas' do
 
     it "holds the uniq union of injected and allowed metas" do
       metas_got = @document.metas
-      metas_expected = (@allowed_metas + Elements.as_elements_for(
+      metas_expected = (Elements.as_elements_for(
         @injected_metas, klass: Elements::Link
-      )).uniq{|q| q.name}.select{|l|
+      ) + @allowed_metas).uniq{|q| q.name}.select{|l|
         @allowed_metas.map(&:name).include?(l.name) && @injected_metas.keys.include?(l.name)
       }
 
-      #TODO: Debug why some tests fail here
       expect(metas_got.map(&:name)).to eq(metas_expected.map(&:name))
       expect(metas_got.map(&:value)).to eq(metas_expected.map(&:value))
+      expect(metas_got.map(&:options).count).to eq(metas_expected.map(&:options).count)
       expect(metas_got.map(&:options)).to eq(metas_expected.map(&:options))
     end
   end
@@ -177,13 +177,15 @@ RSpec.describe SimpleAMS::Document, 'metas' do
 
     it "holds the uniq union of injected and allowed metas" do
       metas_got = @document.metas
-      metas_expected = (@allowed_metas + Elements.as_elements_for(
+      _injected_metas = Elements.as_elements_for(
         @injected_metas, klass: Elements::Link
-      )).uniq{|q| q.name}.select{|l|
-        @allowed_metas.map(&:name).include?(l.name) && @injected_metas.keys.include?(l.name)
+      )
+
+      metas_expected = (_injected_metas.map(&:name) & @allowed_metas.map(&:name)).map{|name|
+        _injected_metas.find{|l| l.name == name}
       }
 
-      expect(metas_got.map(&:name).sort).to eq(metas_expected.map(&:name).sort)
+      expect(metas_got.map(&:name)).to eq(metas_expected.map(&:name))
       expect(metas_got.map(&:value)).to eq(metas_expected.map(&:value))
       expect(metas_got.map(&:options)).to eq(metas_expected.map(&:options))
     end
@@ -224,4 +226,3 @@ RSpec.describe SimpleAMS::Document, 'metas' do
     end
   end
 end
-

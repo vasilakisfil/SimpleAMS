@@ -84,9 +84,9 @@ RSpec.describe SimpleAMS::Options, 'fields' do
     end
 
     it "holds the uniq union of injected and allowed fields" do
-      expect(@options.fields).to(
+      expect(@options.fields.sort).to(
         eq(
-          (@allowed_fields & @injected_options[:fields]).uniq
+          (@allowed_fields & @injected_options[:fields]).uniq.sort
         )
       )
     end

@@ -80,7 +80,7 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         UserSerializer.meta(*meta.as_input)
       end
       @injected_metas = Elements.as_options_for(
-        Helpers.pick(@allowed_metas, length: rand(@allowed_metas.length) + 1)
+        Helpers.pick(@allowed_metas)
       )
 
       injected_options = Helpers.random_options(with:{
@@ -93,13 +93,18 @@ RSpec.describe SimpleAMS::Options, 'metas' do
     end
 
     it "holds the uniq union of injected and allowed metas" do
-      expect(@options.metas.map(&:name)).to(
-        eq(
-          Elements.as_elements_for(
-            @injected_metas, klass: Elements::Meta
-          ).map(&:name) & @allowed_metas.map(&:name)
-        )
+      metas_got = @options.metas
+      _injected_metas = Elements.as_elements_for(
+        @injected_metas, klass: Elements::Meta
       )
+
+      metas_expected = (_injected_metas.map(&:name) & @allowed_metas.map(&:name)).map{|name|
+        _injected_metas.find{|l| l.name == name}
+      }
+
+      expect(metas_got.map(&:name)).to eq(metas_expected.map(&:name))
+      expect(metas_got.map(&:value)).to eq(metas_expected.map(&:value))
+      expect(metas_got.map(&:options)).to eq(metas_expected.map(&:options))
     end
   end
 
@@ -112,7 +117,7 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         end
       }
       @injected_metas = Elements.as_options_for(
-        Helpers.pick(@allowed_metas, length: rand(@allowed_metas.length) + 1)
+        Helpers.pick(@allowed_metas)
       )
 
       injected_options = Helpers.random_options(with:{
@@ -125,13 +130,18 @@ RSpec.describe SimpleAMS::Options, 'metas' do
     end
 
     it "holds the uniq union of injected and allowed metas" do
-      expect(@options.metas.map(&:name)).to(
-        eq(
-          Elements.as_elements_for(
-            @injected_metas, klass: Elements::Meta
-          ).map(&:name) & @allowed_metas.map(&:name)
-        )
+      metas_got = @options.metas
+      _injected_metas = Elements.as_elements_for(
+        @injected_metas, klass: Elements::Meta
       )
+
+      metas_expected = (_injected_metas.map(&:name) & @allowed_metas.map(&:name)).map{|name|
+        _injected_metas.find{|l| l.name == name}
+      }
+
+      expect(metas_got.map(&:name)).to eq(metas_expected.map(&:name))
+      expect(metas_got.map(&:value)).to eq(metas_expected.map(&:value))
+      expect(metas_got.map(&:options)).to eq(metas_expected.map(&:options))
     end
   end
 

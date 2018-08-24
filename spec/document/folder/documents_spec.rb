@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SimpleAMS::Document::Folder do
+RSpec.describe SimpleAMS::Document::Folder, 'documents' do
   describe "with various options for both collection/resource" do
     before do
       @setup_helper = SetupHelper.new
@@ -31,13 +31,13 @@ RSpec.describe SimpleAMS::Document::Folder do
         expect(document.relations.map(&:name)).to eq @setup_helper.expected_relations_names
         expect(document.relations.count).to eq @setup_helper.expected_relations_count
 
-        expect(document.links.map(&:name)).to eq @setup_helper.injected_options[:links].map(&:first)
-        expect(document.links.map(&:value)).to eq @setup_helper.injected_options[:links].map{|l| l[1]}
-        expect(document.links.map(&:options)).to eq @setup_helper.injected_options[:links].map(&:last)
+        expect(document.links.map(&:name)).to eq @setup_helper.injected_options[:links].map(&:first).uniq
+        expect(document.links.map(&:value)).to eq @setup_helper.injected_options[:links].uniq(&:first).map{|l| l[1]}
+        expect(document.links.map(&:options)).to eq @setup_helper.injected_options[:links].uniq(&:first).map(&:last)
 
-        expect(document.metas.map(&:name)).to eq @setup_helper.injected_options[:metas].map(&:first)
-        expect(document.metas.map(&:value)).to eq @setup_helper.injected_options[:metas].map{|l| l[1]}
-        expect(document.metas.map(&:options)).to eq @setup_helper.injected_options[:metas].map(&:last)
+        expect(document.metas.map(&:name)).to eq @setup_helper.injected_options[:metas].map(&:first).uniq
+        expect(document.metas.map(&:value)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map{|l| l[1]}
+        expect(document.metas.map(&:options)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map(&:last)
 
       end
     end

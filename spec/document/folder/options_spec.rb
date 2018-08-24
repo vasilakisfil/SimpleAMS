@@ -1,7 +1,7 @@
 require "spec_helper"
 
 #fields, links, metas etc are tested by document tests
-RSpec.describe SimpleAMS::Document::Folder do
+RSpec.describe SimpleAMS::Document::Folder, 'options' do
   describe "with no injected/allowed collection options" do
     before do
       @injected_options = Helpers.random_options(with: {
