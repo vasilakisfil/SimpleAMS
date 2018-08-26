@@ -8,7 +8,7 @@ class SimpleAMS::Options
       @name = name.is_a?(String) ? name.to_sym : name
       @options = options
 
-      @many = relation == :has_many ? true : false
+      @many = type == :has_many ? true : false
     end
 
     alias relation name
@@ -16,15 +16,14 @@ class SimpleAMS::Options
     def raw
       [type, name, options]
     end
-=begin #TODO: is this really needed?
-    def array?
+
+    def collection?
       @many
     end
 
     def single?
       !array
     end
-=end
 
     private
       attr_writer :type, :name, :options

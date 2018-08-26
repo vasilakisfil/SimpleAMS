@@ -35,7 +35,8 @@ module SimpleAMS
         Field.new(
           options.resource,
           options.serializer,
-          key
+          key,
+          options
         )
       end
 
@@ -43,16 +44,18 @@ module SimpleAMS
         attr_reader :key
 
         #do we need to inject the whole options object?
-        def initialize(resource, serializer, key)
+        def initialize(resource, serializer, key, options)
           @resource = resource
           @serializer = serializer
           @key = key
+          @options = options
         end
 
         def value
           return @value if defined?(@value)
 
           return @value = serializer.send(key) if serializer.respond_to? key
+          binding.pry if resource.is_a?(Array)
           return resource.send(key)
         end
 

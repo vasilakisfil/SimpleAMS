@@ -3,7 +3,7 @@ require 'spec_helper'
 class User
   class << self
     def model_attributes
-      @attributes ||= self.instance_methods(false)
+      @attributes ||= self.instance_methods(false) - relations.map(&:name)
     end
 
     def relation_names
@@ -86,7 +86,7 @@ class User
   end
 
   def followings
-    @followings ||= [0, rand(10)].sample.times.map{User.new}
+    @followings ||= rand(10).times.map{User.new}
   end
 
   def address

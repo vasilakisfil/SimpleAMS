@@ -75,8 +75,13 @@ RSpec.describe SimpleAMS::Document, "relations" do
             )
           )
           @document.relations.each_with_index do |relation, index|
-            expect(relation.name).to eq(@allowed_relations[index].name)
-            expect(relation.document.name).to eq(@allowed_relations[index].name)
+            if relation.folder? && relation.documents.first
+              expect(relation.documents.first.name).to eq(
+                @allowed_relations[index].options[:serializer].to_s.gsub('Serializer','').downcase.to_sym
+              )
+            else
+              expect(relation.name).to eq(@allowed_relations[index].name)
+            end
           end
       end
     end
@@ -188,7 +193,12 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @allowed_relations.each do |relation|
         UserSerializer.send(:define_method, relation.name) do
           name = relation.options[:serializer].to_s.gsub('Serializer', '')
-          Object.const_get("#{name.capitalize}::Sub#{name.capitalize}").new
+          #TODO: Can you add test error handler here in case you override and return a non-array?
+          if relation.type == :has_many
+            [Object.const_get("#{name.capitalize}::Sub#{name.capitalize}").new]
+          else
+            Object.const_get("#{name.capitalize}::Sub#{name.capitalize}").new
+          end
         end
       end
       @document = SimpleAMS::Document.new(
@@ -215,19 +225,35 @@ RSpec.describe SimpleAMS::Document, "relations" do
           )
         )
         @document.relations.each_with_index do |relation, index|
-          expect(relation.name).to eq(@allowed_relations[index].name)
-          expect(relation.document.name).to eq(@allowed_relations[index].name)
-          expect(relation.send(:resource).class).to(
-            eq(relation.send(:options).resource.class)
-          )
+          if relation.folder?
+            expect(relation.documents.first.name).to eq(
+              @allowed_relations[index].options[:serializer].to_s.gsub('Serializer','').downcase.to_sym
+            )
+            expect(relation.documents.first.send(:resource).class).to(
+               eq(relation.send(:options).resource.first.class)
+            )
+          else
+            expect(relation.send(:resource).class).to(
+              eq(relation.send(:options).resource.class)
+            )
+            expect(relation.name).to eq(@allowed_relations[index].name)
+          end
         end
 
         @allowed_relations.each do |relation|
-          expect(@document.relations[relation.name].name).to eq(relation.name)
-          expect(@document.relations[relation.name].document.name).to eq(relation.name)
-          expect(@document.relations[relation.name].send(:resource).class).to(
-            eq(@document.relations[relation.name].send(:options).resource.class)
-          )
+          if relation.type == :has_many
+            expect(@document.relations[relation.name].documents.first.name).to(
+              eq(relation.options[:serializer].to_s.gsub('Serializer','').downcase.to_sym)
+            )
+            expect(@document.relations[relation.name].documents.first.send(:resource).class).to(
+              eq(@document.relations[relation.name].send(:options).resource.first.class)
+            )
+          else
+            expect(@document.relations[relation.name].name).to eq(relation.name)
+            expect(@document.relations[relation.name].send(:resource).class).to(
+              eq(@document.relations[relation.name].send(:options).resource.class)
+            )
+          end
         end
       end
     end
@@ -251,16 +277,21 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns the allowed relations" do
-          expect(@document.relations).to respond_to(:each)
-          expect(@document.relations.map(&:name)).to(
-            eq(
-              @allowed_relations.map(&:name)
-            )
+        expect(@document.relations).to respond_to(:each)
+        expect(@document.relations.map(&:name)).to(
+          eq(
+            @allowed_relations.map(&:name)
           )
-          @document.relations.each_with_index do |relation, index|
+        )
+        @document.relations.each_with_index do |relation, index|
+          if relation.folder? && relation.documents.first
+            expect(relation.documents.first.name).to eq(
+              @allowed_relations[index].options[:serializer].to_s.gsub('Serializer','').downcase.to_sym
+            )
+          else
             expect(relation.name).to eq(@allowed_relations[index].name)
-            expect(relation.document.name).to eq(@allowed_relations[index].name)
           end
+        end
       end
     end
   end

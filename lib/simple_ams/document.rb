@@ -9,6 +9,10 @@ class SimpleAMS::Document
     @resource = options.resource
   end
 
+  def primary_id
+    options.primary_id
+  end
+
   def fields
     return @fields ||= self.class::Fields.new(options)
   end
@@ -35,6 +39,14 @@ class SimpleAMS::Document
 
   def metas
     return @metas ||= self.class::Metas.new(options)
+  end
+
+  def folder?
+    self.is_a?(self.class::Folder)
+  end
+
+  def document?
+    !folder?
   end
 
   class Folder < self

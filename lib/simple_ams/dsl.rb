@@ -24,6 +24,27 @@ module SimpleAMS::DSL
   end
 
   module ClassMethods
+    #TODO: Shouldn't we call here super to presever user's behavior ?
+    def inherited(subclass)
+      _klass = Class.new(Object).extend(ClassMethods)
+      _klass.instance_eval do
+        def options
+          {
+            adapter: adapter,
+            primary_id: primary_id,
+            type: type,
+            fields: fields,
+            relations: relations,
+            includes: includes,
+            links: links,
+            metas: metas,
+          }
+        end
+      end
+
+      subclass.const_set('Collection', _klass)
+    end
+
     def default_options
       @_default_options ||= {
         adapter: [SimpleAMS::Adapters::AMS, {}],
@@ -174,7 +195,7 @@ module SimpleAMS::DSL
       def append_attributes(*attrs)
         @_attributes ||= []
 
-        @_attributes = (@_attributes << attrs).flatten.compact
+        @_attributes = (@_attributes << attrs).flatten.compact.uniq
       end
 
       def append_link(link)
