@@ -54,7 +54,7 @@ class UserSerializer
   #if you also need dynamic options, you can return an array from the lambda
   link :followers, ->(obj) { ["/api/v1/users/#{obj.id}/followers/", rel: obj.type] }
 
-  #same with metas: can be static, dynamic and accept arbiratry options
+  #same with metas: can be static, dynamic and accept arbitrary options
   meta :environment, ->(obj) { Rails.env.to_s }
 
   #collection accepts exactly the same aforementioned interface
@@ -91,7 +91,7 @@ on top of that hash.
 
 
 # Advanced usage
-The DSL in the previous example is just suntactic sugar. In the basis, there is a very powerful
+The DSL in the previous example is just syntactic sugar. In the basis, there is a very powerful
 hash-based DSL that can be used in 3 different places:
 
 * When initializing the `SimpleAMS::Renderer` class to render the data using specific serializer, adapter and options.
@@ -126,8 +126,8 @@ In any case, we have the following options:
   serializer: UserSerializer,
   #can also be a lambda, in case of polymorphic records, ideal for ArrayRenderer
   serializer: ->(obj){ obj.employee? ? EmployeeSerializer : UserSerializer }
-  #specifying the anderlying adapter. This cannot be a lambda in case of ArrayRenderer,
-  #but can take some usefull options that are passed down straignt to the adapter class.
+  #specifying the underlying adapter. This cannot be a lambda in case of ArrayRenderer,
+  #but can take some useful options that are passed down straight to the adapter class.
   adapter: SimpleAMS::Adapters::AMS, root: true
   #the links data
   links: {
@@ -140,10 +140,10 @@ In any case, we have the following options:
     #when the lambda is called, it should return the array structure above
     self: ->(obj) { ["/api/v1/users/#{obj.id}", rel: :user] }
   },
-  #the meta data, same as the links data (available in adapters even for sinlge records)
+  #the meta data, same as the links data (available in adapters even for single records)
   metas: {
     type: ->(obj){ obj.employee? ? :employee : :user}
-    #meta can take arbiratry options as well
+    #meta can take arbitrary options as well
     authorization: :oauth, type: :bearer_token
   },
   #collection parameters, used only in ArrayRenderer
@@ -169,7 +169,7 @@ In any case, we have the following options:
 }
 ```
 
-Now let those options be `OPTIONS`. These can be feeded to either the `SimpleAMS::Renderer`
+Now let those options be `OPTIONS`. These can be fed to either the `SimpleAMS::Renderer`
 or to the serializer class itself using the `with_options` class method. Let's see how:
 
 ```ruby
@@ -195,7 +195,7 @@ end
 
 The same options can be passed when calling the `Renderer`. `Renderer` can override
 some properties, however in all properties that act as sets/arrays (like
-attributes/fields, includes, links etc.), **specified serializer options take precendence** over
+attributes/fields, includes, links etc.), **specified serializer options take precedence** over
 `Renderer` options.
 
 ```ruby
@@ -215,13 +215,10 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
-But reports are very welcome at https://github.com/vasilakisfil/SimpleAMS. Please add as much info as you can (serializer and Rendere input)
+But reports are very welcome at https://github.com/vasilakisfil/SimpleAMS. Please add as much info as you can (serializer and Renderer input)
 so that we can easily track down the bug.
 
 Pull requests are also very welcome on GitHub at https://github.com/vasilakisfil/SimpleAMS.
 However, to keep the code's sanity (AMS I am looking to you), **I will be very picky** on the code style and design,
 to match (my) existing code characteristics.
-
-## Why did I build this ?
-Because I hate libraries taking for granted my API design will follow the "best standards".
-Existing Ruby serializer libraries are very unflexible while their code is extremely complex.
+Because at the end of the day, it's gonna be me who will maintain this thing.
