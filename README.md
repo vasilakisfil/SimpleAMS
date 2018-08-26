@@ -9,7 +9,7 @@ that help developers to build such APIs. Modern Ruby serializers, as I always wa
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'simple-ams'
+gem 'simple_ams'
 ```
 
 And then execute:
@@ -18,7 +18,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install simple-ams
+    $ gem install simple_ams
 
 ## Usage
 The gem's interface has been inspired by ActiveModel Serializers 0.9.2, 0.10.stable, jsonapi-rb and Ember Data.
