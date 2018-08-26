@@ -24,7 +24,7 @@ class Address
   end
 
   def post_code
-    @post_code ||= Faker::Address.post_code
+    @post_code ||= Faker::Address.postcode
   end
 
   def state

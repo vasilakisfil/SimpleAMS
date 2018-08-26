@@ -4,11 +4,11 @@ SimpleCov.start do
   #TODO: maybe we shouldn't exclude spec/support/* files ?
   add_filter "/spec/"
 end
+require 'pry'
 require "simple_ams"
 require 'date'
 require 'securerandom'
 require 'faker'
-require 'pry'
 
 Dir[
   Pathname(
@@ -30,6 +30,8 @@ end
 
 RSpec.configure do |config|
   config.after(:each) do
-    Helpers.reset!(UserSerializer, Api::V1::UserSerializer)
+    Helpers.reset!(
+      UserSerializer, AddressSerializer, MicropostSerializer, Api::V1::UserSerializer
+    )
   end
 end

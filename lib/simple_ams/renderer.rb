@@ -17,7 +17,7 @@ module SimpleAMS
     end
 
     def as_json
-      options.adapter.klass.new(document).as_json
+      options.adapter.klass.new(document, options.adapter.options).as_json
     end
 
     def to_json
@@ -37,7 +37,7 @@ module SimpleAMS
       end
 
       def as_json
-        options.adapter.klass::Collection.new(folder).as_json
+        options.adapter.klass::Collection.new(folder, options.adapter.options).as_json
       end
 
       def to_json

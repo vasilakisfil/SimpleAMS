@@ -1,6 +1,10 @@
 module Helpers
-  def self.pick(array, length: nil)
-    _array = array.sample(length || rand(array.length))
+  def self.pick(array, length: nil, min: 0)
+    if length
+    _array = array.sample(length)
+    else
+    _array = array.sample(rand(array.length + min))
+    end
     _array.sort_by(&array.method(:index))
   end
 

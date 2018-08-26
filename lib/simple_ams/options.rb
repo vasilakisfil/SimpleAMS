@@ -227,7 +227,9 @@ module SimpleAMS
 
       def options_for(allowed:, injected:)
         if not injected.nil?
-          allowed = injected & allowed
+          allowed = injected.class.new(
+            injected.map{|s| s.is_a?(Hash) ? s.keys.first : s}
+          ) & allowed
         end
 
         return allowed
@@ -235,17 +237,33 @@ module SimpleAMS
 
       def _relation_options
         return @_relation_options if defined?(@_relation_options)
-        #maybe save those in a constant?
-        elements = [:fields, :includes, :links, :metas]
 
-        return @_relation_options = elements.inject({}){|memo, element|
-          injected_options.fetch(element, {}).select{|relation_options|
-            relation_options.is_a?(Hash)
-          }.reduce({}, :update).each { |key, value| #WTF is that ?
-            memo[key] = {} if memo[key].nil?
-            memo[key][element] = value
+        @_relation_options = relations.inject({}){|memo, relation|
+          includes_value = (injected_options[:includes] || {}).select{|incl|
+            incl.is_a?(Hash)
+          }.find{|incl_hash|
+            incl_hash.keys.first.to_s == relation.name.to_s
           }
+          if includes_value
+            includes_value = includes_value[relation.name]
+          else
+            #it's important here to return empty array if nothing is found..
+            includes_value = []
+          end
 
+          fields_value = (injected_options[:fields] || {}).select{|field|
+            field.is_a?(Hash)
+          }.find{|field_hash|
+            field_hash.keys.first.to_s == relation.name.to_s
+          } 
+
+          #.. while here just nil will work (pick default fields from serializer)
+          fields_value = fields_value[relation.name] if fields_value
+
+          memo[relation.name] = {
+            includes: includes_value,
+            fields: fields_value
+          }
           memo
         }
       end
