@@ -17,6 +17,7 @@ class SimpleAMS::Adapters::AMS
     hash = hash.merge(links: links) unless links.empty?
     hash = hash.merge(metas: metas) unless metas.empty?
 
+    return {document.name => hash} if options[:root]
     return hash
   end
 
@@ -70,7 +71,10 @@ class SimpleAMS::Adapters::AMS
 
     def as_json
       if options[:root]
-        {folder.name => documents}
+        {
+          folder.name => documents,
+          meta: metas
+        }
       else
         documents
       end
@@ -81,5 +85,13 @@ class SimpleAMS::Adapters::AMS
         adapter.new(document).as_json
       } || []
     end
+
+  def metas
+    @metas ||= folder.metas.inject({}){ |hash, meta|
+      _value = meta.value
+      hash[meta.name] = _value.respond_to?(:as_json) ? _value.as_json : _value
+      hash
+    }
+  end
   end
 end

@@ -242,7 +242,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
               [:microposts, (hash[:followers].first || {})[:microposts]],
               [:followings, (hash[:followers].first || {})[:followings]]
             ].each do |name2, relation2|
-              next if relation2.empty?
+              next if relation2.nil? || relation2.empty?
               if relation2.is_a?(Array)
                 keys2 = (relation2.first&.keys || []) - [:links, :metas]
                 expect(keys2 - @third_level_includes).to eq(@attrs[name2] || [])

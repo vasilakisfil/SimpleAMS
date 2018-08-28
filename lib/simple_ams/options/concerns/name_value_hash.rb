@@ -7,12 +7,13 @@ class SimpleAMS::Options
 
       def initialize(name, value, options = {}, resource:)
         @name = name.is_a?(String) ? name.to_sym : name
-        if value.is_a?(Proc)
+        if value.is_a?(Proc) #TODO: maybe we should do duck typing instead?
           _value = value.call(resource)
-          @value = _value.first
           if _value.is_a?(Array) && _value.length > 1
+            @value = _value.first
             @options = (_value.last || {}).merge(options || {})
           else
+            @value = _value
             @options = options || {}
           end
         else

@@ -38,7 +38,7 @@ RSpec.describe SimpleAMS::Document, 'type' do
 
     it "returns the type specified" do
       expect(@document.type.name).to eq :a_type
-      expect(@document.type.options).to eq({foo: :bar})
+      expect(@document.type.options).to eq({foo: :bar, _explicit: true})
     end
 
     it "updates name correctly" do

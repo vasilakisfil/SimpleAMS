@@ -34,7 +34,7 @@ RSpec.describe SimpleAMS::Options, 'type' do
 
     it "returns the type specified" do
       expect(@options.type.name).to eq @type.name
-      expect(@options.type.options).to eq @type.options
+      expect(@options.type.options).to eq @type.options.merge(_explicit: true)
     end
 
     it "updates name correctly" do

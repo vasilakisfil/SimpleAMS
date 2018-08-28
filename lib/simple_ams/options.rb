@@ -22,19 +22,13 @@ module SimpleAMS
     def primary_id
       return @primary_id if defined?(@primary_id)
 
-      _options = injected_options.fetch(:primary_id, nil)
-      _options = allowed_options.fetch(:primary_id, nil) unless _options
-
-      return @primary_id ||= PrimaryId.new(*_options)
+      return @primary_id = array_of_value_hash_for(PrimaryId, :primary_id)
     end
 
     def type
       return @type if defined?(@type)
 
-      _options = injected_options.fetch(:type, nil)
-      _options = allowed_options.fetch(:type, nil) unless _options
-
-      return @type ||= Type.new(*_options)
+      return @type = array_of_value_hash_for(Type, :type)
     end
 
     #that's handful
@@ -46,31 +40,13 @@ module SimpleAMS
     def fields
       return @fields if defined?(@fields)
 
-      injected = injected_options.fetch(:fields, nil)
-
-      if injected.nil?
-        return @fields = Fields.new(allowed_options.fetch(:fields).uniq)
-      else
-        return @fields = Fields.new(options_for(
-          injected: Fields.new(injected_options.fetch(:fields, nil)),
-          allowed: Fields.new(allowed_options.fetch(:fields).uniq)
-        ).uniq)
-      end
+      return @fields = array_of_items_for(Fields, :fields)
     end
 
     def includes
       return @includes if defined?(@includes)
 
-      injected = injected_options.fetch(:includes, nil)
-
-      if injected.nil?
-        return @includes = Includes.new(allowed_options.fetch(:includes).uniq)
-      else
-        return @includes = Includes.new(options_for(
-          injected: Includes.new(injected_options.fetch(:includes, nil)),
-          allowed: Includes.new(allowed_options.fetch(:includes).uniq)
-        ).uniq)
-      end
+      return @includes = array_of_items_for(Includes, :includes)
     end
 
     #TODO: correctly loop over injected relations, although should be a rarely used feature
@@ -85,47 +61,16 @@ module SimpleAMS
         }
     end
 
-    #TODO: add method-based links, should boost performance
     def links
       return @links if defined?(@links)
 
-      injected = injected_options.fetch(:links, nil)
-      if injected
-        injected = Links.new(
-          injected.map{|l| Links::Link.new(*l.flatten, resource: resource)}
-        )
-      end
-
-      allowed = Links.new(
-        allowed_options.fetch(:links).map{|l| Links::Link.new(*l, resource: resource)}
-      )
-
-      return @links = Links.new(options_for(
-        #TODO: correctly loop over injected properties
-        injected: injected,
-        allowed: allowed,
-      ).uniq{|link| link.name})
+      return @links = array_of_name_value_hash_for(Links, Links::Link, :links)
     end
 
-    #TODO: add method-based metas, should boost performance
     def metas
       return @metas if defined?(@metas)
 
-      injected = injected_options.fetch(:metas, nil)
-      if injected
-        injected = Metas.new(
-          injected.map{|l| Metas::Meta.new(*l.flatten, resource: resource)}
-        )
-      end
-      allowed = Metas.new(
-        allowed_options.fetch(:metas).map{|l| Metas::Meta.new(*l, resource: resource)}
-      )
-
-      return @metas = Metas.new(options_for(
-        #TODO: correctly loop over injected properties
-        injected: injected,
-        allowed: allowed,
-      ).uniq{|meta| meta.name})
+      return @metas = array_of_name_value_hash_for(Metas, Metas::Meta, :metas)
     end
 
     #TODO: handle case of proc
@@ -146,9 +91,9 @@ module SimpleAMS
     def adapter
       return @adapter if defined?(@adapter)
 
-      @adapter = Adapter.new(*injected_options.fetch(:adapter, [nil]))
-      @adapter = Adapter.new(*allowed_options.fetch(:adapter, [nil])) if @adapter.value.nil?
-      @adapter = Adapter.new(SimpleAMS::Adapters::AMS) if @adapter.value.nil?
+      @adapter = Adapter.new(*injected_options.fetch(:adapter, [nil]), resource: resource)
+      @adapter = Adapter.new(*allowed_options.fetch(:adapter, [nil]), resource: resource) if @adapter.value.nil?
+      @adapter = Adapter.new(SimpleAMS::Adapters::AMS, resource: resource) if @adapter.value.nil?
 
       return @adapter
     end
@@ -219,11 +164,46 @@ module SimpleAMS
 
     private
       attr_reader :_internal
-=begin
-      def is_collection?
-        _internal[:is_collection] == true
+
+      #TODO: add method-based links, should boost performance
+      def array_of_name_value_hash_for(collection_klass, item_klass, name)
+        injected = injected_options.fetch(name, nil)
+        if injected
+          injected = collection_klass.new(
+            injected.map{|l| item_klass.new(*l.flatten, resource: resource)}
+          )
+        end
+
+        allowed = collection_klass.new(
+          allowed_options.fetch(name).map{|l| item_klass.new(*l, resource: resource)}
+        )
+
+        return collection_klass.new(options_for(
+          #TODO: correctly loop over injected properties
+          injected: injected,
+          allowed: allowed,
+        ).uniq{|item| item.name})
       end
-=end
+
+      def array_of_value_hash_for(klass, name)
+        _options = injected_options.fetch(name, nil)
+        _options = allowed_options.fetch(name, nil) unless _options
+
+        return klass.new(*_options, resource: resource)
+      end
+
+      def array_of_items_for(klass, name)
+        injected = injected_options.fetch(name, nil)
+
+        if injected.nil?
+          return klass.new(allowed_options.fetch(name).uniq)
+        else
+          return klass.new(options_for(
+            injected: klass.new(injected_options.fetch(name, nil)),
+            allowed: klass.new(allowed_options.fetch(name).uniq)
+          ).uniq)
+        end
+      end
 
       def options_for(allowed:, injected:)
         if not injected.nil?
@@ -255,7 +235,7 @@ module SimpleAMS
             field.is_a?(Hash)
           }.find{|field_hash|
             field_hash.keys.first.to_s == relation.name.to_s
-          } 
+          }
 
           #.. while here just nil will work (pick default fields from serializer)
           fields_value = fields_value[relation.name] if fields_value
@@ -275,9 +255,11 @@ module SimpleAMS
           _serializer_class = self.collection_serializer_class
         end
 
-        _allowed_options = _serializer_class&.options
-
-        return _allowed_options
+        if _serializer_class.respond_to?(:simple_ams?)
+          return _serializer_class&.options
+        else
+          raise "#{_serializer_class} does not respond to SimpleAMS methods, did you include the DSL module?"
+        end
       end
 
       def infer_serializer

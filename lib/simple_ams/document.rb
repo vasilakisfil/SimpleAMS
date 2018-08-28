@@ -79,7 +79,7 @@ class SimpleAMS::Document
           injected_options: resource_options.injected_options.merge({
             serializer: serializer_for(resource)
           }),
-          allowed_options: resource_options.allowed_options
+          allowed_options: serializer_for(resource).options
         })
       end
 

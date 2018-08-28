@@ -13,7 +13,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           includes: [],
           links: [],
           metas: [],
-          collection: UserSerializer::Collection,
+          collection: UserSerializer::Collection_,
         }
       )
     end
@@ -32,14 +32,15 @@ RSpec.describe SimpleAMS::DSL, 'options' do
         next unless UserSerializer.respond_to?(key)
 
         case key
-        when :type, :primary_id
+        when :primary_id
           expect(UserSerializer.options.send(:[], key)).to eq([value, {}])
+        when :type
+          expect(UserSerializer.options.send(:[], key)).to eq([value, {_explicit: true}])
         when :links, :metas
           expect(UserSerializer.options.send(:[], key)).to eq(value.map{|k, v| [k, v].flatten(1)})
         when :collection
-          binding.pry
           expect(UserSerializer.options[:collection]).to(
-            eq(UserSerializer::Collection)
+            eq(UserSerializer::Collection_)
           )
           expect(UserSerializer.options[:collection].links).to(
             eq(value[:links].map{|k, v| [k,v].flatten(1)})
@@ -77,7 +78,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
     it "holds the specified adapter options" do
       expect(UserSerializer.options[:adapter]).to eq(@adapter.as_input)
       expect(UserSerializer.options[:primary_id]).to eq(@primary_id.as_input)
-      expect(UserSerializer.options[:type]).to eq(@type.as_input)
+      expect(UserSerializer.options[:type]).to eq(@type.as_input(_explicit: true))
       expect(Helpers.recursive_sort(UserSerializer.options[:fields])).to(
         eq(Helpers.recursive_sort([@attrs, @random_options[:fields]].flatten(1)).uniq)
       )

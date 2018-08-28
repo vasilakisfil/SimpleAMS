@@ -125,8 +125,8 @@ class Elements
       {self.class.to_s.downcase.to_sym => as_input}
     end
 
-    def as_input
-      [@value, @options]
+    def as_input(extra = {})
+      [@value, @options.merge(extra)]
     end
 
     def as_lambda_input

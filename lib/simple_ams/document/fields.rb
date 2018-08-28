@@ -55,7 +55,6 @@ module SimpleAMS
           return @value if defined?(@value)
 
           return @value = serializer.send(key) if serializer.respond_to? key
-          binding.pry if resource.is_a?(Array)
           return resource.send(key)
         end
 

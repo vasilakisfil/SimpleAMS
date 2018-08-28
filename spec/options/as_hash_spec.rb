@@ -55,7 +55,7 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
         {
           adapter: @adapter.as_input,
           primary_id: @primary_id.as_input,
-          type: @type.as_input,
+          type: @type.as_input(_explicit: true),
           name: @type.name,
           fields: @attrs.uniq,
           serializer: UserSerializer,
