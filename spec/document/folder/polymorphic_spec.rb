@@ -32,10 +32,12 @@ RSpec.describe SimpleAMS::Document::Folder, 'polymorphic collections' do
 
       @collection = 10.times.map{User.new}
 
+      class Api::V1::UserSimpleSerializer < UserSerializer; end;
+
       @folder = SimpleAMS::Document::Folder.new(
         SimpleAMS::Options.new(@collection, {
           injected_options: @setup_helper.injected_options.merge({
-            serializer: ->(obj){ obj.id < 5 ? UserSerializer : Api::V1::UserSerializer},
+            serializer: ->(obj){ obj.id < 5 ? UserSerializer : Api::V1::UserSimpleSerializer},
             collection_serializer: UserSerializer
           })
         })
@@ -68,7 +70,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'polymorphic collections' do
         if document.resource.id < 5
           expect(document.serializer.class).to eq UserSerializer
         else
-          expect(document.serializer.class).to eq Api::V1::UserSerializer
+          expect(document.serializer.class).to eq Api::V1::UserSimpleSerializer
         end
 
       end

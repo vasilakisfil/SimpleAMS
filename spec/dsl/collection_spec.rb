@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe SimpleAMS::DSL, 'collection' do
   context "with no collection options" do
     it "returns a Collection class nested to the serializer" do
-      expect(UserSerializer.collection).to eq UserSerializer::Collection
+      expect(UserSerializer.collection).to eq UserSerializer::Collection_
     end
   end
 
@@ -25,8 +25,8 @@ RSpec.describe SimpleAMS::DSL, 'collection' do
     end
 
     it "creates the embedded Collection class along with the specified options" do
-      expect(UserSerializer::Collection.class).to eq(Class)
-      expect(UserSerializer.collection).to eq(UserSerializer::Collection)
+      expect(UserSerializer::Collection_.class).to eq(Class)
+      expect(UserSerializer.collection).to eq(UserSerializer::Collection_)
       expect(UserSerializer.collection.links).to(
         eq(Helpers::RandomOptions.links.map(&:as_input))
       )

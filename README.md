@@ -57,16 +57,19 @@ class UserSerializer
   #same with metas: can be static, dynamic and accept arbitrary options
   meta :environment, ->(obj) { Rails.env.to_s }
 
-  #collection accepts exactly the same aforementioned interface
-  #although you will rarely use it to full extend
-  #here we use only links and meta
+  #these are properties to the collection resource itself
+  #AND NOT to each resource separately, when applied inside a collection..
+  #It's a rarely used feature but definitely nice to have..
   collection do
+    #collection accepts exactly the same aforementioned interface
+    #here we use only links and meta
     link :root, '/api/v1/', rel: :user
     type :users
     meta :count, ->(collection) { collection.count }
   end
 
-  #note that there is a shortcut if you just need to specify the collection name/type:
+  #note that most probably the only thing that you will need here is the `type`,
+  #so there is a shortcut if you just need to specify the collection name/type:
   #collection :users
 
   #override an attribute

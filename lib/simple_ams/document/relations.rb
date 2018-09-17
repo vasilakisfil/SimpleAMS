@@ -62,7 +62,7 @@ module SimpleAMS
           injected_options: (relation.options || {}).merge(
             options.relation_options_for(
               relation.name
-            ).merge(
+            ).select{|k, v| !v.nil?}.merge(
               expose: options.expose
             )
           ).merge(

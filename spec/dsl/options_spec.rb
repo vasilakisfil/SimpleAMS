@@ -13,7 +13,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           includes: [],
           links: [],
           metas: [],
-          collection: UserSerializer::Collection
+          collection: UserSerializer::Collection_
         }
       )
     end
@@ -42,13 +42,13 @@ RSpec.describe SimpleAMS::DSL, 'options' do
         {
           adapter: @adapter.as_input,
           primary_id: @primary_id.as_input,
-          type: @type.as_input,
+          type: @type.as_input(_explicit: true ),
           fields: @attrs.uniq,
           relations: [],
           includes: [],
           links: @links.map(&:as_input),
           metas: [@meta.as_input],
-          collection: UserSerializer::Collection
+          collection: UserSerializer::Collection_
         }
       )
     end

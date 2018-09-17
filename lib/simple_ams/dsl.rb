@@ -20,12 +20,21 @@ module SimpleAMS::DSL
       end
     end
 
-    host_class.const_set('Collection', _klass)
+    host_class.const_set('Collection_', _klass)
   end
 
   module ClassMethods
     #TODO: Shouldn't we call here super to presever user's behavior ?
     def inherited(subclass)
+      #TODO: why this breaks collection type?
+      subclass.with_options(
+        options.merge(
+          #TODO: maybe add another group of elements under dsl?
+          #this could be DSL::Type.new(type).explicit?
+          type.last[:_explicit] ? {} : {type: nil}
+        )
+      )
+
       _klass = Class.new(Object).extend(ClassMethods)
       _klass.instance_eval do
         def options
@@ -42,7 +51,7 @@ module SimpleAMS::DSL
         end
       end
 
-      subclass.const_set('Collection', _klass)
+      subclass.const_set('Collection_', _klass)
     end
 
     def default_options
@@ -55,11 +64,11 @@ module SimpleAMS::DSL
 
     #TODO: Add tests !!
     def _default_type_name
-      if self.to_s.end_with?('::Collection')
+      if self.to_s.end_with?('::Collection_')
         _name = self.to_s.gsub(
           'Serializer',''
         ).gsub(
-          '::Collection', ''
+          '::Collection_', ''
         ).downcase.split('::').last
 
         return "#{_name}_collection".to_sym
@@ -71,11 +80,21 @@ module SimpleAMS::DSL
       @_options = options
       meths = SimpleAMS::DSL::ClassMethods.instance_methods(false)
       @_options.each do |key, value|
-        if key.to_sym == :collection
-          self.send(:collection){}.with_options(value)
+        if key == :relations
+          (value || []).each{|rel_value|
+            append_relationship(rel_value)
+          }
+        elsif key.to_sym == :collection
+          #TODO: Add proc option maybe?
+          if value.is_a?(Hash)
+            collection{}.with_options(value)
+          end
         elsif meths.include?(key)
-          self.send(key, value) if value.is_a?(Array)
-          self.send(key, value)
+          if (value.is_a?(Array) && value.first.is_a?(Array)) || value.is_a?(Hash)
+            self.send(key, value)
+          else
+            self.send(key, *value)
+          end
         else
           #TODO: Add a proper logger
           puts "SimpeAMS: #{key} is not recognized, ignoring (from #{self.to_s})"
@@ -85,26 +104,16 @@ module SimpleAMS::DSL
       return @_options
     end
 
-    #same for other ValueHashes
-    def adapter(name = nil, options = {})
-      @_adapter ||= default_options[:adapter]
-      return @_adapter if name.nil?
-
-      @_adapter = [name, options]
+    def adapter(value = nil, options = {})
+      @_adapter = _value_hash_for(@_adapter, value, options, :adapter)
     end
 
     def primary_id(value = nil, options = {})
-      @_primary_id ||= default_options[:primary_id]
-      return @_primary_id if value.nil?
-
-      @_primary_id = [value, options]
+      @_primary_id = _value_hash_for(@_primary_id, value, options, :primary_id)
     end
 
     def type(value = nil, options = {})
-      @_type ||= default_options[:type]
-      return @_type if value.nil?
-
-      @_type = [value, options]
+      @_type = _value_hash_for(@_type, value, options.merge(_explicit: true), :type)
     end
 
     def attributes(*args)
@@ -115,6 +124,12 @@ module SimpleAMS::DSL
     end
     alias attribute attributes
     alias fields attributes
+
+    def attributes=(*args)
+      @_attributes = []
+
+      attributes(args)
+    end
 
     def has_many(name, options = {})
       append_relationship([__method__, name, options])
@@ -135,7 +150,7 @@ module SimpleAMS::DSL
     #TODO: there is no memoization here, hence we ignore includes manually set !!
     #Consider fixing it by employing an observer that will clean the instance var
     #each time @_relations is updated
-    def includes(_ = [])
+    def includes(*args)
       relations.map{|rel| rel[1] }
     end
 
@@ -156,19 +171,19 @@ module SimpleAMS::DSL
     def metas(metas = [])
       metas.map{|key, value| append_meta([key, value].flatten(1))} if metas.is_a?(Hash)
 
-      @_metas || []
+      @_metas ||= metas
     end
 
     def collection(name = nil, &block)
       if block
-        self::Collection.class_eval do
+        self::Collection_.class_eval do
           instance_exec(&block)
         end
       end
 
-      self::Collection.type(name) if name
+      self::Collection_.type(name) if name
 
-      return self::Collection
+      return self::Collection_
     end
 
     def options
@@ -185,7 +200,18 @@ module SimpleAMS::DSL
       }
     end
 
+    def simple_ams?
+      true
+    end
+
     private
+      def _value_hash_for(current, value, options, name)
+        _type = current || default_options[name]
+        return _type if value.nil?
+
+        return [value, options]
+      end
+
       def append_relationship(rel)
         @_relations ||= []
 
