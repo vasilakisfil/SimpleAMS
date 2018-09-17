@@ -57,6 +57,9 @@ class UserSerializer
   #same with metas: can be static, dynamic and accept arbitrary options
   meta :environment, ->(obj) { Rails.env.to_s }
 
+  #same with form: can be static, dynamic and accept arbitrary options
+  form :create, ->(obj) { User::CreateForm.for(obj) }
+
   #these are properties to the collection resource itself
   #AND NOT to each resource separately, when applied inside a collection..
   #It's a rarely used feature but definitely nice to have..
@@ -149,6 +152,11 @@ In any case, we have the following options:
     #meta can take arbitrary options as well
     authorization: :oauth, type: :bearer_token
   },
+  #the form data, same as the links/metas data (available in adapters even for single records)
+  forms: {
+    update: ->(obj){ User::UpdateForm.for(obj)}
+    follow: ->(obj){ User::FollowForm.for(obj)}
+  },
   #collection parameters, used only in ArrayRenderer
   collection: {
     links: {
@@ -160,6 +168,10 @@ In any case, we have the following options:
       previous_page: ->(obj) { [obj.previous_page, collection: true] },
       next_page: ->(obj) { [obj.next_page, collection: true] },
       max_per_page: 50,
+    },
+    #creating a resource goes in the collection route (users/), hence inside collection options ;)
+    forms: {
+      create: ->(obj){ User::CreateForm.for(obj)}
     },
   }
   #exposing helpers that will be available inside the seriralizer
@@ -209,8 +221,8 @@ SimpleAMS::Renderer.new(user, {
   #   ...
   #   ...
 }).to_json
-
 ```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

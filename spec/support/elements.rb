@@ -34,8 +34,20 @@ class Elements
     (rand(10) + 3).times.map{Include.new}
   end
 
+  def meta(*args)
+    Meta.new(*args)
+  end
+
   def metas
     (rand(10) + 3).times.map{Meta.new}
+  end
+
+  def form(*args)
+    Form.new(*args)
+  end
+
+  def forms
+    (rand(10) + 3).times.map{Form.new}
   end
 
   def as_elements_for(hash, klass:)
@@ -53,10 +65,6 @@ class Elements
       memo[element.name] = [element.value, element.options]
       memo
     }
-  end
-
-  def meta(*args)
-    Meta.new(*args)
   end
 
   def adapter(*args)
@@ -110,6 +118,8 @@ class Elements
   class Link < NameValueHash; end
 
   class Meta < NameValueHash; end
+
+  class Form < NameValueHash; end
 
   class ValueHash
     attr_reader :value, :options

@@ -16,6 +16,7 @@ module SimpleAMS::DSL
           includes: includes,
           links: links,
           metas: metas,
+          forms: forms,
         }
       end
     end
@@ -47,6 +48,7 @@ module SimpleAMS::DSL
             includes: includes,
             links: links,
             metas: metas,
+            forms: forms,
           }
         end
       end
@@ -162,16 +164,30 @@ module SimpleAMS::DSL
       append_meta([name, value, options])
     end
 
+    def form(name, value, options = {})
+      append_form([name, value, options])
+    end
+
     def links(links = [])
+      return @_links ||= [] if links.empty?
       links.map{|key, value| append_link([key, value].flatten(1))} if links.is_a?(Hash)
 
       @_links ||= links
     end
 
     def metas(metas = [])
+      return @_metas ||= [] if metas.empty?
+
       metas.map{|key, value| append_meta([key, value].flatten(1))} if metas.is_a?(Hash)
 
       @_metas ||= metas
+    end
+
+    def forms(forms = [])
+      return @_forms ||= [] if forms.empty?
+      forms.map{|key, value| append_form([key, value].flatten(1))} if forms.is_a?(Hash)
+
+      @_forms ||= forms
     end
 
     def collection(name = nil, &block)
@@ -196,6 +212,7 @@ module SimpleAMS::DSL
         includes: includes,
         links: links,
         metas: metas,
+        forms: forms,
         collection: collection
       }
     end
@@ -234,6 +251,12 @@ module SimpleAMS::DSL
         @_metas ||= []
 
         @_metas << meta
+      end
+
+      def append_form(form)
+        @_forms ||= []
+
+        @_forms << form
       end
 
       def empty_options

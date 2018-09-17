@@ -106,7 +106,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
           ).to eq true
 
           @includes.map{|name| [name, hash[name]]}.each do |name, relation|
-            next if relation.empty?
+            next if relation.nil? || relation.empty?
             if relation.is_a?(Array)
               keys = (relation.first&.keys || []) - [:links, :metas]
               expect(keys).to eq(@attrs[name] || [])
@@ -229,7 +229,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
           ).to eq true
 
           @first_level_includes.map{|name| [name, hash[name]]}.each do |name, relation|
-            next if relation.empty?
+            next if relation.nil? || relation.empty?
             if relation.is_a?(Array)
               keys = (relation.first&.keys || []) - [:links, :metas]
               expect(keys - @second_level_includes).to eq(@attrs[name] || [])

@@ -13,6 +13,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           includes: [],
           links: [],
           metas: [],
+          forms: [],
           collection: UserSerializer::Collection_
         }
       )
@@ -35,6 +36,8 @@ RSpec.describe SimpleAMS::DSL, 'options' do
       }
       @meta = Elements.meta
       UserSerializer.meta(*@meta.as_input)
+      @form = Elements.form
+      UserSerializer.form(*@form.as_input)
     end
 
     it "holds the specified options" do
@@ -48,6 +51,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           includes: [],
           links: @links.map(&:as_input),
           metas: [@meta.as_input],
+          forms: [@form.as_input],
           collection: UserSerializer::Collection_
         }
       )

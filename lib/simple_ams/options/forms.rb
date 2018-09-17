@@ -1,11 +1,12 @@
 require "simple_ams"
 
 class SimpleAMS::Options
-  class Metas < Array
+  class Forms < Array
     include SimpleAMS::Options::Concerns::Filterable
 
-    class Meta
+    class Form
       include SimpleAMS::Options::Concerns::NameValueHash
     end
   end
 end
+
