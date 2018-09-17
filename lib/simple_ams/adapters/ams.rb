@@ -16,6 +16,7 @@ class SimpleAMS::Adapters::AMS
     hash = hash.merge(relations)
     hash = hash.merge(links: links) unless links.empty?
     hash = hash.merge(metas: metas) unless metas.empty?
+    hash = hash.merge(forms: forms) unless forms.empty?
 
     return {document.name => hash} if options[:root]
     return hash
@@ -41,6 +42,14 @@ class SimpleAMS::Adapters::AMS
     @metas ||= document.metas.inject({}){ |hash, meta|
       _value = meta.value
       hash[meta.name] = _value.respond_to?(:as_json) ? _value.as_json : _value
+      hash
+    }
+  end
+
+  def forms
+    @forms ||= document.forms.inject({}){ |hash, form|
+      _value = form.value
+      hash[form.name] = _value.respond_to?(:as_json) ? _value.as_json : _value
       hash
     }
   end
@@ -86,12 +95,12 @@ class SimpleAMS::Adapters::AMS
       } || []
     end
 
-  def metas
-    @metas ||= folder.metas.inject({}){ |hash, meta|
-      _value = meta.value
-      hash[meta.name] = _value.respond_to?(:as_json) ? _value.as_json : _value
-      hash
-    }
-  end
+    def metas
+      @metas ||= folder.metas.inject({}){ |hash, meta|
+        _value = meta.value
+        hash[meta.name] = _value.respond_to?(:as_json) ? _value.as_json : _value
+        hash
+      }
+    end
   end
 end

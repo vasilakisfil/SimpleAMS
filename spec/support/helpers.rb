@@ -32,7 +32,10 @@ module Helpers
     resources = [resources].flatten
 
     resources.each do |resource|
-      [:attributes, :relations, :links, :metas, :adapter, :primary_id, :type, :collection].each do |var|
+      [
+        :attributes, :relations, :links, :metas, :adapter, :primary_id, :type,
+        :collection, :forms
+      ].each do |var|
         if resource.instance_variable_defined?("@_#{var}")
           resource.remove_instance_variable("@_#{var}")
         end

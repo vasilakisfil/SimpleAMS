@@ -16,6 +16,7 @@ require "simple_ams/options/fields"
 require "simple_ams/options/includes"
 require "simple_ams/options/links"
 require "simple_ams/options/metas"
+require "simple_ams/options/forms"
 require "simple_ams/options/primary_id"
 require "simple_ams/options/type"
 require "simple_ams/options/relation"
@@ -24,6 +25,7 @@ require "simple_ams/document/fields"
 require "simple_ams/document/relations"
 require "simple_ams/document/links"
 require "simple_ams/document/metas"
+require "simple_ams/document/forms"
 
 module SimpleAMS
 end

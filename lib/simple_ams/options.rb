@@ -73,6 +73,12 @@ module SimpleAMS
       return @metas = array_of_name_value_hash_for(Metas, Metas::Meta, :metas)
     end
 
+    def forms
+      return @forms if defined?(@forms)
+
+      return @forms = array_of_name_value_hash_for(Forms, Forms::Form, :forms)
+    end
+
     #TODO: handle case of proc
     def serializer
       return @serializer if defined?(@serializer)

@@ -12,6 +12,9 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
       (rand(10) + 2).times.map{ Elements.meta }.each do |meta|
         UserSerializer.meta(*meta.as_input)
       end
+      (rand(10) + 2).times.map{ Elements.form }.each do |form|
+        UserSerializer.form(*form.as_input)
+      end
       User.relations.each do |relation|
         UserSerializer.send(relation.type, relation.name, relation.options)
       end
@@ -43,12 +46,12 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
       it "returns the correct fields" do
         expect(@hash.keys.count > 0).to eq true
         expect(
-          @hash.keys - [:links, :metas] - User.relations.map(&:name)
+          @hash.keys - [:links, :metas, :forms] - User.relations.map(&:name)
         ).to eq @user_attrs
         expect(@hash[:id]).not_to be_nil
 
         (
-          @hash.keys - [:links, :metas] - User.relations.map(&:name)
+          @hash.keys - [:links, :metas, :forms] - User.relations.map(&:name)
         ).each do |key|
           if @user.send(key).is_a? Date
             expect(@hash[key]).to eq(@user.send(key).to_s)
@@ -59,7 +62,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
       end
     end
 
-    context "links and metas" do
+    context "links, metas and forms" do
       it "returns the correct links" do
         expect(@hash[:links].keys.count > 0).to eq true
 
@@ -77,12 +80,21 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
           expect(@hash[:metas][key]).to eq(@document.metas[key].value)
         end
       end
+
+      it "returns the correct forms" do
+        expect(@hash[:forms].keys.count > 0).to eq true
+
+        expect(@hash[:forms].keys).to eq @document.forms.map(&:name)
+        @hash[:forms].keys.each do |key|
+          expect(@hash[:forms][key]).to eq(@document.forms[key].value)
+        end
+      end
     end
 
     context "relations" do
       it "returns the correct relations" do
         expect(
-           (@hash.keys - @user_attrs - [:links, :metas]).sort
+           (@hash.keys - @user_attrs - [:links, :metas, :forms]).sort
         ).to eq @includes.sort
 
         expect(
@@ -92,12 +104,12 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
         ).to eq true
 
         @includes.map{|name| [name, @hash[name]]}.each do |name, relation|
-          next if relation.empty?
+          next if relation.nil? || relation.empty?
           if relation.is_a?(Array)
-            keys = (relation.first&.keys || []) - [:links, :metas]
+            keys = (relation.first&.keys || []) - [:links, :metas, :forms]
             expect(keys).to eq(@attrs[name] || [])
           else
-            keys = relation.keys - [:links, :metas]
+            keys = relation.keys - [:links, :metas, :forms]
             expect(keys).to eq(@attrs[name] || [])
           end
         end
@@ -115,6 +127,9 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
       end
       (rand(10) + 2).times.map{ Elements.meta }.each do |meta|
         UserSerializer.meta(*meta.as_input)
+      end
+      (rand(10) + 2).times.map{ Elements.form }.each do |form|
+        UserSerializer.form(*form.as_input)
       end
       User.relations.each do |relation|
         UserSerializer.send(relation.type, relation.name, relation.options)
@@ -151,12 +166,12 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
       it "returns the correct fields" do
         expect(@hash.keys.count > 0).to eq true
         expect(
-          @hash.keys - [:links, :metas] - User.relations.map(&:name)
+          @hash.keys - [:links, :metas, :forms] - User.relations.map(&:name)
         ).to eq @user_attrs
         expect(@hash[:id]).not_to be_nil
 
         (
-          @hash.keys - [:links, :metas] - User.relations.map(&:name)
+          @hash.keys - [:links, :metas, :forms] - User.relations.map(&:name)
         ).each do |key|
           if @user.send(key).is_a? Date
             expect(@hash[key]).to eq(@user.send(key).to_s)
@@ -167,7 +182,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
       end
     end
 
-    context "links and metas" do
+    context "links, metas and forms" do
       it "returns the correct links" do
         expect(@hash[:links].keys.count > 0).to eq true
 
@@ -185,12 +200,21 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
           expect(@hash[:metas][key]).to eq(@document.metas[key].value)
         end
       end
+
+      it "returns the correct forms" do
+        expect(@hash[:forms].keys.count > 0).to eq true
+
+        expect(@hash[:forms].keys).to eq @document.forms.map(&:name)
+        @hash[:forms].keys.each do |key|
+          expect(@hash[:forms][key]).to eq(@document.forms[key].value)
+        end
+      end
     end
 
     context "relations" do
       it "returns the correct relations" do
         expect(
-           (@hash.keys - @user_attrs - [:links, :metas]).sort
+           (@hash.keys - @user_attrs - [:links, :metas, :forms]).sort
         ).to eq @first_level_includes.sort
 
         expect(
@@ -200,12 +224,12 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
         ).to eq true
 
         @first_level_includes.map{|name| [name, @hash[name]]}.each do |name, relation|
-          next if relation.empty?
+          next if relation.nil? || relation.empty?
           if relation.is_a?(Array)
-            keys = (relation.first&.keys || []) - [:links, :metas]
+            keys = (relation.first&.keys || []) - [:links, :metas, :forms]
             expect(keys - @second_level_includes).to eq(@attrs[name] || [])
           else
-            keys = relation.keys - [:links, :metas]
+            keys = relation.keys - [:links, :metas, :forms]
             expect(keys - @second_level_includes).to eq(@attrs[name] || [])
           end
 
@@ -213,12 +237,12 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
             [:microposts, (@hash[:followers].first || {})[:microposts]],
             [:followings, (@hash[:followers].first || {})[:followings]]
           ].each do |name2, relation2|
-            next if relation2.empty?
+            next if relation2.nil? || relation2.empty?
             if relation2.is_a?(Array)
-              keys2 = (relation2.first&.keys || []) - [:links, :metas]
+              keys2 = (relation2.first&.keys || []) - [:links, :metas, :forms]
               expect(keys2 - @third_level_includes).to eq(@attrs[name2] || [])
             else
-              keys2 = relation2.keys - [:links, :metas]
+              keys2 = relation2.keys - [:links, :metas, :forms]
               expect(keys2 - @third_level_includes).to eq(@attrs[name2] || [])
             end
           end

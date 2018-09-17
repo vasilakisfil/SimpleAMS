@@ -41,6 +41,10 @@ class SimpleAMS::Document
     return @metas ||= self.class::Metas.new(options)
   end
 
+  def forms
+    return @forms ||= self.class::Forms.new(options)
+  end
+
   def folder?
     self.is_a?(self.class::Folder)
   end
