@@ -24,32 +24,28 @@ class SimpleAMS::Adapters::AMS
 
   def fields
     @fields ||= document.fields.inject({}){ |hash, field|
-      _value = field.value
-      hash[field.key] = _value.respond_to?(:as_json) ? _value.as_json : _value
+      hash[field.key] = field.value
       hash
     }
   end
 
   def links
     @links ||= document.links.inject({}){ |hash, link|
-      _value = link.value
-      hash[link.name] = _value.respond_to?(:as_json) ? _value.as_json : _value
+      hash[link.name] = link.value
       hash
     }
   end
 
   def metas
     @metas ||= document.metas.inject({}){ |hash, meta|
-      _value = meta.value
-      hash[meta.name] = _value.respond_to?(:as_json) ? _value.as_json : _value
+      hash[meta.name] = meta.value
       hash
     }
   end
 
   def forms
     @forms ||= document.forms.inject({}){ |hash, form|
-      _value = form.value
-      hash[form.name] = _value.respond_to?(:as_json) ? _value.as_json : _value
+      hash[form.name] = form.value
       hash
     }
   end
@@ -97,8 +93,7 @@ class SimpleAMS::Adapters::AMS
 
     def metas
       @metas ||= folder.metas.inject({}){ |hash, meta|
-        _value = meta.value
-        hash[meta.name] = _value.respond_to?(:as_json) ? _value.as_json : _value
+        hash[meta.name] = meta.value
         hash
       }
     end
