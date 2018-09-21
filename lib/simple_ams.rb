@@ -21,6 +21,7 @@ require "simple_ams/options/primary_id"
 require "simple_ams/options/type"
 require "simple_ams/options/relation"
 
+require "simple_ams/document/primary_id"
 require "simple_ams/document/fields"
 require "simple_ams/document/relations"
 require "simple_ams/document/links"

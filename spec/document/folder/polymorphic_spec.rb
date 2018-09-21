@@ -54,7 +54,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'polymorphic collections' do
         expect(document.adapter.name).to eq @setup_helper.injected_options[:adapter].first
         expect(document.adapter.options).to eq @setup_helper.injected_options[:adapter].last
 
-        expect(document.fields.members).to eq @setup_helper.injected_options[:fields]
+        expect(document.fields.map(&:key)).to eq @setup_helper.injected_options[:fields]
 
         expect(document.relations.map(&:name)).to eq @setup_helper.expected_relations_names
         expect(document.relations.count).to eq @setup_helper.expected_relations_count

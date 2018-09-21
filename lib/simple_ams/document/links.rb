@@ -4,7 +4,7 @@ module SimpleAMS
   class Document::Links
     include Enumerable
 
-    attr_reader :members
+    Link = Struct.new(:name, :value, :options)
 
     def initialize(options)
       @options = options
@@ -28,33 +28,23 @@ module SimpleAMS
       self
     end
 
+    def any?
+      members.any?
+    end
+
+    def empty?
+      members.empty?
+    end
+
     private
-      attr_reader :options
+      attr_reader :members, :options
 
       def with_decorator(link)
-        Link.new(link)
-      end
-
-      #memoization maybe ?
-      class Link
-        def initialize(link)
-          @link = link
-        end
-
-        def name
-          link.name
-        end
-
-        def value
-          link.respond_to?(:call) ? link.value.call : link.value
-        end
-
-        def options
+        Link.new(
+          link.name,
+          link.respond_to?(:call) ? link.value.call : link.value,
           link.options
-        end
-
-        private
-          attr_reader :link
+        )
       end
   end
 end

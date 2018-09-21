@@ -15,7 +15,7 @@ RSpec.describe SimpleAMS::Document, 'metas' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.metas.members).to eq []
+        expect(@document.metas).to eq({})
       end
     end
 
@@ -49,7 +49,7 @@ RSpec.describe SimpleAMS::Document, 'metas' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.metas.members).not_to eq []
+        expect(@document.metas).not_to eq({})
       end
     end
 
@@ -79,7 +79,7 @@ RSpec.describe SimpleAMS::Document, 'metas' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.metas.members).to eq []
+        expect(@document.metas).to eq({})
       end
     end
 
@@ -106,7 +106,7 @@ RSpec.describe SimpleAMS::Document, 'metas' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.metas.members).to eq []
+        expect(@document.metas).to eq({})
       end
     end
 

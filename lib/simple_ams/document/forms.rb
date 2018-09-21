@@ -3,7 +3,7 @@ require "simple_ams"
 module SimpleAMS
   class Document::Forms < Document::Links
     def initialize(options)
-      super
+      @options = options
       @members = options.forms
     end
 

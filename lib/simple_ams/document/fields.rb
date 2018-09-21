@@ -4,7 +4,7 @@ module SimpleAMS
   class Document::Fields
     include Enumerable
 
-    attr_reader :members
+    Field = Struct.new(:key, :value)
 
     def initialize(options)
       @options = options
@@ -15,51 +15,37 @@ module SimpleAMS
       found = members.find{|field| field == key}
       return nil unless found
 
-      return with_decorator(found)
+      value_of(found)
     end
 
+    #TODO: Can we make this faster?
     def each(&block)
       return enum_for(:each) unless block_given?
 
       members.each{ |key|
-        yield with_decorator(key)
+        yield value_of(key)
       }
 
       self
     end
 
+    def any?
+      members.any?
+    end
+
+    def empty?
+      members.empty?
+    end
+
     private
-      attr_reader :options
+      attr_reader :members, :options
 
-      def with_decorator(key)
-        Field.new(
-          options.resource,
-          options.serializer,
-          key,
-          options
-        )
-      end
-
-      class Field
-        attr_reader :key
-
-        #do we need to inject the whole options object?
-        def initialize(resource, serializer, key, options)
-          @resource = resource
-          @serializer = serializer
-          @key = key
-          @options = options
+      def value_of(key)
+        if options.serializer.respond_to?(key)
+          Field.new(key, options.serializer.send(key))
+        else
+          Field.new(key, options.resource.send(key))
         end
-
-        def value
-          return @value if defined?(@value)
-
-          return @value = serializer.send(key) if serializer.respond_to? key
-          return resource.send(key)
-        end
-
-        private
-          attr_reader :resource, :serializer
       end
   end
 end

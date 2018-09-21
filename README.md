@@ -41,7 +41,7 @@ class UserSerializer
   attributes :id, :name, :email, :birth_date
 
   #specify available relations
-  has_many :videos, :comments, :posts
+  has_many :videos
   belongs_to :organization
   has_one :profile
 

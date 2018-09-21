@@ -15,7 +15,7 @@ RSpec.describe SimpleAMS::Document, 'forms' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.forms.members).to eq []
+        expect(@document.forms).to eq({})
       end
     end
 
@@ -49,7 +49,7 @@ RSpec.describe SimpleAMS::Document, 'forms' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.forms.members).not_to eq []
+        expect(@document.forms).not_to eq({})
       end
     end
 
@@ -79,7 +79,7 @@ RSpec.describe SimpleAMS::Document, 'forms' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.forms.members).to eq []
+        expect(@document.forms).to eq({})
       end
     end
 
@@ -106,7 +106,7 @@ RSpec.describe SimpleAMS::Document, 'forms' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.forms.members).to eq []
+        expect(@document.forms).to eq({})
       end
     end
 

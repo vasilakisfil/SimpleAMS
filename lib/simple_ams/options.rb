@@ -15,6 +15,13 @@ module SimpleAMS
     end
     alias collection resource
 
+    #performance enchancement method for non-polymorphic collections
+    def with_resource(resource)
+      @resource = resource
+
+      return self
+    end
+
     def relation_options_for(relation_name)
       return _relation_options[relation_name] || {}
     end
@@ -85,13 +92,7 @@ module SimpleAMS
 
       _serializer = injected_options.fetch(:serializer, serializer_class)
 
-      return @serializer = _serializer.new.extend(
-        SimpleAMS::Methy.of(
-          expose.merge({
-            object: resource
-          })
-        )
-      )
+      return @serializer = instantiated_serializer_for(_serializer)
     end
 
     def adapter
@@ -266,6 +267,16 @@ module SimpleAMS
         else
           raise "#{_serializer_class} does not respond to SimpleAMS methods, did you include the DSL module?"
         end
+      end
+
+      def instantiated_serializer_for(serializer_klass)
+        serializer_klass.new.extend(
+          SimpleAMS::Methy.of(
+            expose.merge({
+              object: resource
+            })
+          )
+        )
       end
 
       def infer_serializer
