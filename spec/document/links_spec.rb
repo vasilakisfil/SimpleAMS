@@ -15,7 +15,7 @@ RSpec.describe SimpleAMS::Document, 'links' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.links.members).to eq []
+        expect(@document.links).to eq({})
       end
     end
 
@@ -49,7 +49,7 @@ RSpec.describe SimpleAMS::Document, 'links' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.links.members).not_to eq []
+        expect(@document.links).not_to eq({})
       end
     end
 
@@ -79,7 +79,7 @@ RSpec.describe SimpleAMS::Document, 'links' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.links.members).to eq []
+        expect(@document.links).to(eq({}))
       end
     end
 
@@ -106,7 +106,7 @@ RSpec.describe SimpleAMS::Document, 'links' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.links.members).to eq []
+        expect(@document.links).to eq({})
       end
     end
 

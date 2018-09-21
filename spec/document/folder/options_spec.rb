@@ -16,9 +16,9 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
     end
 
     it "returns correct collection attributes" do
-      expect(@folder.fields.members).to eq []
-      expect(@folder.links.members).to eq []
-      expect(@folder.metas.members).to eq []
+      expect(@folder.fields).to eq([])
+      expect(@folder.links).to eq({})
+      expect(@folder.metas).to eq({})
       expect(@folder.relations.count).to eq 0
       #expect(@folder.type.name).to eq :users
     end
@@ -65,7 +65,8 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
     end
 
     it "returns correct collection attributes" do
-      expect(@folder.fields.members).to(
+      members = @folder.fields.any?? @folder.fields.send(:members) : []
+      expect(members).to(
         eq(Helpers::RandomOptions.allowed_fields.map(&:as_input).uniq)
       )
       expect(@folder.links.map(&:name)).to(
@@ -102,9 +103,9 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
     end
 
     it "returns correct collection attributes" do
-      expect(@folder.fields.members).to eq []
-      expect(@folder.links.members).to eq []
-      expect(@folder.metas.members).to eq []
+      expect(@folder.fields).to eq []
+      expect(@folder.links).to eq({})
+      expect(@folder.metas).to eq({})
       expect(@folder.relations.count).to eq 0
       #expect(@folder.type.name).to eq :users
     end
@@ -132,7 +133,8 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
     end
 
     it "returns correct attributes" do
-      expect(@folder.fields.members).to(
+      members = @folder.fields.any?? @folder.fields.send(:members) : []
+      expect(members).to(
         eq(@setup_helper.collection_injected.fields.uniq)
       )
       expect(@folder.links.map(&:name)).to(
@@ -161,7 +163,8 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
     end
 
     it "returns correct attributes" do
-      expect(@folder.fields.members).to(
+      members = @folder.fields.any?? @folder.fields.send(:members) : []
+      expect(members).to(
         eq(@setup_helper.collection_injected.fields.uniq)
       )
       expect(@folder.links.map(&:name)).to(

@@ -3,7 +3,7 @@ require "simple_ams"
 module SimpleAMS
   class Document::Metas < Document::Links
     def initialize(options)
-      super
+      @options = options
       @members = options.metas
     end
 

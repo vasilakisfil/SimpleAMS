@@ -37,7 +37,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
 
     describe "members" do
       it "returns an empty array" do
-        expect(@document.fields.members).to eq []
+        expect(@document.fields.map(&:key)).to eq []
+        expect(@document.options.fields).to eq []
       end
     end
 
@@ -71,7 +72,7 @@ RSpec.describe SimpleAMS::Document, 'fields' do
 
     context "members" do
       it "holds the allowed fields only" do
-        expect(@document.fields.members).to eq User.model_attributes
+        expect(@document.fields.map(&:key)).to eq User.model_attributes
       end
     end
 
@@ -104,7 +105,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
 
     describe "members" do
       it "holds the allowed fields only" do
-        expect(@document.fields.members).to eq []
+        expect(@document.fields).to eq []
+        expect(@document.options.fields).to eq []
       end
     end
 
@@ -138,7 +140,7 @@ RSpec.describe SimpleAMS::Document, 'fields' do
 
     describe "members" do
       it "holds the allowed fields only" do
-        expect(@document.fields.members).to eq @allowed
+        expect(@document.fields.map(&:key)).to eq @allowed
       end
     end
 
@@ -172,7 +174,7 @@ RSpec.describe SimpleAMS::Document, 'fields' do
 
     describe "members" do
       it "holds the allowed fields only" do
-        expect(@document.fields.members).to eq @allowed
+        expect(@document.fields.map(&:key)).to eq @allowed
       end
     end
 

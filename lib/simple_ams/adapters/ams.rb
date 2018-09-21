@@ -13,7 +13,7 @@ class SimpleAMS::Adapters::AMS
 
     #TODO: I think bang method for merging is way faster ?
     hash = hash.merge(fields)
-    hash = hash.merge(relations)
+    hash = hash.merge(relations) unless relations.empty?
     hash = hash.merge(links: links) unless links.empty?
     hash = hash.merge(metas: metas) unless metas.empty?
     hash = hash.merge(forms: forms) unless forms.empty?
@@ -30,6 +30,8 @@ class SimpleAMS::Adapters::AMS
   end
 
   def links
+    return @links ||= {} if document.links.empty?
+
     @links ||= document.links.inject({}){ |hash, link|
       hash[link.name] = link.value
       hash
@@ -51,7 +53,7 @@ class SimpleAMS::Adapters::AMS
   end
 
   def relations
-    return {} if document.relations.empty?
+    return @relations = {} if document.relations.empty?
 
     @relations ||= document.relations.inject({}){ |hash, relation|
       if relation.folder?
