@@ -1,10 +1,11 @@
 require "simple_ams"
 
 class SimpleAMS::Document
-  attr_reader :options, :serializer, :resource
+  attr_reader :options, :embedded_options, :serializer, :resource
 
-  def initialize(options = SimpleAMS::Options.new)
+  def initialize(options = SimpleAMS::Options.new, embedded_options = nil)
     @options = options
+    @embedded_options = embedded_options
     @serializer = options.serializer
     @resource = options.resource
   end
@@ -21,8 +22,9 @@ class SimpleAMS::Document
 
   def relations
     return @relations if defined?(@relations)
-    return @relations = {} if options.relations.empty?
-    return @relations ||= self.class::Relations.new(options)
+    return @relations ||= self.class::Relations.new(
+      options, options.relations
+    )
   end
 
   def name
@@ -55,6 +57,12 @@ class SimpleAMS::Document
     return @forms ||= self.class::Forms.new(options)
   end
 
+  def generics
+    return @generics if defined?(@generics)
+    return @generics = {} if options.generics.empty?
+    return @generics ||= self.class::Generics.new(options)
+  end
+
   def folder?
     self.is_a?(self.class::Folder)
   end
@@ -63,11 +71,18 @@ class SimpleAMS::Document
     !folder?
   end
 
+  def embedded
+    return nil unless embedded_options
+
+    @embedded ||= SimpleAMS::Document.new(embedded_options)
+  end
+
   class Folder < self
     attr_reader :collection
 
-    def initialize(options)
+    def initialize(options = SimpleAMS::Options.new, embedded_options = nil)
       @_options = options
+      @embedded_options = embedded_options
       @options = @_options.collection_options
 
       @collection = options.collection

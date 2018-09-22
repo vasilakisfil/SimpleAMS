@@ -77,7 +77,7 @@ RSpec.describe SimpleAMS::Options, "relations" do
     end
 
     it "holds the specified options" do
-      expect(@options.relations).to(
+      expect(@options.relations.available).to(
         eq(
           []
         )
@@ -100,7 +100,7 @@ RSpec.describe SimpleAMS::Options, "relations" do
     end
 
     it "holds the specified options" do
-      expect(@options.relations).to(
+      expect(@options.relations.available).to(
         eq([])
       )
     end
@@ -110,7 +110,7 @@ RSpec.describe SimpleAMS::Options, "relations" do
     before do
       @injected_relation_options = Helpers.random_options
       @injected_relations = User.relations.map do |relation|
-        [relation.type, relation.name, @injected_relation_options]
+        [relation.type, relation.name, @injected_relation_options, nil]
       end
       @injected_relations.each do |relation_array|
         type = relation_array[0]
@@ -153,7 +153,7 @@ RSpec.describe SimpleAMS::Options, "relations" do
     end
 
     it "holds the specified options" do
-      expect(@options.relations).to(
+      expect(@options.relations.available).to(
         eq([])
       )
     end

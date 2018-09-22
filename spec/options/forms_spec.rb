@@ -151,7 +151,7 @@ RSpec.describe SimpleAMS::Options, 'forms' do
         @user = User.new
         @allowed_forms = [
           Elements::Form.new(
-            name: :user, value: ->(obj){
+            name: :user, value: ->(obj, s){
               ["api/v1/users/#{@user.id}", {rel: :user}]
             }
           ),
@@ -174,8 +174,8 @@ RSpec.describe SimpleAMS::Options, 'forms' do
         expect(@options.forms.count).to eq(2)
 
         expect(@options.forms.first.name).to eq(@allowed_forms.first.name)
-        expect(@options.forms.first.value).to eq(@allowed_forms.first.value.call(@user).first)
-        expect(@options.forms.first.options).to eq(@allowed_forms.first.value.call(@user).last)
+        expect(@options.forms.first.value).to eq(@allowed_forms.first.value.call(@user, nil).first)
+        expect(@options.forms.first.options).to eq(@allowed_forms.first.value.call(@user, nil).last)
 
         expect(@options.forms.last.name).to eq(@allowed_forms.last.name)
         expect(@options.forms.last.value).to eq(@allowed_forms.last.value)
@@ -193,7 +193,7 @@ RSpec.describe SimpleAMS::Options, 'forms' do
 
         #@injected_forms = Helpers.pick(@allowed_forms).inject({}) { |memo, form|
         @injected_forms = [@allowed_forms.first].inject({}) { |memo, form|
-          memo[form.name] = ->(obj){ ["/api/v1/#{@user.id}/#{form.name}", rel: form.name] }
+          memo[form.name] = ->(obj, s){ ["/api/v1/#{@user.id}/#{form.name}", rel: form.name] }
           memo
         }
 
@@ -210,7 +210,7 @@ RSpec.describe SimpleAMS::Options, 'forms' do
 
         @options.forms.each do |form|
           expect(form.name).to eq(@injected_forms.find{|l| l.first == form.name}[0])
-          expect(form.value).to eq(@injected_forms[form.name].call(@user).first)
+          expect(form.value).to eq(@injected_forms[form.name].call(@user, nil).first)
         end
       end
     end

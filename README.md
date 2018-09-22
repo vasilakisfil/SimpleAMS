@@ -41,9 +41,17 @@ class UserSerializer
   attributes :id, :name, :email, :birth_date
 
   #specify available relations
-  has_many :videos
-  belongs_to :organization
-  has_one :profile
+  has_one :profile, serializer: ProfileSerializer
+  #belongs_to is just an alias to has_one
+  belongs_to :organization, serializer: OrganizationSerializer
+  has_many :videos, serializer: VideosSerializer
+    #rarely used: if you need more options, you can pas a block
+    #which adheres to the same DSL as described here
+    #it goes to an option called `embedded`
+    #essentially these options here should be used for linking current resource
+    #with the relation (useful for JSONAPI for instance)
+    generic :include_data, false
+  end
 
   #specify some links
   link :feed, '/api/v1/me/feed'
@@ -59,6 +67,10 @@ class UserSerializer
 
   #same with form: can be static, dynamic and accept arbitrary options
   form :create, ->(obj) { User::CreateForm.for(obj) }
+
+  #or if you need something quite generic (and probably adapter-related)
+  #again it follows the same patterns as link
+  generic :include_embedded_data, true, {only: :collection}
 
   #these are properties to the collection resource itself
   #AND NOT to each resource separately, when applied inside a collection..

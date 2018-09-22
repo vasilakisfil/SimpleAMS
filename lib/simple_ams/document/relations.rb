@@ -5,9 +5,9 @@ module SimpleAMS
   class Document::Relations
     include Enumerable
 
-    def initialize(options)
+    def initialize(options, relations)
       @options = options
-      @relations = options.relations
+      @relations = relations
       @serializer = options.serializer
       @resource = options.resource
     end
@@ -33,13 +33,29 @@ module SimpleAMS
       count == 0
     end
 
+    def available
+      return @available ||= [] if relations.available.empty?
+
+      @available ||= self.class.new(options, relations.available)
+    end
+
     private
       attr_reader :options, :relations, :serializer, :resource
 
       def relation_for(relation)
-        renderer_klass_for(relation).new(
+        relation_value = relation_value_for(relation.name)
+
+        renderer_klass_for(relation, relation_value).new(
           SimpleAMS::Options.new(
-            relation_value_for(relation.name), relation_options_for(relation)
+            relation_value, relation_options_for(relation)
+          ),
+          SimpleAMS::Options.new(
+            resource, {
+              injected_options: {
+                serializer: relation.embedded
+              },
+              allowed_options: relation.embedded.options
+            }
           )
         )
       end
@@ -71,19 +87,33 @@ module SimpleAMS
             }
           )
         }
+
+        if relation.collection?
         #TODO: deep merge, can we automate this somehow ?
-        _relation_options[:injected_options][:collection] = (_relation_options[:collection] || {}).merge(
-          name: relation.name
-        )
+          _relation_options[:injected_options][:collection] = {
+            name: relation.name
+          }.merge(_relation_options[:injected_options][:collection] || {})
+        else
+          _relation_options[:injected_options][:name] = relation.name
+        end
 
         return _relation_options
       end
+=begin
+      def embedded_relation_options_for(relation)
+        _relation_options = relation_options_for(relation).merge(
+          allowed_options: relation.embedded.options
+        )
+        _relation_options[:injected_options][:serializer] = relation.embedded
 
-      def renderer_klass_for(relation)
-        renderer = SimpleAMS::Document
-        collection_renderer = renderer::Folder
+        return _relation_options
+      end
+=end
 
-        relation.collection? ? collection_renderer : renderer
+      def renderer_klass_for(relation, relation_value)
+        return SimpleAMS::Document::Folder if relation.collection?
+        return SimpleAMS::Document::Folder if relation_value.respond_to?(:each)
+        return SimpleAMS::Document
       end
 
 =begin TODO: Add that as public method, should help performance in edge cases

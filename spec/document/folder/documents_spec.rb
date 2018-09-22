@@ -28,8 +28,8 @@ RSpec.describe SimpleAMS::Document::Folder, 'documents' do
 
         expect(document.fields.map(&:key)).to eq @setup_helper.injected_options[:fields]
 
-        expect(document.relations.map(&:name)).to eq @setup_helper.expected_relations_names
-        expect(document.relations.count).to eq @setup_helper.expected_relations_count
+        expect(document.relations.available.map(&:name)).to eq @setup_helper.expected_relations_names
+        expect(document.relations.available.count).to eq @setup_helper.expected_relations_count
 
         expect(document.links.map(&:name)).to eq @setup_helper.injected_options[:links].map(&:first).uniq
         expect(document.links.map(&:value)).to eq @setup_helper.injected_options[:links].uniq(&:first).map{|l| l[1]}

@@ -50,6 +50,14 @@ class Elements
     (rand(10) + 3).times.map{Form.new}
   end
 
+  def generic(*args)
+    Generic.new(*args)
+  end
+
+  def generics
+    (rand(10) + 3).times.map{Generic.new}
+  end
+
   def as_elements_for(hash, klass:)
     hash.map{|key, value|
       klass.new({
@@ -120,6 +128,8 @@ class Elements
   class Meta < NameValueHash; end
 
   class Form < NameValueHash; end
+
+  class Generic < NameValueHash; end
 
   class ValueHash
     attr_reader :value, :options

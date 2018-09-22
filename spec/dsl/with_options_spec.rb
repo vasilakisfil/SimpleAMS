@@ -14,6 +14,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           links: [],
           metas: [],
           forms: [],
+          generics: [],
           collection: UserSerializer::Collection_,
         }
       )
@@ -37,7 +38,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
           expect(UserSerializer.options.send(:[], key)).to eq([value, {}])
         when :type
           expect(UserSerializer.options.send(:[], key)).to eq([value, {_explicit: true}])
-        when :links, :metas, :forms
+        when :links, :metas, :forms, :generics
           expect(UserSerializer.options.send(:[], key)).to eq(value.map{|k, v| [k, v].flatten(1)})
         when :collection
           expect(UserSerializer.options[:collection]).to(
