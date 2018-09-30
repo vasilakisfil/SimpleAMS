@@ -17,6 +17,7 @@ module SimpleAMS::DSL
           links: links,
           metas: metas,
           forms: forms,
+          generics: generics,
         }
       end
     end
@@ -49,6 +50,7 @@ module SimpleAMS::DSL
             links: links,
             metas: metas,
             forms: forms,
+            generics: generics,
           }
         end
       end
@@ -133,20 +135,38 @@ module SimpleAMS::DSL
       attributes(args)
     end
 
-    def has_many(name, options = {})
-      append_relationship([__method__, name, options])
+    def has_many(name, options = {}, &block)
+      append_relationship(
+        [__method__, name, options, embedded_class_for(name, options, block)]
+      )
     end
 
-    def has_one(name, options = {})
-      append_relationship([__method__, name, options])
+    def has_one(name, options = {}, &block)
+      append_relationship(
+        [__method__, name, options, embedded_class_for(name, options, block)]
+      )
     end
 
-    def belongs_to(name, options = {})
-      append_relationship([__method__, name, options])
+    def belongs_to(name, options = {}, &block)
+      append_relationship(
+        [__method__, name, options, embedded_class_for(name, options, block)]
+      )
     end
 
     def relations
       @_relations || []
+    end
+
+    def embedded_class_for(name, options, block)
+      embedded = Class.new(self)
+      klass_name = "Embedded#{name.to_s.capitalize}Options_"
+      self.const_set(klass_name, embedded)
+      embedded.with_options(
+        default_options.merge(options.select{|k| k != :serializer})
+      )
+      embedded.instance_exec(&block) if block
+
+      return embedded
     end
 
     #TODO: there is no memoization here, hence we ignore includes manually set !!
@@ -166,6 +186,10 @@ module SimpleAMS::DSL
 
     def form(name, value, options = {})
       append_form([name, value, options])
+    end
+
+    def generic(name, value, options = {})
+      append_generic([name, value, options])
     end
 
     def links(links = [])
@@ -188,6 +212,13 @@ module SimpleAMS::DSL
       forms.map{|key, value| append_form([key, value].flatten(1))} if forms.is_a?(Hash)
 
       @_forms ||= forms
+    end
+
+    def generics(generics = [])
+      return @_generics ||= [] if generics.empty?
+      generics.map{|key, value| append_generic([key, value].flatten(1))} if generics.is_a?(Hash)
+
+      @_generics ||= generics
     end
 
     def collection(name = nil, &block)
@@ -213,6 +244,7 @@ module SimpleAMS::DSL
         links: links,
         metas: metas,
         forms: forms,
+        generics: generics,
         collection: collection
       }
     end
@@ -257,6 +289,12 @@ module SimpleAMS::DSL
         @_forms ||= []
 
         @_forms << form
+      end
+
+      def append_generic(generic)
+        @_generics ||= []
+
+        @_generics << generic
       end
 
       def empty_options

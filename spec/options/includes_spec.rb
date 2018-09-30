@@ -54,7 +54,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
     end
 
     it "holds the specified options" do
-      expect(@options.relations).to(
+      expect(@options.relations.available).to(
         eq(
           []
         )
@@ -78,7 +78,7 @@ RSpec.describe SimpleAMS::Options, "includes" do
     end
 
     it "holds the specified options" do
-      expect(@options.relations.map(&:name)).to(
+      expect(@options.relations.available.map(&:name)).to(
         eq(
           @allowed_relations.keys & @injected_relations
         )

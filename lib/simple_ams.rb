@@ -5,6 +5,7 @@ require "simple_ams/document"
 require "simple_ams/dsl"
 require "simple_ams/adapters"
 require "simple_ams/adapters/ams"
+require "simple_ams/adapters/jsonapi"
 require "simple_ams/renderer"
 
 require "simple_ams/options"
@@ -17,9 +18,10 @@ require "simple_ams/options/includes"
 require "simple_ams/options/links"
 require "simple_ams/options/metas"
 require "simple_ams/options/forms"
+require "simple_ams/options/generics"
 require "simple_ams/options/primary_id"
 require "simple_ams/options/type"
-require "simple_ams/options/relation"
+require "simple_ams/options/relations"
 
 require "simple_ams/document/primary_id"
 require "simple_ams/document/fields"
@@ -27,6 +29,7 @@ require "simple_ams/document/relations"
 require "simple_ams/document/links"
 require "simple_ams/document/metas"
 require "simple_ams/document/forms"
+require "simple_ams/document/generics"
 
 module SimpleAMS
 end

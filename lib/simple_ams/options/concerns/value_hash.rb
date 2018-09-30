@@ -5,9 +5,9 @@ class SimpleAMS::Options
     module ValueHash
       attr_reader :value, :options
 
-      def initialize(value, options = {}, resource:)
+      def initialize(value, options = {}, resource:, serializer:)
         if value.is_a?(Proc) #TODO: maybe we should do duck typing instead?
-          _value = value.call(resource)
+          _value = value.call(resource, serializer)
           if _value.is_a?(Array) && _value.length > 1
             @value = _value.first
             @options = (_value.last || {}).merge(options || {})

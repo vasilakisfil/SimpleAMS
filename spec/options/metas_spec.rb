@@ -151,7 +151,7 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         @user = User.new
         @allowed_metas = [
           Elements::Meta.new(
-            name: :user, value: ->(obj){
+            name: :user, value: ->(obj, s){
               ["#{@user.id}", collection: :yes]
             }
           ),
@@ -174,8 +174,8 @@ RSpec.describe SimpleAMS::Options, 'metas' do
         expect(@options.metas.count).to eq(2)
 
         expect(@options.metas.first.name).to eq(@allowed_metas.first.name)
-        expect(@options.metas.first.value).to eq(@allowed_metas.first.value.call(@user).first)
-        expect(@options.metas.first.options).to eq(@allowed_metas.first.value.call(@user).last)
+        expect(@options.metas.first.value).to eq(@allowed_metas.first.value.call(@user, nil).first)
+        expect(@options.metas.first.options).to eq(@allowed_metas.first.value.call(@user, nil).last)
 
         expect(@options.metas.last.name).to eq(@allowed_metas.last.name)
         expect(@options.metas.last.value).to eq(@allowed_metas.last.value)
@@ -193,7 +193,7 @@ RSpec.describe SimpleAMS::Options, 'metas' do
 
         #@injected_metas = Helpers.pick(@allowed_metas).inject({}) { |memo, meta|
         @injected_metas = [@allowed_metas.first].inject({}) { |memo, meta|
-          memo[meta.name] = ->(obj){ ["#{@user.id}/#{meta.name}", rel: meta.name] }
+          memo[meta.name] = ->(obj, s){ ["#{@user.id}/#{meta.name}", rel: meta.name] }
           memo
         }
 
@@ -210,7 +210,7 @@ RSpec.describe SimpleAMS::Options, 'metas' do
 
         @options.metas.each do |meta|
           expect(meta.name).to eq(@injected_metas.find{|l| l.first == meta.name}[0])
-          expect(meta.value).to eq(@injected_metas[meta.name].call(@user).first)
+          expect(meta.value).to eq(@injected_metas[meta.name].call(@user, nil).first)
         end
       end
     end

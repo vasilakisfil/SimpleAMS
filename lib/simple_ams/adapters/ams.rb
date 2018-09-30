@@ -53,9 +53,9 @@ class SimpleAMS::Adapters::AMS
   end
 
   def relations
-    return @relations = {} if document.relations.empty?
+    return @relations = {} if document.relations.available.empty?
 
-    @relations ||= document.relations.inject({}){ |hash, relation|
+    @relations ||= document.relations.available.inject({}){ |hash, relation|
       if relation.folder?
         value = relation.documents.map{|doc| self.class.new(doc).as_json}
       else

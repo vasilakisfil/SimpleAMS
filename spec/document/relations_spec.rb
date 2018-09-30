@@ -68,13 +68,13 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns the allowed relations" do
-          expect(@document.relations).to respond_to(:each)
-          expect(@document.relations.map(&:name)).to(
+          expect(@document.relations.available).to respond_to(:each)
+          expect(@document.relations.available.map(&:name)).to(
             eq(
               @allowed_relations.map(&:name)
             )
           )
-          @document.relations.each_with_index do |relation, index|
+          @document.relations.available.each_with_index do |relation, index|
             if relation.folder? && relation.documents.first
               expect(relation.documents.first.name).to eq(
                 @allowed_relations[index].options[:serializer].to_s.gsub('Serializer','').downcase.to_sym
@@ -106,9 +106,9 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns an empty array" do
-        expect(@document.relations).to respond_to(:each)
-        expect(@document.relations.map(&:name)).to eq([])
-        @document.relations.each do |field|
+        expect(@document.relations.available).to respond_to(:each)
+        expect(@document.relations.available.map(&:name)).to eq([])
+        @document.relations.available.each do |field|
           fail('this should never happen as relations should be empty')
         end
       end
@@ -139,9 +139,9 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns the specified relations" do
-        expect(@document.relations).to respond_to(:each)
-        expect(@document.relations.map(&:name)).to eq([])
-        @document.relations.each do |field|
+        expect(@document.relations.available).to respond_to(:each)
+        expect(@document.relations.available.map(&:name)).to eq([])
+        @document.relations.available.each do |field|
           fail('this should never happen as relations should be empty')
         end
       end
@@ -170,9 +170,9 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns the specified relations" do
-        expect(@document.relations).to respond_to(:each)
-        expect(@document.relations.map(&:name)).to eq([])
-        @document.relations.each do |field|
+        expect(@document.relations.available).to respond_to(:each)
+        expect(@document.relations.available.map(&:name)).to eq([])
+        @document.relations.available.each do |field|
           fail('this should never happen as relations should be empty')
         end
       end
@@ -218,13 +218,13 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns the allowed relations" do
-        expect(@document.relations).to respond_to(:each)
-        expect(@document.relations.map(&:name)).to(
+        expect(@document.relations.available).to respond_to(:each)
+        expect(@document.relations.available.map(&:name)).to(
           eq(
             @allowed_relations.map(&:name)
           )
         )
-        @document.relations.each_with_index do |relation, index|
+        @document.relations.available.each_with_index do |relation, index|
           if relation.folder?
             expect(relation.documents.first.name).to eq(
               @allowed_relations[index].options[:serializer].to_s.gsub('Serializer','').downcase.to_sym
@@ -242,16 +242,16 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
         @allowed_relations.each do |relation|
           if relation.type == :has_many
-            expect(@document.relations[relation.name].documents.first.name).to(
+            expect(@document.relations.available[relation.name].documents.first.name).to(
               eq(relation.options[:serializer].to_s.gsub('Serializer','').downcase.to_sym)
             )
-            expect(@document.relations[relation.name].documents.first.send(:resource).class).to(
-              eq(@document.relations[relation.name].send(:options).resource.first.class)
+            expect(@document.relations.available[relation.name].documents.first.send(:resource).class).to(
+              eq(@document.relations.available[relation.name].send(:options).resource.first.class)
             )
           else
-            expect(@document.relations[relation.name].name).to eq(relation.name)
-            expect(@document.relations[relation.name].send(:resource).class).to(
-              eq(@document.relations[relation.name].send(:options).resource.class)
+            expect(@document.relations.available[relation.name].name).to eq(relation.name)
+            expect(@document.relations.available[relation.name].send(:resource).class).to(
+              eq(@document.relations.available[relation.name].send(:options).resource.class)
             )
           end
         end
@@ -277,13 +277,13 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns the allowed relations" do
-        expect(@document.relations).to respond_to(:each)
-        expect(@document.relations.map(&:name)).to(
+        expect(@document.relations.available).to respond_to(:each)
+        expect(@document.relations.available.map(&:name)).to(
           eq(
             @allowed_relations.map(&:name)
           )
         )
-        @document.relations.each_with_index do |relation, index|
+        @document.relations.available.each_with_index do |relation, index|
           if relation.folder? && relation.documents.first
             expect(relation.documents.first.name).to eq(
               @allowed_relations[index].options[:serializer].to_s.gsub('Serializer','').downcase.to_sym
@@ -315,8 +315,8 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
     context "values" do
       it "returns the allowed relations" do
-          expect(@document.relations).to respond_to(:each)
-          expect{@document.relations.map(&:name)}.to raise_error(
+          expect(@document.relations.available).to respond_to(:each)
+          expect{@document.relations.available.map(&:name)}.to raise_error(
             RuntimeError, /Could not infer serializer/
           )
       end

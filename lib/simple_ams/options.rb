@@ -7,7 +7,7 @@ module SimpleAMS
     attr_reader :resource, :allowed_options, :injected_options
 
     #injected_options is always a Hash object
-    def initialize(resource, injected_options: {}, allowed_options: nil)
+    def initialize(resource = nil, injected_options: {}, allowed_options: nil)
       @resource = resource
       @injected_options = injected_options || {}
       @_internal = @injected_options[:_internal] || {}
@@ -38,7 +38,6 @@ module SimpleAMS
       return @type = array_of_value_hash_for(Type, :type)
     end
 
-    #that's handful
     def name
       @name ||= injected_options[:name] || allowed_options[:name] || type.name
     end
@@ -58,14 +57,12 @@ module SimpleAMS
 
     #TODO: correctly loop over injected relations, although should be a rarely used feature
     def relations
-      return @relations if defined?(@relations) #||= options_for(
+      return @relations if defined?(@relations)
 
       relations = injected_options.fetch(:relations, nil)
       relations = allowed_options.fetch(:relations, []) if relations.nil?
 
-      return @relations = relations.map{|rel| Relation.new(*rel)}.select{
-          |relation| includes.include?(relation.name)
-        }
+      return @relations = Relations.new(relations, includes)
     end
 
     def links
@@ -86,6 +83,14 @@ module SimpleAMS
       return @forms = array_of_name_value_hash_for(Forms, Forms::Form, :forms)
     end
 
+    def generics
+      return @generics if defined?(@generics)
+
+      return @generics = array_of_name_value_hash_for(
+        Generics, Generics::Option, :generics
+      )
+    end
+
     #TODO: handle case of proc
     def serializer
       return @serializer if defined?(@serializer)
@@ -95,12 +100,23 @@ module SimpleAMS
       return @serializer = instantiated_serializer_for(_serializer)
     end
 
-    def adapter
-      return @adapter if defined?(@adapter)
+    def adapter(_serializer: nil)
+      return @adapter if defined?(@adapter) && _serializer.nil?
+      serializer = _serializer || serializer
 
-      @adapter = Adapter.new(*injected_options.fetch(:adapter, [nil]), resource: resource)
-      @adapter = Adapter.new(*allowed_options.fetch(:adapter, [nil]), resource: resource) if @adapter.value.nil?
-      @adapter = Adapter.new(SimpleAMS::Adapters::AMS, resource: resource) if @adapter.value.nil?
+      @adapter = Adapter.new(*injected_options.fetch(:adapter, [nil]), {
+        resource: resource, serializer: serializer
+      })
+      if @adapter.value.nil?
+        @adapter = Adapter.new(*allowed_options.fetch(:adapter, [nil]), {
+          resource: resource, serializer: serializer
+        })
+      end
+      if @adapter.value.nil?
+        @adapter = Adapter.new(SimpleAMS::Adapters::AMS, {
+          resource: resource, serializer: serializer
+        })
+      end
 
       return @adapter
     end
@@ -132,7 +148,8 @@ module SimpleAMS
 
       #TODO: Do we need that merge ?
       _injected_options = @injected_options.fetch(:collection, {}).merge({
-        serializer: collection_serializer_class
+        serializer: collection_serializer_class,
+        adapter: adapter(_serializer: collection_serializer_class).raw
       })
       _allowed_options = @allowed_options.fetch(:collection).options
 
@@ -177,15 +194,19 @@ module SimpleAMS
         injected = injected_options.fetch(name, nil)
         if injected
           injected = collection_klass.new(
-            injected.map{|l| item_klass.new(*l.flatten, resource: resource)}
+            injected.map{|l| item_klass.new(*l.flatten, {
+              resource: resource, serializer: serializer
+            })}
           )
         end
 
         allowed = collection_klass.new(
-          allowed_options.fetch(name).map{|l| item_klass.new(*l, resource: resource)}
+          allowed_options.fetch(name).map{|l| item_klass.new(*l, {
+            resource: resource, serializer: serializer
+          })}
         )
 
-        return collection_klass.new(options_for(
+        return collection_klass.new(priority_options_for(
           #TODO: correctly loop over injected properties
           injected: injected,
           allowed: allowed,
@@ -196,7 +217,9 @@ module SimpleAMS
         _options = injected_options.fetch(name, nil)
         _options = allowed_options.fetch(name, nil) unless _options
 
-        return klass.new(*_options, resource: resource)
+        return klass.new(*_options, {
+          resource: resource, serializer: serializer
+        })
       end
 
       def array_of_items_for(klass, name)
@@ -205,14 +228,14 @@ module SimpleAMS
         if injected.nil?
           return klass.new(allowed_options.fetch(name).uniq)
         else
-          return klass.new(options_for(
+          return klass.new(priority_options_for(
             injected: klass.new(injected_options.fetch(name, nil)),
             allowed: klass.new(allowed_options.fetch(name).uniq)
           ).uniq)
         end
       end
 
-      def options_for(allowed:, injected:)
+      def priority_options_for(allowed:, injected:)
         if not injected.nil?
           allowed = injected.class.new(
             injected.map{|s| s.is_a?(Hash) ? s.keys.first : s}
@@ -221,6 +244,12 @@ module SimpleAMS
 
         return allowed
       end
+
+=begin
+      def options_for(allowed:, injected:)
+        (allowed || []).concat(injected || [])
+      end
+=end
 
       def _relation_options
         return @_relation_options if defined?(@_relation_options)

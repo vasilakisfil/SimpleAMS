@@ -18,7 +18,9 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relations.count).to eq 1
-        expect(UserSerializer.relations.first).to eq [:has_many, :microposts, {}]
+        expect(UserSerializer.relations.first).to eq(
+          [:has_many, :microposts, {}, UserSerializer::EmbeddedMicropostsOptions_]
+        )
       end
     end
 
@@ -31,7 +33,9 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relations.count).to eq 1
-        expect(UserSerializer.relations.first).to eq [:has_many, :microposts, @options]
+        expect(UserSerializer.relations.first).to eq(
+          [:has_many, :microposts, @options, UserSerializer::EmbeddedMicropostsOptions_]
+        )
       end
     end
   end
@@ -45,7 +49,9 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relations.count).to eq 1
-        expect(UserSerializer.relations.first).to eq [:has_one, :follower, {}]
+        expect(UserSerializer.relations.first).to eq(
+          [:has_one, :follower, {}, UserSerializer::EmbeddedFollowerOptions_]
+        )
       end
     end
 
@@ -58,7 +64,9 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relations.count).to eq 1
-        expect(UserSerializer.relations.first).to eq [:has_one, :follower, @options]
+        expect(UserSerializer.relations.first).to eq(
+          [:has_one, :follower, @options, UserSerializer::EmbeddedFollowerOptions_]
+        )
       end
     end
   end
@@ -72,7 +80,9 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relations.count).to eq 1
-        expect(UserSerializer.relations.first).to eq [:belongs_to, :unit, {}]
+        expect(UserSerializer.relations.first).to eq(
+          [:belongs_to, :unit, {}, UserSerializer::EmbeddedUnitOptions_]
+        )
       end
     end
 
@@ -85,7 +95,9 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
       it "holds the specified options" do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relations.count).to eq 1
-        expect(UserSerializer.relations.first).to eq [:belongs_to, :unit, @options]
+        expect(UserSerializer.relations.first).to eq(
+          [:belongs_to, :unit, @options, UserSerializer::EmbeddedUnitOptions_]
+        )
       end
     end
   end
@@ -105,13 +117,19 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
         expect(UserSerializer.relations.count).to eq 3
 
         relation = UserSerializer.relations.find{|r| r[1] == :microposts}
-        expect(relation).to eq [:has_many, :microposts, @options]
+        expect(relation).to eq(
+          [:has_many, :microposts, @options, UserSerializer::EmbeddedMicropostsOptions_]
+        )
 
         relation = UserSerializer.relations.find{|r| r[1] == :unit}
-        expect(relation).to eq [:belongs_to, :unit, @options]
+        expect(relation).to eq(
+          [:belongs_to, :unit, @options,  UserSerializer::EmbeddedUnitOptions_]
+        )
 
         relation = UserSerializer.relations.find{|r| r[1] == :follower}
-        expect(relation).to eq [:has_one, :follower, @options]
+        expect(relation).to eq(
+          [:has_one, :follower, @options, UserSerializer::EmbeddedFollowerOptions_]
+        )
       end
     end
   end

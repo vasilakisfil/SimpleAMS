@@ -32,9 +32,15 @@ module Helpers
     resources = [resources].flatten
 
     resources.each do |resource|
+      resource.relations.each{|r|
+        if r.last.to_s.include?('Embedded')
+          resource.send(:remove_const, r.last.to_s.split('::').last)
+        end
+      }
+
       [
         :attributes, :relations, :links, :metas, :adapter, :primary_id, :type,
-        :collection, :forms
+        :collection, :forms, :generics
       ].each do |var|
         if resource.instance_variable_defined?("@_#{var}")
           resource.remove_instance_variable("@_#{var}")
@@ -44,6 +50,15 @@ module Helpers
           resource::Collection_.remove_instance_variable("@_#{var}")
         end
       end
+
+      model = const_get(resource.to_s.gsub('Serializer',''))
+      relations = model.respond_to?(:relations) ? model.relations : []
+      relations.map(&:name).each do |name|
+        if const_defined?("#{resource.to_s}::Embedded#{name.capitalize}Options_")
+          resource.send(:remove_const, "Embedded#{name.capitalize}Options_")
+        end
+      end
+
     end
   end
 
@@ -66,7 +81,7 @@ module Helpers
         links: {
           root: '/api/v1/',
           documentation: '/api/documentation', foobar: [:yes, :no].sample,
-          status: ->(obj){["/status/#{obj.hash}"]}
+          status: ->(obj, s){["/status/#{obj.hash}"]}
         },
         meta: Options.hash
       }

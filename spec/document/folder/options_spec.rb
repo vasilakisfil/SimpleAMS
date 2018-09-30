@@ -187,7 +187,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
       expect(@folder.resource_options.metas.map(&:name)).to(
         eq(@setup_helper.resource_injected.metas.map(&:name).uniq)
       )
-      expect(@folder.resource_options.relations.count).to(
+      expect(@folder.resource_options.relations.available.count).to(
         eq(@setup_helper.expected_relations_count)
       )
       #expect(@folder.type.name).to eq :users

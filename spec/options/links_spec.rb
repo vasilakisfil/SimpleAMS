@@ -151,7 +151,7 @@ RSpec.describe SimpleAMS::Options, 'links' do
         @user = User.new
         @allowed_links = [
           Elements::Link.new(
-            name: :user, value: ->(obj){
+            name: :user, value: ->(obj, s){
               ["api/v1/users/#{@user.id}", {rel: :user}]
             }
           ),
@@ -174,8 +174,8 @@ RSpec.describe SimpleAMS::Options, 'links' do
         expect(@options.links.count).to eq(2)
 
         expect(@options.links.first.name).to eq(@allowed_links.first.name)
-        expect(@options.links.first.value).to eq(@allowed_links.first.value.call(@user).first)
-        expect(@options.links.first.options).to eq(@allowed_links.first.value.call(@user).last)
+        expect(@options.links.first.value).to eq(@allowed_links.first.value.call(@user, nil).first)
+        expect(@options.links.first.options).to eq(@allowed_links.first.value.call(@user, nil).last)
 
         expect(@options.links.last.name).to eq(@allowed_links.last.name)
         expect(@options.links.last.value).to eq(@allowed_links.last.value)
@@ -193,7 +193,7 @@ RSpec.describe SimpleAMS::Options, 'links' do
 
         #@injected_links = Helpers.pick(@allowed_links).inject({}) { |memo, link|
         @injected_links = [@allowed_links.first].inject({}) { |memo, link|
-          memo[link.name] = ->(obj){ ["/api/v1/#{@user.id}/#{link.name}", rel: link.name] }
+          memo[link.name] = ->(obj, s){ ["/api/v1/#{@user.id}/#{link.name}", rel: link.name] }
           memo
         }
 
@@ -210,7 +210,7 @@ RSpec.describe SimpleAMS::Options, 'links' do
 
         @options.links.each do |link|
           expect(link.name).to eq(@injected_links.find{|l| l.first == link.name}[0])
-          expect(link.value).to eq(@injected_links[link.name].call(@user).first)
+          expect(link.value).to eq(@injected_links[link.name].call(@user, nil).first)
         end
       end
     end

@@ -8,19 +8,16 @@ module SimpleAMS
     end
 
     def value
-      if options.serializer.respond_to?(@key)
-        Field.new(key, options.serializer.send(@name))
+      if @options.serializer.respond_to?(name)
+        @options.serializer.send(name)
       else
-        Field.new(key, options.resource.send(key))
+        @options.resource.send(name)
       end
     end
 
     def options
       @options.primary_id.options
     end
-
-    private
-      attr_reader :options
   end
 end
 
