@@ -55,6 +55,13 @@ module SimpleAMS::DSL
         end
       end
 
+      _klass.with_options(
+        self::Collection_.options.merge(
+          #TODO: maybe add another group of elements under dsl?
+          #this could be DSL::Type.new(type).explicit?
+          type.last[:_explicit] ? {} : {type: nil}
+        )
+      )
       subclass.const_set('Collection_', _klass)
     end
 
