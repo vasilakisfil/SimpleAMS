@@ -149,7 +149,8 @@ module SimpleAMS
       #TODO: Do we need that merge ?
       _injected_options = @injected_options.fetch(:collection, {}).merge({
         serializer: collection_serializer_class,
-        adapter: adapter(_serializer: collection_serializer_class).raw
+        adapter: adapter(_serializer: collection_serializer_class).raw,
+        expose: expose
       })
       _allowed_options = @allowed_options.fetch(:collection).options
 

@@ -11,12 +11,11 @@ class SimpleAMS::Adapters::AMS
   def as_json
     hash = {}
 
-    #TODO: I think bang method for merging is way faster ?
-    hash = hash.merge(fields)
-    hash = hash.merge(relations) unless relations.empty?
-    hash = hash.merge(links: links) unless links.empty?
-    hash = hash.merge(metas: metas) unless metas.empty?
-    hash = hash.merge(forms: forms) unless forms.empty?
+    hash.merge!(fields)
+    hash.merge!(relations) unless relations.empty?
+    hash.merge!(links: links) unless links.empty?
+    hash.merge!(metas: metas) unless metas.empty?
+    hash.merge!(forms: forms) unless forms.empty?
 
     return {document.name => hash} if options[:root]
     return hash
@@ -57,7 +56,7 @@ class SimpleAMS::Adapters::AMS
 
     @relations ||= document.relations.available.inject({}){ |hash, relation|
       if relation.folder?
-        value = relation.documents.map{|doc| self.class.new(doc).as_json}
+        value = relation.map{|doc| self.class.new(doc).as_json}
       else
         value = self.class.new(relation).as_json
       end
@@ -80,7 +79,8 @@ class SimpleAMS::Adapters::AMS
       if options[:root]
         {
           folder.name => documents,
-          meta: metas
+          meta: metas,
+          links: links
         }
       else
         documents
@@ -88,7 +88,7 @@ class SimpleAMS::Adapters::AMS
     end
 
     def documents
-      return folder.documents.map{|document|
+      return folder.map{|document|
         adapter.new(document).as_json
       } || []
     end
@@ -96,6 +96,13 @@ class SimpleAMS::Adapters::AMS
     def metas
       @metas ||= folder.metas.inject({}){ |hash, meta|
         hash[meta.name] = meta.value
+        hash
+      }
+    end
+
+    def links
+      @links ||= folder.links.inject({}){ |hash, link|
+        hash[link.name] = link.value
         hash
       }
     end

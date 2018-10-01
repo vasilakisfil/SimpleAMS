@@ -16,9 +16,9 @@ class SimpleAMS::Adapters::JSONAPI
       data: data,
     }
 
-    hash = hash.merge(links: links) unless links.empty?
-    hash = hash.merge(metas: metas) unless metas.empty?
-    hash = hash.merge(included: included) unless included.empty?
+    hash.merge!(links: links) unless links.empty?
+    hash.merge!(metas: metas) unless metas.empty?
+    hash.merge!(included: included) unless included.empty?
 
     return hash
   end
@@ -30,7 +30,7 @@ class SimpleAMS::Adapters::JSONAPI
       attributes: fields,
     }
 
-    data = data.merge(relationships: relationships) unless relationships.empty?
+    data.merge!(relationships: relationships) unless relationships.empty?
 
     data
   end
@@ -55,15 +55,15 @@ class SimpleAMS::Adapters::JSONAPI
       _hash = {}
       embedded_relation_data = embedded_relation_data_for(relation)
       unless embedded_relation_data.empty?
-        _hash = _hash.merge(data: embedded_relation_data_for(relation))
+        _hash.merge!(data: embedded_relation_data_for(relation))
       end
 
       embedded_relation_links = embedded_relation_links_for(relation)
       unless embedded_relation_links.empty?
-        _hash = _hash.merge(links: embedded_relation_links_for(relation))
+        _hash.merge!(links: embedded_relation_links_for(relation))
       end
 
-      hash = hash.merge(relation.name => _hash) unless _hash.empty?
+      hash.merge!(relation.name => _hash) unless _hash.empty?
       hash
     }
   end
@@ -74,14 +74,14 @@ class SimpleAMS::Adapters::JSONAPI
     if relation.folder?
       value = relation.documents.map{|doc|
         {
-          document.primary_id.name => document.primary_id.value.to_s,
-          type: document.type.name
+          doc.primary_id.name => doc.primary_id.value.to_s,
+          type: doc.type.name
         }
       }
     else
       value = {
-        relation.primary_id.name => document.primary_id.value.to_s,
-        type: document.type.name
+        relation.primary_id.name => relation.primary_id.value.to_s,
+        type: relation.type.name
       }
     end
   end
@@ -124,7 +124,7 @@ class SimpleAMS::Adapters::JSONAPI
 
     @included ||= document.relations.available.inject([]){ |array, relation|
       if relation.folder?
-        array << relation.documents.map{|doc| self.class.new(doc).as_json[:data]}
+        array << relation.map{|doc| self.class.new(doc).as_json[:data]}
       else
         array << self.class.new(relation).as_json[:data]
       end
@@ -146,14 +146,14 @@ class SimpleAMS::Adapters::JSONAPI
       hash = {
         data: documents
       }
-      hash = hash.merge(meta: metas) unless metas.empty?
-      hash = hash.merge(links: links) unless links.empty?
+      hash.merge!(meta: metas) unless metas.empty?
+      hash.merge!(links: links) unless links.empty?
 
       return hash
     end
 
     def documents
-      return folder.documents.map{|document|
+      return folder.map{|document|
         adapter.new(document).as_json[:data]
       } || []
     end
@@ -171,7 +171,6 @@ class SimpleAMS::Adapters::JSONAPI
         hash
       }
     end
-
   end
 
   private

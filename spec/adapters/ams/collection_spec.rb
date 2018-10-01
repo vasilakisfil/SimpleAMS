@@ -67,7 +67,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
     context "links and metas" do
       it "returns the correct links" do
         @array_hash.each do |hash|
-          document = @folder.documents.find{|d| d.fields[:id].value == hash[:id]}
+          document = @folder.find{|d| d.fields[:id].value == hash[:id]}
 
           expect(hash[:links].keys.count > 0).to eq true
 
@@ -80,7 +80,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
 
       it "returns the correct metas" do
         @array_hash.each do |hash|
-          document = @folder.documents.find{|d| d.fields[:id].value == hash[:id]}
+          document = @folder.find{|d| d.fields[:id].value == hash[:id]}
 
           expect(hash[:metas].keys.count > 0).to eq true
 
@@ -190,7 +190,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
     context "links and metas" do
       it "returns the correct links" do
         @array_hash.each do |hash|
-          document = @folder.documents.find{|d| d.fields[:id].value == hash[:id]}
+          document = @folder.find{|d| d.fields[:id].value == hash[:id]}
 
           expect(hash[:links].keys.count > 0).to eq true
 
@@ -203,7 +203,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
 
       it "returns the correct metas" do
         @array_hash.each do |hash|
-          document = @folder.documents.find{|d| d.fields[:id].value == hash[:id]}
+          document = @folder.find{|d| d.fields[:id].value == hash[:id]}
 
           expect(hash[:metas].keys.count > 0).to eq true
 
