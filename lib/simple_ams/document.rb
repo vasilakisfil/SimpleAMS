@@ -3,7 +3,7 @@ require "simple_ams"
 class SimpleAMS::Document
   attr_reader :options, :embedded_options, :serializer, :resource
 
-  def initialize(options = SimpleAMS::Options.new, embedded_options = nil)
+  def initialize(options, embedded_options = nil)
     @options = options
     @embedded_options = embedded_options
     @serializer = options.serializer
@@ -78,18 +78,30 @@ class SimpleAMS::Document
   end
 
   class Folder < self
-    attr_reader :collection
+    include Enumerable
+    attr_reader :members
 
-    def initialize(options = SimpleAMS::Options.new, embedded_options = nil)
+    def initialize(options, embedded_options = nil)
       @_options = options
       @embedded_options = embedded_options
       @options = @_options.collection_options
 
-      @collection = options.collection
+      @members = options.collection
     end
 
+    def each(&block)
+      return enum_for(:each) unless block_given?
+
+      members.each do |resource|
+        yield SimpleAMS::Document.new(options_for(resource))
+      end
+
+      self
+    end
+
+    #do we really need this method ?
     def documents
-      @documents = collection.map do |resource|
+      @members.map do |resource|
         SimpleAMS::Document.new(options_for(resource))
       end
     end
@@ -110,6 +122,9 @@ class SimpleAMS::Document
             allowed_options: serializer_for(resource).options
           })
         else
+          resource_options.with_resource(resource)
+        end
+=begin
           SimpleAMS::Options.new(resource, {
             injected_options: resource_options.injected_options.merge({
               serializer: serializer_for(resource)
@@ -117,6 +132,7 @@ class SimpleAMS::Document
             allowed_options: serializer_for(resource).options
           })
         end
+=end
       end
 
       def serializer_for(resource)

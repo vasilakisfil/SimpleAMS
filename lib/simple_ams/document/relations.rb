@@ -47,7 +47,7 @@ module SimpleAMS
 
         renderer_klass_for(relation, relation_value).new(
           SimpleAMS::Options.new(
-            relation_value, relation_options_for(relation)
+            relation_value, relation_options_for(relation, relation_value)
           ),
           SimpleAMS::Options.new(
             resource, {
@@ -73,7 +73,7 @@ module SimpleAMS
       # *user injected when instantiating the SimpleAMS class
       # *relation options injected from parent serializer
       # *serializer class options
-      def relation_options_for(relation)
+      def relation_options_for(relation, relation_value)
         _relation_options = {
           injected_options: (relation.options || {}).merge(
             options.relation_options_for(
@@ -88,7 +88,7 @@ module SimpleAMS
           )
         }
 
-        if relation.collection?
+        if relation.collection? || relation_value.respond_to?(:each)
         #TODO: deep merge, can we automate this somehow ?
           _relation_options[:injected_options][:collection] = {
             name: relation.name
