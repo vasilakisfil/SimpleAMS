@@ -58,15 +58,16 @@ class UserSerializer
   #links can also take other options, as specified by RFC 8288
   link :root, '/api/v1/', rel: :user
   #link values can be dynamic as well through lambdas
-  link :posts, ->(obj) { "/api/v1/users/#{obj.id}/posts/" }, rel: :user
+  #lambdas take arguments the object to be serialized and the instantiated serializer
+  link :posts, ->(obj, s) { "/api/v1/users/#{obj.id}/posts/" }, rel: :user
   #if you also need dynamic options, you can return an array from the lambda
-  link :followers, ->(obj) { ["/api/v1/users/#{obj.id}/followers/", rel: obj.type] }
+  link :followers, ->(obj, s) { ["/api/v1/users/#{obj.id}/followers/", rel: obj.type] }
 
   #same with metas: can be static, dynamic and accept arbitrary options
-  meta :environment, ->(obj) { Rails.env.to_s }
+  meta :environment, ->(obj, s) { Rails.env.to_s }
 
   #same with form: can be static, dynamic and accept arbitrary options
-  form :create, ->(obj) { User::CreateForm.for(obj) }
+  form :create, ->(obj, s) { User::CreateForm.for(obj) }
 
   #or if you need something quite generic (and probably adapter-related)
   #again it follows the same patterns as link
@@ -80,7 +81,7 @@ class UserSerializer
     #here we use only links and meta
     link :root, '/api/v1/', rel: :user
     type :users
-    meta :count, ->(collection) { collection.count }
+    meta :count, ->(collection, s) { collection.count }
   end
 
   #note that most probably the only thing that you will need here is the `type`,
@@ -143,7 +144,7 @@ In any case, we have the following options:
   #makes sense to use it when initializing the Renderer
   serializer: UserSerializer,
   #can also be a lambda, in case of polymorphic records, ideal for ArrayRenderer
-  serializer: ->(obj){ obj.employee? ? EmployeeSerializer : UserSerializer }
+  serializer: ->(obj, s){ obj.employee? ? EmployeeSerializer : UserSerializer }
   #specifying the underlying adapter. This cannot be a lambda in case of ArrayRenderer,
   #but can take some useful options that are passed down straight to the adapter class.
   adapter: SimpleAMS::Adapters::AMS, root: true
@@ -156,18 +157,18 @@ In any case, we have the following options:
     posts: "/api/v1/posts/", rel: :posts,
     #it can also be a lambda that takes the resource to be rendered as a param
     #when the lambda is called, it should return the array structure above
-    self: ->(obj) { ["/api/v1/users/#{obj.id}", rel: :user] }
+    self: ->(obj, s) { ["/api/v1/users/#{obj.id}", rel: :user] }
   },
   #the meta data, same as the links data (available in adapters even for single records)
   metas: {
-    type: ->(obj){ obj.employee? ? :employee : :user}
+    type: ->(obj, s){ obj.employee? ? :employee : :user}
     #meta can take arbitrary options as well
     authorization: :oauth, type: :bearer_token
   },
   #the form data, same as the links/metas data (available in adapters even for single records)
   forms: {
-    update: ->(obj){ User::UpdateForm.for(obj)}
-    follow: ->(obj){ User::FollowForm.for(obj)}
+    update: ->(obj, s){ User::UpdateForm.for(obj)}
+    follow: ->(obj, s){ User::FollowForm.for(obj)}
   },
   #collection parameters, used only in ArrayRenderer
   collection: {
@@ -175,10 +176,10 @@ In any case, we have the following options:
       root: '/api/v1'
     },
     metas: {
-      pages: ->(obj) { [obj.pages, collection: true]},
-      current_page: ->(obj) { [obj.current_page, collection: true] },
-      previous_page: ->(obj) { [obj.previous_page, collection: true] },
-      next_page: ->(obj) { [obj.next_page, collection: true] },
+      pages: ->(obj, s) { [obj.pages, collection: true]},
+      current_page: ->(obj, s) { [obj.current_page, collection: true] },
+      previous_page: ->(obj, s) { [obj.previous_page, collection: true] },
+      next_page: ->(obj, s) { [obj.next_page, collection: true] },
       max_per_page: 50,
     },
     #creating a resource goes in the collection route (users/), hence inside collection options ;)

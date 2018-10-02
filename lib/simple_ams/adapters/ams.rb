@@ -9,6 +9,8 @@ class SimpleAMS::Adapters::AMS
   end
 
   def as_json
+    return nil if document.resource.nil?
+
     hash = {}
 
     hash.merge!(fields)
