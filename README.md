@@ -59,7 +59,7 @@ class UserSerializer
   link :root, '/api/v1/', rel: :user
   #link values can be dynamic as well through lambdas
   #lambdas take arguments the object to be serialized and the instantiated serializer
-  link :posts, ->(obj, s) { "/api/v1/users/#{obj.id}/posts/" }, rel: :user
+  link :posts, ->(obj, s) { s.api_v1_user_followers_path(user_id: obj.id) }, rel: :user
   #if you also need dynamic options, you can return an array from the lambda
   link :followers, ->(obj, s) { ["/api/v1/users/#{obj.id}/followers/", rel: obj.type] }
 
