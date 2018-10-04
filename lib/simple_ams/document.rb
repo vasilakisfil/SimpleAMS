@@ -122,9 +122,9 @@ class SimpleAMS::Document
             allowed_options: serializer_for(resource).options
           })
         else
-          resource_options.with_resource(resource)
-        end
-=begin
+#          resource_options.with_resource(resource)
+#        end
+          # we need to optimize that using tracked properties
           SimpleAMS::Options.new(resource, {
             injected_options: resource_options.injected_options.merge({
               serializer: serializer_for(resource)
@@ -132,7 +132,6 @@ class SimpleAMS::Document
             allowed_options: serializer_for(resource).options
           })
         end
-=end
       end
 
       def serializer_for(resource)
