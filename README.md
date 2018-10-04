@@ -44,7 +44,7 @@ class UserSerializer
   has_one :profile, serializer: ProfileSerializer
   #belongs_to is just an alias to has_one
   belongs_to :organization, serializer: OrganizationSerializer
-  has_many :videos, serializer: VideosSerializer
+  has_many :videos, serializer: VideosSerializer do
     #rarely used: if you need more options, you can pas a block
     #which adheres to the same DSL as described here
     #it goes to an option called `embedded`
