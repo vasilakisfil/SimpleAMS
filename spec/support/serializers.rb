@@ -5,14 +5,24 @@ class UserSerializer
   class << self
     def with_overrides(array = [])
       undefine_all
-      array.each do |meth|
-        self.send(:define_method, meth) {
-          if object.send(meth).respond_to?('*')
-            object.send(meth)*2
-          else
-            'Something else'
-          end
-        }
+      if array.is_a?(Array)
+        array.each do |meth|
+          self.send(:define_method, meth) {
+            if object.send(meth).respond_to?('*')
+              object.send(meth)*2
+            else
+              'Something else'
+            end
+          }
+        end
+      elsif array.is_a?(Hash)
+        array.each do |meth, value|
+          self.send(:define_method, meth) {
+            value
+          }
+        end
+      else
+        raise 'wrong type'
       end
     end
 
