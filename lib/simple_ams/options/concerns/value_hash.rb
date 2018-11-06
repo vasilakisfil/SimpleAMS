@@ -4,6 +4,7 @@ class SimpleAMS::Options
   module Concerns
     module ValueHash
       attr_reader :value, :options
+      alias :name :value
 
       def initialize(value, options = {}, resource:, serializer:)
         if value.is_a?(Proc) #TODO: maybe we should do duck typing instead?
@@ -20,8 +21,6 @@ class SimpleAMS::Options
           @options = options || {}
         end
       end
-
-      alias_method :name, :value
 
       def raw
         [value, options]

@@ -80,6 +80,7 @@ class SimpleAMS::Document
   class Folder < self
     include Enumerable
     attr_reader :members
+    alias collection resource
 
     def initialize(options, embedded_options = nil)
       @_options = options
@@ -87,6 +88,7 @@ class SimpleAMS::Document
       @options = @_options.collection_options
 
       @members = options.collection
+      @resource = options.resource
     end
 
     def each(&block)

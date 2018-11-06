@@ -92,6 +92,62 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
           end
         end
       end
+
+
+      context "with lambda" do
+        context "allowed #{element}" do
+          before do
+            @user = User.new
+            @allowed_element = Object.const_get(
+              "#{Elements}::#{element.split('_').map(&:capitalize).join}"
+            ).new(
+              value: ->(obj, s){ [obj.id, {foo: :bar}] }
+            )
+            UserSerializer.send(element, *@allowed_element.as_lambda_input)
+
+            @options = SimpleAMS::Options.new(@user, {
+              injected_options: Helpers.random_options(with: {
+                serializer: UserSerializer
+              }, without: [element.to_sym])
+            })
+          end
+
+          it "holds the unwrapped #{element}" do
+            expect(@options.send(element).value).to(
+              eq(@allowed_element.value.call(@user, nil).first)
+            )
+            expect(@options.send(element).options).to(
+              eq(@allowed_element.value.call(@user, nil).last.merge(element.default_options))
+            )
+          end
+        end
+
+        context "injected #{element}" do
+          before do
+            @user = User.new
+            @allowed_element = Elements.send(element)
+            UserSerializer.send(element, *@allowed_element.as_input)
+
+            @injected_element = ->(obj, s){ ["/api/v1/#{obj.id}", rel: :foobar] }
+
+            @options = SimpleAMS::Options.new(@user, {
+              injected_options: Helpers.random_options(with: {
+                serializer: UserSerializer,
+                element.to_sym => @injected_element
+              })
+            })
+          end
+
+          it "holds the injected lambda #{element}" do
+            expect(@options.send(element).value).to(
+              eq(@injected_element.call(@user, nil).first)
+            )
+            expect(@options.send(element).options).to(
+              eq(@injected_element.call(@user, nil).last)
+            )
+          end
+        end
+      end
     end
   end
 end
