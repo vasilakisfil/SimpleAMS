@@ -150,7 +150,11 @@ class Elements
     end
 
     def as_lambda_input
-      ->{ [@value, @options] }
+      if @value.is_a?(Proc)
+        @value
+      else
+        ->{ [@value, @options] }
+      end
     end
   end
 

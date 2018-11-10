@@ -1,6 +1,5 @@
 require "spec_helper"
 
-#TODO: add tests for block case in the serializer
 #these tests have been replicated from links, so some options make sense only for links
 #but this shouldn't affect the tests' effeciency
 RSpec.describe SimpleAMS::Options, 'name_value_hash' do
@@ -162,7 +161,7 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             @allowed_elements = [
               Object.const_get("#{Elements}::#{element.capitalize}").new(
                 name: :user, value: ->(obj, s){
-                  ["api/v1/users/#{@user.id}", {rel: :user}]
+                  ["api/v1/users/#{obj.id}", {rel: :user}]
                 }
               ),
               Object.const_get("#{Elements}::#{element.capitalize}").new(
