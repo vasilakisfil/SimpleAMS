@@ -57,6 +57,24 @@ RSpec.describe SimpleAMS::DSL, 'name_value_hash' do
           end
         end
       end
+
+      context "with multiple #{element.plural} at once" do
+        before do
+          @elements = (rand(10) + 2).times.map{ Elements.send(element) }.uniq{|i| i.name}
+          UserSerializer.send(element.plural, @elements.inject({}){|memo, el|
+            memo[el.name] = el.as_input[1..-1]; memo
+          })
+        end
+
+        it "holds the specified #{element.plural}" do
+          expect(UserSerializer.send(element.plural).count).to eq @elements.count
+          UserSerializer.send(element.plural).each_with_index do |t, index|
+            expect(t).to eq @elements[index].as_input
+            #just in case
+            expect(t).to eq [@elements[index].name, @elements[index].value, @elements[index].options]
+          end
+        end
+      end
     end
   end
 end

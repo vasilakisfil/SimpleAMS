@@ -107,8 +107,9 @@ module SimpleAMS::DSL
             self.send(key, *value)
           end
         else
-          #TODO: Add a proper logger
-          puts "SimpeAMS: #{key} is not recognized, ignoring (from #{self.to_s})"
+          SimpleAMS.configuration.logger.info(
+            "SimpeAMS: #{key} is not recognized, ignoring (from #{self.to_s})"
+          )
         end
       end
 

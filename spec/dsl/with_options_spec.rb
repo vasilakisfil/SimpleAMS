@@ -87,6 +87,23 @@ RSpec.describe SimpleAMS::DSL, 'options' do
       expect(UserSerializer.options[:links].sort).to eq([UserSerializer.options[:links], @links.map(&:as_input)].flatten(1).uniq.sort)
     end
   end
+
+  context "with options that don't really exist" do
+    before do
+      #TODO: Figure out what's going on when collection is nil or {},
+      #i.e. add tests for these cases
+      @random_options = {foo: :bar}
+      @spy_logger = spy('::Logger')
+      SimpleAMS.configure do |config|
+        config.logger = @spy_logger
+      end
+      UserSerializer.with_options(@random_options)
+    end
+
+    it "holds the specified options" do
+      expect(@spy_logger).to have_received(:info)
+    end
+  end
 end
 
 

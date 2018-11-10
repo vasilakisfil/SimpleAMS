@@ -61,5 +61,11 @@ RSpec.describe SimpleAMS::DSL, 'options' do
       )
     end
   end
+
+  #TODO: Move that to general tests?
+  it "responds to simple_ams? method" do
+    expect(UserSerializer).to respond_to(:simple_ams?)
+    expect(UserSerializer.simple_ams?).to eq true
+  end
 end
 

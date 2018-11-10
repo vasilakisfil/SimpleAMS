@@ -286,5 +286,3 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
     end
   end
 end
-
-

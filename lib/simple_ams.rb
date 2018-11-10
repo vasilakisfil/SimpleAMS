@@ -30,6 +30,23 @@ require "simple_ams/document/links"
 require "simple_ams/document/metas"
 require "simple_ams/document/forms"
 require "simple_ams/document/generics"
+require "logger"
 
 module SimpleAMS
+  class << self
+    attr_accessor :configuration
+  end
+
+  def self.configure
+    self.configuration ||= Configuration.new
+    yield(configuration)
+  end
+
+  class Configuration
+    attr_accessor :logger
+
+    def initialize
+      @logger = ::Logger.new(STDOUT)
+    end
+  end
 end
