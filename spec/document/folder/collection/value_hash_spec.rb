@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe SimpleAMS::Document, 'value_hash' do
+RSpec.describe SimpleAMS::Document::Folder, '(collection) value_hash' do
   [:type, :primary_id, :adapter].map(&:to_s).each do |element|
     element.send(:extend, Module.new{
       def type?
@@ -26,8 +26,8 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
     describe "(#{element})" do
       context "with no #{element} is specified" do
         before do
-          @document = SimpleAMS::Document.new(
-            SimpleAMS::Options.new(User.new, {
+          @folder = SimpleAMS::Document::Folder.new(
+            SimpleAMS::Options.new(User.array, {
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer,
               }, without: [element.to_sym])
@@ -36,18 +36,24 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
         end
 
         it "defaults to class name" do
-          expect(@document.send(element).name).to eq element.default_name
+          @folder.each do |document|
+            expect(document.send(element).name).to eq element.default_name
+          end
         end
 
         if element.type?
           it "updates name correctly" do
-            expect(@document.name).to eq @document.send(element).name
+            @folder.each do |document|
+              expect(document.name).to eq document.send(element).name
+            end
           end
         end
 
         if element.primary_id?
           it "value defaults to resource id" do
-            expect(@document.send(element).value).to eq @document.resource.id
+            @folder.each do |document|
+              expect(document.send(element).value).to eq document.resource.id
+            end
           end
         end
       end
@@ -57,8 +63,8 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
           @element = Elements.send(element, value: :an_element, options: {foo: :bar})
           UserSerializer.send(element, *@element.as_input)
 
-          @document = SimpleAMS::Document.new(
-            SimpleAMS::Options.new(User.new, {
+          @folder = SimpleAMS::Document::Folder.new(
+            SimpleAMS::Options.new(User.array, {
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer,
               }, without: [element.to_sym])
@@ -67,15 +73,19 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
         end
 
         it "returns the #{element} specified" do
-          expect(@document.send(element).name).to eq :an_element
-          expect(@document.send(element).options).to(
-            eq({foo: :bar}.merge(element.default_options))
-          )
+          @folder.each do |document|
+            expect(document.send(element).name).to eq :an_element
+            expect(document.send(element).options).to(
+              eq({foo: :bar}.merge(element.default_options))
+            )
+          end
         end
 
         if element.type?
           it "updates name correctly" do
-            expect(@document.name).to eq @document.send(element).name
+            @folder.each do |document|
+              expect(document.name).to eq document.send(element).name
+            end
           end
         end
       end
@@ -94,8 +104,8 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
           UserSerializer.send(element, *_element.as_input)
 
           @element = Elements.send(element, value: :another_element, options: {bar: :foo})
-          @document = SimpleAMS::Document.new(
-            SimpleAMS::Options.new(User.new, {
+          @folder = SimpleAMS::Document::Folder.new(
+            SimpleAMS::Options.new(User.array, {
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer,
                 element.to_sym => @element.as_input
@@ -112,19 +122,25 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
         end
 
         it "returns the injected #{element} specified" do
-          expect(@document.send(element).name).to eq @element.value
-          expect(@document.send(element).options).to eq(@element.options)
+          @folder.each do |document|
+            expect(document.send(element).name).to eq @element.value
+            expect(document.send(element).options).to eq(@element.options)
+          end
         end
 
         if element.type?
           it "updates name correctly" do
-            expect(@document.name).to eq @document.send(element).name
+            @folder.each do |document|
+              expect(document.name).to eq document.send(element).name
+            end
           end
         end
 
         if element.primary_id?
           it "value resource's value" do
-            expect(@document.send(element).value).to eq 'another_element_value'
+            @folder.each do |document|
+              expect(document.send(element).value).to eq 'another_element_value'
+            end
           end
         end
       end
@@ -210,3 +226,4 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
     end
   end
 end
+

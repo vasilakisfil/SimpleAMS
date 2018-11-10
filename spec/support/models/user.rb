@@ -26,6 +26,14 @@ class User
         )
       ]
     end
+
+    def array
+      (rand(10) + 1).times.map{self.new}.send(:extend, Module.new{
+        def id
+          @id ||= rand(100000)
+        end
+      })
+    end
   end
 
   def initialize(opts = {})

@@ -175,7 +175,7 @@ module SimpleAMS
     def collection_serializer_class
       return @collection_serializer_class if defined?(@collection_serializer_class)
 
-      if serializer_class.is_a?(Proc)
+      if serializer_class.is_a?(Proc) #TODO: maybe we should do duck typing instead?
         @collection_serializer_class = injected_options[:collection_serializer]
         if @collection_serializer_class.nil?
           raise "In case of a proc serializer, you need to specify a collection_serializer"
@@ -288,7 +288,7 @@ module SimpleAMS
       #TODO: raise exception if both are nil!
       def fetch_allowed_options
         _serializer_class = self.serializer_class
-        if _serializer_class.is_a?(Proc)
+        if _serializer_class.is_a?(Proc) #TODO: maybe we should do duck typing instead?
           _serializer_class = self.collection_serializer_class
         end
 

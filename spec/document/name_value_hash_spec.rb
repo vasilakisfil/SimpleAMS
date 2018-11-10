@@ -1,6 +1,5 @@
 require "spec_helper"
 
-#TODO: add tests for block case in the serializer
 RSpec.describe SimpleAMS::Document, 'name_value_hash' do
   [:generic, :link, :meta, :form].map(&:to_s).each do |element|
     element.send(:extend, Module.new{
@@ -230,6 +229,86 @@ RSpec.describe SimpleAMS::Document, 'name_value_hash' do
             expect(element_got.name).to eq(element_expected.name)
             expect(element_got.value).to eq(element_expected.value)
             expect(element_got.options).to eq(element_expected.options)
+          end
+        end
+      end
+
+      context "with lambda" do
+        context "allowed #{element.plural}" do
+          before do
+            @user = User.new
+            @allowed_elements = [
+              Object.const_get("#{Elements}::#{element.capitalize}").new(
+                name: :user, value: ->(obj, s){
+                  ["api/v1/users/#{obj.id}", {rel: :user}]
+                }
+              ),
+              Object.const_get("#{Elements}::#{element.capitalize}").new(
+                name: :root, value: "api/v1/root", options: {rel: :root}
+              ),
+            ]
+            @allowed_elements.each do |el|
+              UserSerializer.send(element, *el.as_input)
+            end
+
+            options = SimpleAMS::Options.new(@user, {
+              injected_options: Helpers.random_options(with: {
+                serializer: UserSerializer
+              }, without: [element.plural.to_sym])
+            })
+
+            @document = SimpleAMS::Document.new(options)
+          end
+
+          it "holds the unwrapped #{element.plural}" do
+            expect(@document.send(element.plural).count).to eq(2)
+
+            expect(@document.send(element.plural).first.name).to(
+              eq(@allowed_elements.first.name)
+            )
+            expect(@document.send(element.plural).first.value).to(
+              eq(@allowed_elements.first.value.call(@user, nil).first)
+            )
+            expect(@document.send(element.plural).first.options).to(
+              eq(@allowed_elements.first.value.call(@user, nil).last)
+            )
+
+            expect(@document.send(element.plural).map.to_a.last.name).to eq(@allowed_elements.last.name)
+            expect(@document.send(element.plural).map.to_a.last.value).to eq(@allowed_elements.last.value)
+            expect(@document.send(element.plural).map.to_a.last.options).to eq(@allowed_elements.last.options)
+          end
+        end
+
+        context "injected #{element.plural}" do
+          before do
+            @user = User.new
+            @allowed_elements = Elements.send(element.plural)
+            @allowed_elements.each do |el|
+              UserSerializer.send(element, *el.as_input)
+            end
+
+            @injected_elements = [@allowed_elements.first].inject({}) { |memo, el|
+              memo[el.name] = ->(obj, s){ ["/api/v1/#{obj.id}/#{el.name}", rel: el.name] }
+              memo
+            }
+
+            options = SimpleAMS::Options.new(@user, {
+              injected_options: Helpers.random_options(with: {
+                serializer: UserSerializer,
+                element.plural.to_sym => @injected_elements
+              })
+            })
+
+            @document = SimpleAMS::Document.new(options)
+          end
+
+          it "holds the injected lambda #{element.plural}" do
+            expect(@document.send(element.plural).count).to eq(@injected_elements.count)
+
+            @document.send(element.plural).each do |el|
+              expect(el.name).to eq(@injected_elements.find{|l| l.first == el.name}[0])
+              expect(el.value).to eq(@injected_elements[el.name].call(@user, nil).first)
+            end
           end
         end
       end

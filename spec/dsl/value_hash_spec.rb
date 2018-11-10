@@ -41,7 +41,7 @@ RSpec.describe SimpleAMS::DSL, 'value_hash' do
         context "with options" do
           before do
             @element = Elements.send(element, {
-              value: Helpers::Options.single, options: Helpers::Options.hash
+              value: ->(obj, s){Helpers::Options.single}, options: Helpers::Options.hash
             })
             UserSerializer.send(element, *@element.as_input)
           end
@@ -53,6 +53,20 @@ RSpec.describe SimpleAMS::DSL, 'value_hash' do
             expect(UserSerializer.send(element)).to(
               eq [@element.value, @element.options.merge(element.default_options)]
             )
+          end
+        end
+
+        context "with lambda #{element}" do
+          before do
+            @element = Elements.send(element, {
+              value: Helpers::Options.single, options: Helpers::Options.hash
+            })
+            UserSerializer.send(element, *@element.as_lambda_input)
+          end
+
+          it "holds the specified generic" do
+            expect(UserSerializer.send(element).first.is_a?(Proc)).to eq true
+            expect(UserSerializer.send(element).first.call).to eq @element.as_input[0..-1]
           end
         end
       end
