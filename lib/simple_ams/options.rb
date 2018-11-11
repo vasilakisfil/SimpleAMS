@@ -2,12 +2,15 @@ require "simple_ams"
 
 module SimpleAMS
   class Options
+    include Concerns::TrackedProperties
+
     class Collection < self; end
 
     attr_reader :resource, :allowed_options, :injected_options
 
     #injected_options is always a Hash object
     def initialize(resource = nil, injected_options: {}, allowed_options: nil)
+      initialize_tracking!
       @resource = resource
       @injected_options = injected_options || {}
       @_internal = @injected_options[:_internal] || {}
@@ -15,29 +18,29 @@ module SimpleAMS
     end
     alias collection resource
 
-=begin
     #performance enchancement method for non-polymorphic collections
     def with_resource(resource)
       @resource = resource
 
+      clean_volatile_properties!
+
       return self
     end
-=end
 
     def relation_options_for(relation_name)
       return _relation_options[relation_name] || {}
     end
 
     def primary_id
-      return @primary_id if defined?(@primary_id)
+      return tracked(__method__).value if tracked(__method__).value
 
-      return @primary_id = array_of_value_hash_for(PrimaryId, :primary_id)
+      return tracked(__method__).value = array_of_value_hash_for(PrimaryId, :primary_id)
     end
 
     def type
-      return @type if defined?(@type)
+      return tracked(__method__).value if tracked(__method__).value
 
-      return @type = array_of_value_hash_for(Type, :type)
+      return tracked(__method__).value = array_of_value_hash_for(Type, :type)
     end
 
     def name
@@ -68,27 +71,27 @@ module SimpleAMS
     end
 
     def links
-      return @links if defined?(@links)
+      return tracked(__method__).value if tracked(__method__).value
 
-      return @links = array_of_name_value_hash_for(Links, Links::Link, :links)
+      return tracked(__method__).value = array_of_name_value_hash_for(Links, Links::Link, :links)
     end
 
     def metas
-      return @metas if defined?(@metas)
+      return tracked(__method__).value if tracked(__method__).value
 
-      return @metas = array_of_name_value_hash_for(Metas, Metas::Meta, :metas)
+      return tracked(__method__).value = array_of_name_value_hash_for(Metas, Metas::Meta, :metas)
     end
 
     def forms
-      return @forms if defined?(@forms)
+      return tracked(__method__).value if tracked(__method__).value
 
-      return @forms = array_of_name_value_hash_for(Forms, Forms::Form, :forms)
+      return tracked(__method__).value = array_of_name_value_hash_for(Forms, Forms::Form, :forms)
     end
 
     def generics
-      return @generics if defined?(@generics)
+      return tracked(__method__).value if tracked(__method__).value
 
-      return @generics = array_of_name_value_hash_for(
+      return tracked(__method__).value = array_of_name_value_hash_for(
         Generics, Generics::Option, :generics
       )
     end
@@ -243,7 +246,7 @@ module SimpleAMS
       def priority_options_for(allowed:, injected:)
         if not injected.nil?
           allowed = injected.class.new(
-            injected.map{|s| s.is_a?(Hash) ? s.keys.first : s}
+            injected.map{|s| s.is_a?(Hash) ? (s.first && s.first[0]) : s}
           ) & allowed
         end
 
@@ -260,10 +263,9 @@ module SimpleAMS
         return @_relation_options if defined?(@_relation_options)
 
         @_relation_options = relations.inject({}){|memo, relation|
-          includes_value = (injected_options[:includes] || {}).select{|incl|
-            incl.is_a?(Hash)
-          }.find{|incl_hash|
-            incl_hash.keys.first.to_s == relation.name.to_s
+          includes_value = (injected_options[:includes] || {}).find{|incl_hash|
+            incl_hash.is_a?(Hash) &&
+              (incl_hash.first && incl_hash.first[0]).to_s == relation.name.to_s
           }
           if includes_value
             includes_value = includes_value[relation.name]
@@ -272,10 +274,9 @@ module SimpleAMS
             includes_value = []
           end
 
-          fields_value = (injected_options[:fields] || {}).select{|field|
-            field.is_a?(Hash)
-          }.find{|field_hash|
-            field_hash.keys.first.to_s == relation.name.to_s
+          fields_value = (injected_options[:fields] || {}).find{|field_hash|
+            field_hash.is_a?(Hash) &&
+              (field_hash.first && field_hash.first[0]).to_s == relation.name.to_s
           }
 
           #.. while here just nil will work (pick default fields from serializer)
@@ -315,7 +316,7 @@ module SimpleAMS
 
       def infer_serializer
         namespace = _internal[:module] ? "#{_internal[:module]}::" : ""
-        resource_klass = resource.kind_of?(Array) ? resource.first.class : resource.class
+        resource_klass = resource.kind_of?(Array) ? resource[0].class : resource.class
         if resource_klass == NilClass
           return EmptySerializer
         else

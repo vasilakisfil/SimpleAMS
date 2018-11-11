@@ -4,6 +4,10 @@ class SimpleAMS::Options
   class Generics < Array
     include SimpleAMS::Options::Concerns::Filterable
 
+    def volatile?
+      self.any?(&:volatile?)
+    end
+
     class Option
       include SimpleAMS::Options::Concerns::NameValueHash
     end

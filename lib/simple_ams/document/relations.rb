@@ -30,7 +30,7 @@ module SimpleAMS
     end
 
     def empty?
-      count == 0
+      relations.length == 0
     end
 
     def available
@@ -83,7 +83,7 @@ module SimpleAMS
             )
           ).merge(
             _internal: {
-              module: serializer.class.to_s.rpartition('::').first
+              module: serializer.class.to_s.rpartition('::')[0]
             }
           )
         }

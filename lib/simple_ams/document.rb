@@ -28,15 +28,15 @@ class SimpleAMS::Document
   end
 
   def name
-    options.name
+    @name ||= options.name
   end
 
   def type
-    options.type
+    @type ||= options.type
   end
 
   def adapter
-    options.adapter
+    @adapter ||= options.adapter
   end
 
   def links
@@ -64,7 +64,7 @@ class SimpleAMS::Document
   end
 
   def folder?
-    self.is_a?(self.class::Folder)
+    @is_folder ||= self.is_a?(self.class::Folder)
   end
 
   def document?
@@ -104,6 +104,7 @@ class SimpleAMS::Document
     #do we really need this method ?
     def documents
       @members.map do |resource|
+        #need optimization here!
         SimpleAMS::Document.new(options_for(resource))
       end
     end
@@ -124,8 +125,8 @@ class SimpleAMS::Document
             allowed_options: serializer_for(resource).options
           })
         else
-#          resource_options.with_resource(resource)
-#        end
+          resource_options.with_resource(resource)
+=begin
           # we need to optimize that using tracked properties
           SimpleAMS::Options.new(resource, {
             injected_options: resource_options.injected_options.merge({
@@ -133,6 +134,7 @@ class SimpleAMS::Document
             }),
             allowed_options: serializer_for(resource).options
           })
+=end
         end
       end
 

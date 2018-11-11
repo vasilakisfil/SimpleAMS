@@ -45,7 +45,7 @@ module Helpers
         if resource.instance_variable_defined?("@_#{var}")
           resource.remove_instance_variable("@_#{var}")
         end
-        
+
         if resource::Collection_.instance_variable_defined?("@_#{var}")
           resource::Collection_.remove_instance_variable("@_#{var}")
         end

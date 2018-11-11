@@ -8,10 +8,11 @@ require "simple_ams/adapters/ams"
 require "simple_ams/adapters/jsonapi"
 require "simple_ams/renderer"
 
-require "simple_ams/options"
 require "simple_ams/options/concerns/filterable"
 require "simple_ams/options/concerns/name_value_hash"
 require "simple_ams/options/concerns/value_hash"
+require "simple_ams/options/concerns/tracked_properties"
+require "simple_ams/options"
 require "simple_ams/options/adapter"
 require "simple_ams/options/fields"
 require "simple_ams/options/includes"
@@ -34,12 +35,15 @@ require "logger"
 
 module SimpleAMS
   class << self
-    attr_accessor :configuration
+    def configuration
+      @configuration ||= Configuration.new
+    end
+    attr_writer :configuration
   end
 
   def self.configure
     self.configuration ||= Configuration.new
-    yield(configuration)
+    yield(self.configuration)
   end
 
   class Configuration
