@@ -15,12 +15,14 @@ module SimpleAMS
     end
     alias collection resource
 
+=begin
     #performance enchancement method for non-polymorphic collections
     def with_resource(resource)
       @resource = resource
 
       return self
     end
+=end
 
     def relation_options_for(relation_name)
       return _relation_options[relation_name] || {}
@@ -112,11 +114,13 @@ module SimpleAMS
           resource: resource, serializer: serializer
         })
       end
+=begin
       if @adapter.value.nil?
         @adapter = Adapter.new(SimpleAMS::Adapters::AMS, {
           resource: resource, serializer: serializer
         })
       end
+=end
 
       return @adapter
     end

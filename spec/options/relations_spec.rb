@@ -37,6 +37,13 @@ RSpec.describe SimpleAMS::Options, "relations" do
           @allowed_relations.keys
         )
       )
+      expect(@options.relations.map(&:single?)).to(
+        eq(
+          @allowed_relations.values.map{|t|
+            t == :has_many ? false : true
+          }
+        )
+      )
     end
   end
 

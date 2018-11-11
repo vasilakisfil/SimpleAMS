@@ -5,7 +5,15 @@ RSpec.describe SimpleAMS do
     expect(SimpleAMS::VERSION).not_to be nil
   end
 
-  it "does something useful" do
-    expect(true).to eq(true)
+  it "raises error when using a non SimpleAMS class" do
+    expect{SimpleAMS::Renderer.new(
+        User.new,
+        Helpers.random_options(with: {
+          serializer: OpenStruct,
+        }).tap{|h|
+          h.delete(:name)
+        }
+      )
+    }.to raise_error(/does not respond to SimpleAMS methods/)
   end
 end

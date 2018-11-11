@@ -39,6 +39,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       it "returns an empty array" do
         expect(@document.fields.map(&:key)).to eq []
         expect(@document.options.fields).to eq []
+        expect(@document.fields.any?).to eq false
+        expect(@document.fields.empty?).to eq true
       end
     end
 
@@ -175,6 +177,9 @@ RSpec.describe SimpleAMS::Document, 'fields' do
     describe "members" do
       it "holds the allowed fields only" do
         expect(@document.fields.map(&:key)).to eq @allowed
+
+        expect(@document.fields.any?).to eq @allowed.any?
+        expect(@document.fields.empty?).to eq @allowed.empty?
       end
     end
 
@@ -213,6 +218,9 @@ RSpec.describe SimpleAMS::Document, 'fields' do
     describe "members" do
       it "holds the allowed fields only" do
         fields = (@allowed - User.relations.map(&:name))
+
+        expect(@field_klass.any?).to eq fields.any?
+        expect(@field_klass.empty?).to eq fields.empty?
 
         fields.each do |field|
           if @overrides.include?(field)

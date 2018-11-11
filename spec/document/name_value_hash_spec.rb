@@ -29,6 +29,7 @@ RSpec.describe SimpleAMS::Document, 'name_value_hash' do
         describe "values" do
           it "returns an empty array" do
             expect(@document.send(element.plural)).to respond_to(:each)
+            expect(@document.send(element.plural).any?).to eq(false)
             @document.send(element.plural).each do |field|
               fail('this should never happen as fields should be empty')
             end
@@ -158,6 +159,8 @@ RSpec.describe SimpleAMS::Document, 'name_value_hash' do
           expect(elements_got.map(&:value)).to eq(elements_expected.map(&:value))
           expect(elements_got.map(&:options).count).to eq(elements_expected.map(&:options).count)
           expect(elements_got.map(&:options)).to eq(elements_expected.map(&:options))
+
+          expect(@document.send(element.plural).any?).to eq(elements_expected.any?)
         end
       end
 

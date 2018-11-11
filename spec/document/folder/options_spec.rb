@@ -15,6 +15,11 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
       )
     end
 
+    it "is a folder" do
+      expect(@folder.folder?).to eq true
+      expect(@folder.document?).to eq false
+    end
+
     it "returns correct collection attributes" do
       expect(@folder.fields).to eq([])
       expect(@folder.links).to eq({})

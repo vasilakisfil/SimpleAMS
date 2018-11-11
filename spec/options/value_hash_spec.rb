@@ -40,6 +40,27 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
         end
       end
 
+      context "when #{element} specified is nil" do
+        before do
+          UserSerializer.send(element, nil)
+          @options = SimpleAMS::Options.new(User.new, {
+            injected_options: Helpers.random_options(with:{
+              serializer: UserSerializer,
+            }).tap{|h| h.delete(element.to_sym)}
+          })
+        end
+
+        it "defaults to class name" do
+          expect(@options.send(element).name).to eq element.default_name
+        end
+
+        if element.type?
+          it "updates name correctly" do
+            expect(@options.name).to eq @options.send(element).name
+          end
+        end
+      end
+
       context "with no injected #{element}" do
         before do
           @element = Elements.send(element)
@@ -118,6 +139,33 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
             )
             expect(@options.send(element).options).to(
               eq(@allowed_element.value.call(@user, nil).last.merge(element.default_options))
+            )
+          end
+        end
+
+        context "allowed #{element} as a single value" do
+          before do
+            @user = User.new
+            @allowed_element = Object.const_get(
+              "#{Elements}::#{element.split('_').map(&:capitalize).join}"
+            ).new(
+              value: ->(obj, s){obj.id}, options: {foo: :bar}
+            )
+            UserSerializer.send(element, *@allowed_element.as_lambda_input(explicit_options: true))
+
+            @options = SimpleAMS::Options.new(@user, {
+              injected_options: Helpers.random_options(with: {
+                serializer: UserSerializer
+              }, without: [element.to_sym])
+            })
+          end
+
+          it "holds the unwrapped #{element}" do
+            expect(@options.send(element).value).to(
+              eq(@allowed_element.value.call(@user, nil))
+            )
+            expect(@options.send(element).options).to(
+              eq(@allowed_element.options.merge(element.default_options))
             )
           end
         end

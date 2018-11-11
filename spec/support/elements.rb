@@ -99,7 +99,7 @@ class Elements
       @name = name || Helpers::Options.single.to_sym
       @value = value || Faker::Lorem.word
       if @value.is_a?(Proc)
-        @options = {}
+        @options = options || {}
       else
         @options = options == nil ? Helpers::Options.hash : options
       end
@@ -109,9 +109,13 @@ class Elements
       [@name, @value, @options]
     end
 
-    def as_lambda_input
+    def as_lambda_input(explicit_options: false)
       if @value.is_a?(Proc)
-        [@name, @value]
+        if explicit_options
+          [@name, @value, @options]
+        else
+          [@name, @value]
+        end
       else
         [@name, ->{ [@value, @options] } ]
       end
@@ -149,9 +153,13 @@ class Elements
       [@value, @options.merge(extra)]
     end
 
-    def as_lambda_input
+    def as_lambda_input(explicit_options: false)
       if @value.is_a?(Proc)
-        @value
+        if explicit_options
+          [@value, @options]
+        else
+          @value
+        end
       else
         ->{ [@value, @options] }
       end
