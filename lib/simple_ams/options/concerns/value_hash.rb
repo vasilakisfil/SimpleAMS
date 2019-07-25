@@ -7,11 +7,12 @@ class SimpleAMS::Options
       alias :name :value
 
       def initialize(value, options = {}, resource:, serializer:)
-        if value.is_a?(Proc) #TODO: maybe we should do duck typing instead?
+        if value.respond_to?(:call)
+          @volatile = true
           _value = value.call(resource, serializer)
           if _value.is_a?(Array) && _value.length > 1
-            @value = _value.first
-            @options = (_value.last || {}).merge(options || {})
+            @value = _value[0]
+            @options = (_value[-1] || {}).merge(options || {})
           else
             @value = _value
             @options = options || {}
@@ -24,6 +25,10 @@ class SimpleAMS::Options
 
       def raw
         [value, options]
+      end
+
+      def volatile?
+        return @volatile || false
       end
 
       private

@@ -2,7 +2,8 @@ require "simple_ams"
 
 class SimpleAMS::Adapters::JSONAPI
   DEFAULT_OPTIONS = {
-    skip_id_in_attributes: true
+    skip_id_in_attributes: false,
+    key_transform: nil
   }
 
   attr_reader :document, :options
@@ -45,7 +46,16 @@ class SimpleAMS::Adapters::JSONAPI
   end
 
   def transform_key(key)
-    key.to_s.gsub('_', '-')
+    case options[:key_transform]
+    #when :camel
+    #when :camel_lower
+    when :dash
+      key.to_s.gsub('_','-')
+    when :underscore
+      key.to_s.gsub('-', '_')
+    else
+      key
+    end
   end
 
   def relationships
@@ -53,6 +63,7 @@ class SimpleAMS::Adapters::JSONAPI
 
     @relationships ||= document.relations.inject({}){ |hash, relation|
       _hash = {}
+
       embedded_relation_data = embedded_relation_data_for(relation)
       unless embedded_relation_data.empty?
         _hash.merge!(data: embedded_relation_data_for(relation))
@@ -124,9 +135,9 @@ class SimpleAMS::Adapters::JSONAPI
 
     @included ||= document.relations.available.inject([]){ |array, relation|
       if relation.folder?
-        array << relation.map{|doc| self.class.new(doc).as_json[:data]}
+        array << relation.map{|doc| self.class.new(doc, options).as_json[:data]}
       else
-        array << self.class.new(relation).as_json[:data]
+        array << self.class.new(relation, options).as_json[:data]
       end
 
       array
@@ -148,14 +159,22 @@ class SimpleAMS::Adapters::JSONAPI
       }
       hash.merge!(meta: metas) unless metas.empty?
       hash.merge!(links: links) unless links.empty?
+      hash.merge!(included: included) unless included.empty?
 
       return hash
     end
 
     def documents
+      @included = []
       return folder.map{|document|
-        adapter.new(document).as_json[:data]
+        _doc = adapter.new(document, options).as_json
+        @included << _doc[:included]
+        _doc[:data]
       } || []
+    end
+
+    def included
+      (@included || []).flatten
     end
 
     def metas

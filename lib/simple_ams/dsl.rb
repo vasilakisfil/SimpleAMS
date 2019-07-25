@@ -33,7 +33,7 @@ module SimpleAMS::DSL
         options.merge(
           #TODO: maybe add another group of elements under dsl?
           #this could be DSL::Type.new(type).explicit?
-          type.last[:_explicit] ? {} : {type: nil}
+          type[-1][:_explicit] ? {} : {type: nil}
         )
       )
 
@@ -59,7 +59,7 @@ module SimpleAMS::DSL
         self::Collection_.options.merge(
           #TODO: maybe add another group of elements under dsl?
           #this could be DSL::Type.new(type).explicit?
-          type.last[:_explicit] ? {} : {type: nil}
+          type[-1][:_explicit] ? {} : {type: nil}
         )
       )
       subclass.const_set('Collection_', _klass)
@@ -80,11 +80,11 @@ module SimpleAMS::DSL
           'Serializer',''
         ).gsub(
           '::Collection_', ''
-        ).downcase.split('::').last
+        ).downcase.split('::')[-1]
 
         return "#{_name}_collection".to_sym
       else
-        return self.to_s.gsub('Serializer','').downcase.split('::').last.to_sym
+        return self.to_s.gsub('Serializer','').downcase.split('::')[-1].to_sym
       end
     end
     def with_options(options = {})
@@ -101,7 +101,7 @@ module SimpleAMS::DSL
             collection{}.with_options(value)
           end
         elsif meths.include?(key)
-          if (value.is_a?(Array) && value.first.is_a?(Array)) || value.is_a?(Hash)
+          if (value.is_a?(Array) && value[0].is_a?(Array)) || value.is_a?(Hash)
             self.send(key, value)
           else
             self.send(key, *value)

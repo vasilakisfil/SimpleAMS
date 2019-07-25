@@ -7,7 +7,7 @@ class SimpleAMS::Options
       #for optimizing performance, ask only the first element
       #other idea is to create another module just for (Name)ValueHash objects
       def &(other_filterables)
-        other_is_object = other_filterables.first.respond_to?(:name)
+        other_is_object = other_filterables[0].respond_to?(:name)
 
         return self.class.new(
           self.select{|m|
@@ -23,18 +23,18 @@ class SimpleAMS::Options
       #for optimizing performance, ask only the first element of self and save it as state
       def include?(member)
         unless defined?(@self_is_object)
-          @self_is_object = self.first.respond_to?(:name)
+          @self_is_object = self[0].respond_to?(:name)
         end
 
         if @self_is_object
-          self.map(&:name).include?(member)
+          self.any?{|s| s.name == member}
         else
           super
         end
       end
 
       def raw
-        if self.first.respond_to?(:raw)
+        if self[0].respond_to?(:raw)
           self.map(&:raw)
         else
           self.map{|i| i}
