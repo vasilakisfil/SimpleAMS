@@ -28,7 +28,6 @@ module SimpleAMS::DSL
   module ClassMethods
     #TODO: Shouldn't we call here super to presever user's behavior ?
     def inherited(subclass)
-      #TODO: why this breaks collection type?
       subclass.with_options(
         options.merge(
           #TODO: maybe add another group of elements under dsl?
