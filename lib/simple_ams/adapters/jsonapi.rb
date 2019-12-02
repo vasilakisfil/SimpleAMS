@@ -47,12 +47,12 @@ class SimpleAMS::Adapters::JSONAPI
 
   def transform_key(key)
     case options[:key_transform]
-    #when :camel
-    #when :camel_lower
-    when :dash
+    when :camel
+      key.to_s.split('_').map(&capitalize).join
+    when :kebab
       key.to_s.gsub('_','-')
-    when :underscore
-      key.to_s.gsub('-', '_')
+    when :snake
+      key
     else
       key
     end
@@ -83,7 +83,7 @@ class SimpleAMS::Adapters::JSONAPI
     return {} if relation.embedded.generics[:skip_data]&.value
 
     if relation.folder?
-      value = relation.documents.map{|doc|
+      value = relation.each.map{|doc|
         {
           doc.primary_id.name => doc.primary_id.value.to_s,
           type: doc.type.name

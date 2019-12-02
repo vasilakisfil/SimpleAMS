@@ -103,10 +103,7 @@ class SimpleAMS::Document
 
     #do we really need this method ?
     def documents
-      @members.map do |resource|
-        #need optimization here!
-        SimpleAMS::Document.new(options_for(resource))
-      end
+      each.map
     end
 
     def resource_options
