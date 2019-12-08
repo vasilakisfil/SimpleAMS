@@ -134,6 +134,8 @@ class SimpleAMS::Adapters::JSONAPI
     return @included ||= [] if document.relations.available.empty?
 
     @included ||= document.relations.available.inject([]){ |array, relation|
+      next array if relation.embedded.generics[:skip_data]&.value
+
       if relation.folder?
         array << relation.map{|doc| self.class.new(doc, options).as_json[:data]}
       else
