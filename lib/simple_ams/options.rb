@@ -32,15 +32,15 @@ module SimpleAMS
     end
 
     def primary_id
-      return tracked(__method__).value if tracked(__method__).value
+      return tracked(:primary_id).value if tracked(:primary_id).value
 
-      return tracked(__method__).value = array_of_value_hash_for(PrimaryId, :primary_id)
+      return tracked(:primary_id).value = array_of_value_hash_for(PrimaryId, :primary_id)
     end
 
     def type
-      return tracked(__method__).value if tracked(__method__).value
+      return tracked(:type).value if tracked(:type).value
 
-      return tracked(__method__).value = array_of_value_hash_for(Type, :type)
+      return tracked(:type).value = array_of_value_hash_for(Type, :type)
     end
 
     def name
@@ -71,27 +71,27 @@ module SimpleAMS
     end
 
     def links
-      return tracked(__method__).value if tracked(__method__).value
+      return tracked(:links).value if tracked(:links).value
 
-      return tracked(__method__).value = array_of_name_value_hash_for(Links, Links::Link, :links)
+      return tracked(:links).value = array_of_name_value_hash_for(Links, Links::Link, :links)
     end
 
     def metas
-      return tracked(__method__).value if tracked(__method__).value
+      return tracked(:metas).value if tracked(:metas).value
 
-      return tracked(__method__).value = array_of_name_value_hash_for(Metas, Metas::Meta, :metas)
+      return tracked(:metas).value = array_of_name_value_hash_for(Metas, Metas::Meta, :metas)
     end
 
     def forms
-      return tracked(__method__).value if tracked(__method__).value
+      return tracked(:forms).value if tracked(:forms).value
 
-      return tracked(__method__).value = array_of_name_value_hash_for(Forms, Forms::Form, :forms)
+      return tracked(:forms).value = array_of_name_value_hash_for(Forms, Forms::Form, :forms)
     end
 
     def generics
-      return tracked(__method__).value if tracked(__method__).value
+      return tracked(:generics).value if tracked(:generics).value
 
-      return tracked(__method__).value = array_of_name_value_hash_for(
+      return tracked(:generics).value = array_of_name_value_hash_for(
         Generics, Generics::Option, :generics
       )
     end
