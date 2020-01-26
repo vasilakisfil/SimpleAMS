@@ -34,7 +34,11 @@ module Helpers
     resources.each do |resource|
       resource.relations.each{|r|
         if r.last.to_s.include?('Embedded')
-          resource.send(:remove_const, r.last.to_s.split('::').last)
+          begin
+            resource.send(:remove_const, r.last.to_s.split('::').last)
+          rescue NameError => _
+            #ignore
+          end
         end
       }
 
@@ -51,7 +55,7 @@ module Helpers
         end
       end
 
-      model = const_get(resource.to_s.gsub('Serializer',''))
+      model = const_get(resource.to_s.split("::").last.gsub('Serializer',''))
       relations = model.respond_to?(:relations) ? model.relations : []
       relations.map(&:name).each do |name|
         if const_defined?("#{resource.to_s}::Embedded#{name.capitalize}Options_")

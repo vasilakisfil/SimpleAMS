@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/vasilakisfil/SimpleAMS.svg?branch=master)](https://travis-ci.org/vasilakisfil/SimpleAMS)
+
 # SimpleAMS
 > "Simple things should be simple and complex things should be possible." Alan Kay.
 
