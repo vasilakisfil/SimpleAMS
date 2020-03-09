@@ -21,7 +21,7 @@ module SimpleAMS
     #performance enchancement method for non-polymorphic collections
     def with_resource(resource)
       @resource = resource
-
+      remove_instance_variable(:@serializer) if defined?(@serializer)
       clean_volatile_properties!
 
       return self
