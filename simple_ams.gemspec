@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{ActiveModel Serializers, simplified.}
   spec.description   = %q{ActiveModel Serializers, simplified.}
-  spec.homepage      = "https://github.com/vasilakisfil/simple-ams"
+  spec.homepage      = "https://github.com/vasilakisfil/SimpleAMS"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
