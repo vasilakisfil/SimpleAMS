@@ -27,6 +27,7 @@ The gem's interface has been inspired by ActiveModel Serializers 0.9.2, 0.10.sta
 However, **it has been built for POROs, does not rely in any dependency and does not relate to Rails in any case** other than
 some nostalgia for the (advanced at that time) pre-0.10 ActiveModel Serialiers.
 
+You can find the core ideas, the reasoning behind the architecture, use cases and examples [here](https://vasilakisfil.social/blog/2020/01/20/modern-ruby-serializers/).
 
 ### Simple case
 
