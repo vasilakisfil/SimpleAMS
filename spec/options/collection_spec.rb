@@ -88,4 +88,36 @@ RSpec.describe SimpleAMS::Options, 'collection' do
       expect(links_got.map(&:options)).to eq(links_expected.map(&:options))
     end
   end
+
+  context "when collection is not an array" do
+    let(:collection) do
+      Class.new do
+        def initialize(arr)
+          @arr = arr
+        end
+
+        def to_a
+          @arr
+        end
+
+        def [](index)
+          @arr[index]
+        end
+
+        def first
+          @arr.first
+        end
+
+        def last
+          @arr.last
+        end
+      end.new([User.new])
+    end
+
+    let(:options) { SimpleAMS::Options.new(collection) }
+
+    it "infers serialier class correctly" do
+      expect(options.serializer_class).to eq UserSerializer
+    end
+  end
 end
