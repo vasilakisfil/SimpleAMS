@@ -316,7 +316,7 @@ module SimpleAMS
 
       def infer_serializer
         namespace = _internal[:module] ? "#{_internal[:module]}::" : ""
-        resource_klass = resource.kind_of?(Array) ? resource[0].class : resource.class
+        resource_klass = resource.respond_to?(:to_a) && resource.respond_to?(:last) ? resource[0].class : resource.class
         if resource_klass == NilClass
           return EmptySerializer
         else
