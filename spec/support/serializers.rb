@@ -28,7 +28,7 @@ class UserSerializer
 
     def undefine_all
       model_klass = Object.const_get(self.to_s.gsub("Serializer",""))
-      model_klass.model_attributes.each{|meth|
+      model_klass.model_attributes.each { |meth|
         begin
           self.send(:remove_method, meth)
         rescue NameError => _
