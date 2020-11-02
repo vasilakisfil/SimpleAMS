@@ -6,13 +6,13 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
       UserSerializer.adapter(SimpleAMS::Adapters::AMS)
       @user_attrs = (Helpers.pick(User.model_attributes, min: 1) + [:id]).uniq
       UserSerializer.attributes(*@user_attrs)
-      (rand(10) + 2).times.map{ Elements.link }.each do |link|
+      (rand(10) + 2).times.map { Elements.link }.each do |link|
         UserSerializer.link(*link.as_input)
       end
-      (rand(10) + 2).times.map{ Elements.meta }.each do |meta|
+      (rand(10) + 2).times.map { Elements.meta }.each do |meta|
         UserSerializer.meta(*meta.as_input)
       end
-      (rand(10) + 2).times.map{ Elements.form }.each do |form|
+      (rand(10) + 2).times.map { Elements.form }.each do |form|
         UserSerializer.form(*form.as_input)
       end
       User.relations.each do |relation|
@@ -98,12 +98,12 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
         ).to eq @includes.sort
 
         expect(
-          @includes.map{|name| @hash[name]}.all?{|relation|
+          @includes.map { |name| @hash[name] }.all? { |relation|
             relation.is_a?(Array) || relation.is_a?(Hash)
           }
         ).to eq true
 
-        @includes.map{|name| [name, @hash[name]]}.each do |name, relation|
+        @includes.map { |name| [name, @hash[name]] }.each do |name, relation|
           next if relation.nil? || relation.empty?
           if relation.is_a?(Array)
             keys = (relation.first&.keys || []) - [:links, :metas, :forms]
@@ -122,13 +122,13 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
       UserSerializer.adapter(SimpleAMS::Adapters::AMS)
       @user_attrs = (Helpers.pick(User.model_attributes, min: 1) + [:id]).uniq
       UserSerializer.attributes(*@user_attrs)
-      (rand(10) + 2).times.map{ Elements.link }.each do |link|
+      (rand(10) + 2).times.map { Elements.link }.each do |link|
         UserSerializer.link(*link.as_input)
       end
-      (rand(10) + 2).times.map{ Elements.meta }.each do |meta|
+      (rand(10) + 2).times.map { Elements.meta }.each do |meta|
         UserSerializer.meta(*meta.as_input)
       end
-      (rand(10) + 2).times.map{ Elements.form }.each do |form|
+      (rand(10) + 2).times.map { Elements.form }.each do |form|
         UserSerializer.form(*form.as_input)
       end
       User.relations.each do |relation|
@@ -218,12 +218,12 @@ RSpec.describe SimpleAMS::Adapters::AMS, "resource" do
         ).to eq @first_level_includes.sort
 
         expect(
-          @first_level_includes.map{|name| @hash[name]}.all?{|relation|
+          @first_level_includes.map { |name| @hash[name] }.all? { |relation|
             relation.is_a?(Array) || relation.is_a?(Hash)
           }
         ).to eq true
 
-        @first_level_includes.map{|name| [name, @hash[name]]}.each do |name, relation|
+        @first_level_includes.map { |name| [name, @hash[name]] }.each do |name, relation|
           next if relation.nil? || relation.empty?
           if relation.is_a?(Array)
             keys = (relation.first&.keys || []) - [:links, :metas, :forms]
