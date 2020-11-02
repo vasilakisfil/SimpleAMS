@@ -4,7 +4,7 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
   context "with no options" do
     before do
       @options = SimpleAMS::Options.new(User.new, {
-        injected_options: {serializer: UserSerializer}
+        injected_options: { serializer: UserSerializer }
       })
     end
 
@@ -38,15 +38,15 @@ RSpec.describe SimpleAMS::Options, 'as_hash' do
       UserSerializer.type(*@type.as_input)
       @attrs = Helpers::Options.array
       UserSerializer.attributes(*@attrs)
-      @links = (rand(10) + 2).times.map{ Elements.link }.uniq{|l| l.name}
-      @links.each{|link|
+      @links = (rand(10) + 2).times.map { Elements.link }.uniq { |l| l.name }
+      @links.each { |link|
         UserSerializer.link(*link.as_input)
       }
       @meta = Elements.meta
       UserSerializer.meta(*@meta.as_input)
 
       @options = SimpleAMS::Options.new(User.new, {
-        injected_options: {serializer: UserSerializer}
+        injected_options: { serializer: UserSerializer }
       })
     end
 

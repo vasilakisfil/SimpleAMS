@@ -7,7 +7,7 @@ RSpec.describe SimpleAMS::Options, 'name' do
       @options = SimpleAMS::Options.new(User.new, {
         injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
-        }).tap{|h|
+        }).tap { |h|
           h.delete(:name)
         }
       })
