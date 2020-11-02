@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 module SimpleAMS
   class Renderer
@@ -7,7 +7,7 @@ module SimpleAMS
       @options = SimpleAMS::Options.new(resource, injected_options: options)
     end
 
-    #resource decorator ?
+    # resource decorator ?
     def document
       @document ||= SimpleAMS::Document.new(options)
     end
@@ -20,7 +20,7 @@ module SimpleAMS
       options.adapter.klass.new(document, options.adapter.options).as_json
     end
 
-    def to_json
+    def to_json(*_args)
       as_json.to_json
     end
 
@@ -28,8 +28,8 @@ module SimpleAMS
       def initialize(collection, options = {})
         @collection = collection
         @options = SimpleAMS::Options.new(collection, {
-          injected_options: options.merge(_internal: is_collection)
-        })
+                                            injected_options: options.merge(_internal: is_collection)
+                                          })
       end
 
       def folder
@@ -40,20 +40,21 @@ module SimpleAMS
         options.adapter.klass::Collection.new(folder, options.adapter.options).as_json
       end
 
-      def to_json
+      def to_json(*_args)
         as_json.to_json
       end
 
       private
-        attr_reader :collection, :options
 
-        def is_collection
-          { is_collection: true }
-        end
+      attr_reader :collection, :options
+
+      def is_collection
+        { is_collection: true }
+      end
     end
 
     private
-      attr_reader :resource, :options
-  end
 
+    attr_reader :resource, :options
+  end
 end

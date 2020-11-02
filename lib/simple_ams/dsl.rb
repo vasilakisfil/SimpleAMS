@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 module SimpleAMS::DSL
   def self.included(host_class)
@@ -17,7 +17,7 @@ module SimpleAMS::DSL
           links: links,
           metas: metas,
           forms: forms,
-          generics: generics,
+          generics: generics
         }
       end
     end
@@ -26,13 +26,13 @@ module SimpleAMS::DSL
   end
 
   module ClassMethods
-    #TODO: Shouldn't we call here super to presever user's behavior ?
+    # TODO: Shouldn't we call here super to presever user's behavior ?
     def inherited(subclass)
       subclass.with_options(
         options.merge(
-          #TODO: maybe add another group of elements under dsl?
-          #this could be DSL::Type.new(type).explicit?
-          type[-1][:_explicit] ? {} : {type: nil}
+          # TODO: maybe add another group of elements under dsl?
+          # this could be DSL::Type.new(type).explicit?
+          type[-1][:_explicit] ? {} : { type: nil }
         )
       )
 
@@ -49,16 +49,16 @@ module SimpleAMS::DSL
             links: links,
             metas: metas,
             forms: forms,
-            generics: generics,
+            generics: generics
           }
         end
       end
 
       _klass.with_options(
         self::Collection_.options.merge(
-          #TODO: maybe add another group of elements under dsl?
-          #this could be DSL::Type.new(type).explicit?
-          type[-1][:_explicit] ? {} : {type: nil}
+          # TODO: maybe add another group of elements under dsl?
+          # this could be DSL::Type.new(type).explicit?
+          type[-1][:_explicit] ? {} : { type: nil }
         )
       )
       subclass.const_set('Collection_', _klass)
@@ -72,47 +72,46 @@ module SimpleAMS::DSL
       }
     end
 
-    #TODO: Add tests !!
+    # TODO: Add tests !!
     def _default_type_name
-      if self.to_s.end_with?('::Collection_')
-        _name = self.to_s.gsub(
-          'Serializer',''
+      if to_s.end_with?('::Collection_')
+        _name = to_s.gsub(
+          'Serializer', ''
         ).gsub(
           '::Collection_', ''
         ).downcase.split('::')[-1]
 
-        return "#{_name}_collection".to_sym
+        "#{_name}_collection".to_sym
       else
-        return self.to_s.gsub('Serializer','').downcase.split('::')[-1].to_sym
+        to_s.gsub('Serializer', '').downcase.split('::')[-1].to_sym
       end
     end
+
     def with_options(options = {})
       @_options = options
       meths = SimpleAMS::DSL::ClassMethods.instance_methods(false)
       @_options.each do |key, value|
         if key == :relations
-          (value || []).each{|rel_value|
+          (value || []).each do |rel_value|
             append_relationship(rel_value)
-          }
-        elsif key.to_sym == :collection
-          #TODO: Add proc option maybe?
-          if value.is_a?(Hash)
-            collection{}.with_options(value)
           end
+        elsif key.to_sym == :collection
+          # TODO: Add proc option maybe?
+          collection {}.with_options(value) if value.is_a?(Hash)
         elsif meths.include?(key)
           if (value.is_a?(Array) && value[0].is_a?(Array)) || value.is_a?(Hash)
-            self.send(key, value)
+            send(key, value)
           else
-            self.send(key, *value)
+            send(key, *value)
           end
         else
           SimpleAMS.configuration.logger.info(
-            "SimpeAMS: #{key} is not recognized, ignoring (from #{self.to_s})"
+            "SimpeAMS: #{key} is not recognized, ignoring (from #{self})"
           )
         end
       end
 
-      return @_options
+      @_options
     end
 
     def adapter(value = nil, options = {})
@@ -129,7 +128,7 @@ module SimpleAMS::DSL
 
     def attributes(*args)
       @_attributes ||= []
-      return @_attributes.uniq if (args&.empty? || args.nil?)
+      return @_attributes.uniq if args&.empty? || args.nil?
 
       append_attributes(args)
     end
@@ -167,20 +166,20 @@ module SimpleAMS::DSL
     def embedded_class_for(name, options, block)
       embedded = Class.new(self)
       klass_name = "Embedded#{name.to_s.capitalize}Options_"
-      self.const_set(klass_name, embedded)
+      const_set(klass_name, embedded)
       embedded.with_options(
-        default_options.merge(options.select{|k| k != :serializer})
+        default_options.merge(options.select { |k| k != :serializer })
       )
       embedded.instance_exec(&block) if block
 
-      return embedded
+      embedded
     end
 
-    #TODO: there is no memoization here, hence we ignore includes manually set !!
-    #Consider fixing it by employing an observer that will clean the instance var
-    #each time @_relations is updated
-    def includes(*args)
-      relations.map{|rel| rel[1] }
+    # TODO: there is no memoization here, hence we ignore includes manually set !!
+    # Consider fixing it by employing an observer that will clean the instance var
+    # each time @_relations is updated
+    def includes(*_args)
+      relations.map { |rel| rel[1] }
     end
 
     def link(name, value, options = {})
@@ -201,7 +200,8 @@ module SimpleAMS::DSL
 
     def links(links = [])
       return @_links ||= [] if links.empty?
-      links.map{|key, value| append_link([key, value].flatten(1))} if links.is_a?(Hash)
+
+      links.map { |key, value| append_link([key, value].flatten(1)) } if links.is_a?(Hash)
 
       @_links ||= links
     end
@@ -209,21 +209,23 @@ module SimpleAMS::DSL
     def metas(metas = [])
       return @_metas ||= [] if metas.empty?
 
-      metas.map{|key, value| append_meta([key, value].flatten(1))} if metas.is_a?(Hash)
+      metas.map { |key, value| append_meta([key, value].flatten(1)) } if metas.is_a?(Hash)
 
       @_metas ||= metas
     end
 
     def forms(forms = [])
       return @_forms ||= [] if forms.empty?
-      forms.map{|key, value| append_form([key, value].flatten(1))} if forms.is_a?(Hash)
+
+      forms.map { |key, value| append_form([key, value].flatten(1)) } if forms.is_a?(Hash)
 
       @_forms ||= forms
     end
 
     def generics(generics = [])
       return @_generics ||= [] if generics.empty?
-      generics.map{|key, value| append_generic([key, value].flatten(1))} if generics.is_a?(Hash)
+
+      generics.map { |key, value| append_generic([key, value].flatten(1)) } if generics.is_a?(Hash)
 
       @_generics ||= generics
     end
@@ -237,7 +239,7 @@ module SimpleAMS::DSL
 
       self::Collection_.type(name) if name
 
-      return self::Collection_
+      self::Collection_
     end
 
     def options
@@ -261,50 +263,50 @@ module SimpleAMS::DSL
     end
 
     private
-      def _value_hash_for(current, value, options, name)
-        _type = current || default_options[name]
-        return _type if value.nil?
 
-        return [value, options]
-      end
+    def _value_hash_for(current, value, options, name)
+      _type = current || default_options[name]
+      return _type if value.nil?
 
-      def append_relationship(rel)
-        @_relations ||= []
+      [value, options]
+    end
 
-        @_relations << rel
-      end
+    def append_relationship(rel)
+      @_relations ||= []
 
-      def append_attributes(*attrs)
-        @_attributes ||= []
+      @_relations << rel
+    end
 
-        @_attributes = (@_attributes << attrs).flatten.compact.uniq
-      end
+    def append_attributes(*attrs)
+      @_attributes ||= []
 
-      def append_link(link)
-        @_links ||= []
+      @_attributes = (@_attributes << attrs).flatten.compact.uniq
+    end
 
-        @_links << link
-      end
+    def append_link(link)
+      @_links ||= []
 
-      def append_meta(meta)
-        @_metas ||= []
+      @_links << link
+    end
 
-        @_metas << meta
-      end
+    def append_meta(meta)
+      @_metas ||= []
 
-      def append_form(form)
-        @_forms ||= []
+      @_metas << meta
+    end
 
-        @_forms << form
-      end
+    def append_form(form)
+      @_forms ||= []
 
-      def append_generic(generic)
-        @_generics ||= []
+      @_forms << form
+    end
 
-        @_generics << generic
-      end
+    def append_generic(generic)
+      @_generics ||= []
 
-      def empty_options
-      end
+      @_generics << generic
+    end
+
+    def empty_options; end
   end
 end

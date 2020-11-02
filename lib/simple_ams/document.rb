@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 class SimpleAMS::Document
   attr_reader :options, :embedded_options, :serializer, :resource
@@ -17,12 +17,14 @@ class SimpleAMS::Document
   def fields
     return @fields if defined?(@fields)
     return @fields = [] if options.fields.empty?
-    return @fields ||= self.class::Fields.new(options)
+
+    @fields ||= self.class::Fields.new(options)
   end
 
   def relations
     return @relations if defined?(@relations)
-    return @relations ||= self.class::Relations.new(
+
+    @relations ||= self.class::Relations.new(
       options, options.relations
     )
   end
@@ -42,29 +44,33 @@ class SimpleAMS::Document
   def links
     return @links if defined?(@links)
     return @links = {} if options.links.empty?
-    return @links ||= self.class::Links.new(options)
+
+    @links ||= self.class::Links.new(options)
   end
 
   def metas
     return @metas if defined?(@metas)
     return @metas = {} if options.metas.empty?
-    return @metas ||= self.class::Metas.new(options)
+
+    @metas ||= self.class::Metas.new(options)
   end
 
   def forms
     return @forms if defined?(@forms)
     return @forms = {} if options.forms.empty?
-    return @forms ||= self.class::Forms.new(options)
+
+    @forms ||= self.class::Forms.new(options)
   end
 
   def generics
     return @generics if defined?(@generics)
     return @generics = {} if options.generics.empty?
-    return @generics ||= self.class::Generics.new(options)
+
+    @generics ||= self.class::Generics.new(options)
   end
 
   def folder?
-    @is_folder ||= self.is_a?(self.class::Folder)
+    @is_folder ||= is_a?(self.class::Folder)
   end
 
   def document?
@@ -91,7 +97,7 @@ class SimpleAMS::Document
       @resource = options.resource
     end
 
-    def each(&block)
+    def each
       return enum_for(:each) unless block_given?
 
       members.each do |resource|
@@ -101,7 +107,7 @@ class SimpleAMS::Document
       self
     end
 
-    #do we really need this method ?
+    # do we really need this method ?
     def documents
       each.map
     end
@@ -111,26 +117,27 @@ class SimpleAMS::Document
     end
 
     private
-      attr_reader :_options
 
-      def options_for(resource)
-        if resource_options.serializer_class.respond_to?(:call)
-          SimpleAMS::Options.new(resource, {
-            injected_options: resource_options.injected_options.merge({
-              serializer: serializer_for(resource)
-            }),
-            allowed_options: serializer_for(resource).options
-          })
-        else
-          resource_options.with_resource(resource)
-        end
+    attr_reader :_options
+
+    def options_for(resource)
+      if resource_options.serializer_class.respond_to?(:call)
+        SimpleAMS::Options.new(resource, {
+                                 injected_options: resource_options.injected_options.merge({
+                                                                                             serializer: serializer_for(resource)
+                                                                                           }),
+                                 allowed_options: serializer_for(resource).options
+                               })
+      else
+        resource_options.with_resource(resource)
       end
+    end
 
-      def serializer_for(resource)
-        _serializer = resource_options.serializer_class
-        _serializer = _serializer.call(resource) if _serializer.respond_to?(:call)
+    def serializer_for(resource)
+      serializer = resource_options.serializer_class
+      serializer = serializer.call(resource) if serializer.respond_to?(:call)
 
-        return _serializer
-      end
+      serializer
+    end
   end
 end
