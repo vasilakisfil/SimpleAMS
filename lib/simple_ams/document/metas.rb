@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 module SimpleAMS
   class Document::Metas < Document::Generics
@@ -11,5 +11,3 @@ module SimpleAMS
     end
   end
 end
-
-
