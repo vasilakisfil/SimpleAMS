@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 class SimpleAMS::Options
   class Forms < Generics
@@ -9,4 +9,3 @@ class SimpleAMS::Options
     end
   end
 end
-

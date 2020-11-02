@@ -1,11 +1,11 @@
-require "simple_ams"
+require 'simple_ams'
 
 class SimpleAMS::Options
   class Generics < Array
     include SimpleAMS::Options::Concerns::Filterable
 
     def volatile?
-      self.any?(&:volatile?)
+      any?(&:volatile?)
     end
 
     class Option
@@ -13,5 +13,3 @@ class SimpleAMS::Options
     end
   end
 end
-
-
