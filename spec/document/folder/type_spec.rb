@@ -4,8 +4,8 @@ RSpec.describe SimpleAMS::Document::Folder, 'type' do
   context "without specifying type" do
     before do
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
-          injected_options: {serializer: UserSerializer}
+        SimpleAMS::Options.new(10.times.map { User.new }, {
+          injected_options: { serializer: UserSerializer }
         })
       )
     end
@@ -20,8 +20,8 @@ RSpec.describe SimpleAMS::Document::Folder, 'type' do
     before do
       UserSerializer.collection(:users)
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
-          injected_options: {serializer: UserSerializer}
+        SimpleAMS::Options.new(10.times.map { User.new }, {
+          injected_options: { serializer: UserSerializer }
         })
       )
     end
@@ -35,8 +35,8 @@ RSpec.describe SimpleAMS::Document::Folder, 'type' do
   context "when specifying type in allowed options with block" do
     before do
       Helpers.define_singleton_for('RandomOptions', {
-        links: (rand(10) + 2).times.map{ Elements.link },
-        metas: (rand(10) + 2).times.map{ Elements.meta }
+        links: (rand(10) + 2).times.map { Elements.link },
+        metas: (rand(10) + 2).times.map { Elements.meta }
       })
       UserSerializer.collection(:users) do
         Helpers::RandomOptions.links.each do |l|
@@ -47,8 +47,8 @@ RSpec.describe SimpleAMS::Document::Folder, 'type' do
         end
       end
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
-          injected_options: {serializer: UserSerializer}
+        SimpleAMS::Options.new(10.times.map { User.new }, {
+          injected_options: { serializer: UserSerializer }
         })
       )
     end
@@ -62,7 +62,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'type' do
   context "when specifying type in injected options" do
     before do
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
+        SimpleAMS::Options.new(10.times.map { User.new }, {
           injected_options: {
             serializer: UserSerializer, collection: {
               type: :users
@@ -82,7 +82,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'type' do
     before do
       UserSerializer.collection(:users)
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
+        SimpleAMS::Options.new(10.times.map { User.new }, {
           injected_options: {
             serializer: UserSerializer, collection: {
               type: :followers

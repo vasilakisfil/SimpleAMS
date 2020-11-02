@@ -7,16 +7,16 @@ RSpec.describe SimpleAMS::Document::Folder, 'polymorphic collections' do
       @setup_helper.set_collection_allowed_options! #probably not needed
       @setup_helper.set_resource_allowed_options!
 
-      @collection = 10.times.map{|i| User.new(id: i)}
+      @collection = 10.times.map { |i| User.new(id: i) }
 
     end
 
     it "raises an error regarding collection serializer" do
-      expect{
+      expect {
         SimpleAMS::Document::Folder.new(
           SimpleAMS::Options.new(@collection, {
             injected_options: @setup_helper.injected_options.merge({
-              serializer: ->(obj){ obj.id < 5 ? UserSerializer : Api::V1::UserSerializer},
+              serializer: ->(obj) { obj.id < 5 ? UserSerializer : Api::V1::UserSerializer },
             })
           })
         )
@@ -30,14 +30,14 @@ RSpec.describe SimpleAMS::Document::Folder, 'polymorphic collections' do
       @setup_helper.set_collection_allowed_options! #probably not needed
       @setup_helper.set_resource_allowed_options!
 
-      @collection = 10.times.map{User.new}
+      @collection = 10.times.map { User.new }
 
       class Api::V1::UserSimpleSerializer < UserSerializer; end;
 
       @folder = SimpleAMS::Document::Folder.new(
         SimpleAMS::Options.new(@collection, {
           injected_options: @setup_helper.injected_options.merge({
-            serializer: ->(obj){ obj.id < 5 ? UserSerializer : Api::V1::UserSimpleSerializer},
+            serializer: ->(obj) { obj.id < 5 ? UserSerializer : Api::V1::UserSimpleSerializer },
             collection_serializer: UserSerializer
           })
         })
@@ -60,11 +60,11 @@ RSpec.describe SimpleAMS::Document::Folder, 'polymorphic collections' do
         expect(document.relations.available.count).to eq @setup_helper.expected_relations_count
 
         expect(document.links.map(&:name)).to eq @setup_helper.injected_options[:links].map(&:first).uniq
-        expect(document.links.map(&:value)).to eq @setup_helper.injected_options[:links].uniq(&:first).map{|l| l[1]}
+        expect(document.links.map(&:value)).to eq @setup_helper.injected_options[:links].uniq(&:first).map { |l| l[1] }
         expect(document.links.map(&:options)).to eq @setup_helper.injected_options[:links].uniq(&:first).map(&:last)
 
         expect(document.metas.map(&:name)).to eq @setup_helper.injected_options[:metas].map(&:first).uniq
-        expect(document.metas.map(&:value)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map{|l| l[1]}
+        expect(document.metas.map(&:value)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map { |l| l[1] }
         expect(document.metas.map(&:options)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map(&:last)
 
         if document.resource.id < 5

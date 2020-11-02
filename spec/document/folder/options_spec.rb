@@ -9,7 +9,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
       }, without: [:collection])
 
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
+        SimpleAMS::Options.new(10.times.map { User.new }, {
           injected_options: @injected_options,
         })
       )
@@ -63,7 +63,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
       }, without: [:collection])
 
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
+        SimpleAMS::Options.new(10.times.map { User.new }, {
           injected_options: @injected_options
         })
       )
@@ -101,7 +101,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
       })
 
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
+        SimpleAMS::Options.new(10.times.map { User.new }, {
           injected_options: @injected_options
         })
       )
@@ -130,7 +130,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
       @setup_helper.set_collection_allowed_options!
 
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
+        SimpleAMS::Options.new(10.times.map { User.new }, {
           injected_options: @setup_helper.injected_options
         })
       )
@@ -160,7 +160,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'options' do
       @setup_helper.set_resource_allowed_options!
 
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(10.times.map{User.new}, {
+        SimpleAMS::Options.new(10.times.map { User.new }, {
           injected_options: @setup_helper.injected_options
         })
       )
