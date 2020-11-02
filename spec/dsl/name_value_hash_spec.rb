@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe SimpleAMS::DSL, 'name_value_hash' do
   [:generic, :link, :meta, :form].map(&:to_s).each do |element|
-    element.send(:extend, Module.new{
+    element.send(:extend, Module.new {
       def plural
         "#{self.to_s}s"
       end
@@ -42,8 +42,8 @@ RSpec.describe SimpleAMS::DSL, 'name_value_hash' do
 
       context "with multiple #{element.plural}" do
         before do
-          @elements = (rand(10) + 2).times.map{ Elements.send(element) }
-          @elements.each{|t|
+          @elements = (rand(10) + 2).times.map { Elements.send(element) }
+          @elements.each { |t|
             UserSerializer.send(element, *t.as_input)
           }
         end
@@ -60,8 +60,8 @@ RSpec.describe SimpleAMS::DSL, 'name_value_hash' do
 
       context "with multiple #{element.plural} at once" do
         before do
-          @elements = (rand(10) + 2).times.map{ Elements.send(element) }.uniq{|i| i.name}
-          UserSerializer.send(element.plural, @elements.inject({}){|memo, el|
+          @elements = (rand(10) + 2).times.map { Elements.send(element) }.uniq { |i| i.name }
+          UserSerializer.send(element.plural, @elements.inject({}) { |memo, el|
             memo[el.name] = el.as_input[1..-1]; memo
           })
         end

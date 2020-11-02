@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe SimpleAMS::DSL, 'array values' do
   [:attribute].map(&:to_s).each do |element|
-    element.send(:extend, Module.new{
+    element.send(:extend, Module.new {
       def plural
         "#{self.to_s}s"
       end
