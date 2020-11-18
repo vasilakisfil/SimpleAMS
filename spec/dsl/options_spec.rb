@@ -31,8 +31,8 @@ RSpec.describe SimpleAMS::DSL, 'options' do
       UserSerializer.type(*@type.as_input)
       @attrs = Helpers::Options.array
       UserSerializer.attributes(*@attrs)
-      @links = (rand(10) + 2).times.map{ Elements.link }
-      @links.each{|link|
+      @links = (rand(10) + 2).times.map { Elements.link }
+      @links.each { |link|
         UserSerializer.link(*link.as_input)
       }
       @meta = Elements.meta

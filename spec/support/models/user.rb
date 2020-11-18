@@ -13,22 +13,22 @@ class User
     def relations
       [
         OpenStruct.new(
-          type: :has_many, name: :microposts, options: {serializer: MicropostSerializer}
+          type: :has_many, name: :microposts, options: { serializer: MicropostSerializer }
         ),
         OpenStruct.new(
-          type: :has_many, name: :followers, options: {serializer: UserSerializer}
+          type: :has_many, name: :followers, options: { serializer: UserSerializer }
         ),
         OpenStruct.new(
-          type: :has_many, name: :followings, options: {serializer: UserSerializer}
+          type: :has_many, name: :followings, options: { serializer: UserSerializer }
         ),
         OpenStruct.new(
-          type: :has_one, name: :address, options: {serializer: AddressSerializer}
+          type: :has_one, name: :address, options: { serializer: AddressSerializer }
         )
       ]
     end
 
     def array
-      (rand(10) + 1).times.map{self.new}.send(:extend, Module.new{
+      (rand(10) + 1).times.map { self.new }.send(:extend, Module.new {
         def id
           @id ||= rand(100000)
         end
@@ -86,15 +86,15 @@ class User
   end
 
   def microposts
-    @microposts ||= rand(10).times.map{Micropost.new}
+    @microposts ||= rand(10).times.map { Micropost.new }
   end
 
   def followers
-    @followers ||= rand(10).times.map{User.new}
+    @followers ||= rand(10).times.map { User.new }
   end
 
   def followings
-    @followings ||= rand(10).times.map{User.new}
+    @followings ||= rand(10).times.map { User.new }
   end
 
   def address

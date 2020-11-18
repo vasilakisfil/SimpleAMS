@@ -6,7 +6,7 @@ RSpec.describe SimpleAMS::Options, 'collection' do
       @options = SimpleAMS::Options.new(User.new, {
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
-        }).tap{|h|
+        }).tap { |h|
           h.delete(:collection)
         }
       })
@@ -79,8 +79,8 @@ RSpec.describe SimpleAMS::Options, 'collection' do
         @injected_links, klass: Elements::Link
       )
 
-      links_expected = (_injected_links.map(&:name) & _allowed_links.map(&:name)).map{|name|
-        _injected_links.find{|l| l.name == name}
+      links_expected = (_injected_links.map(&:name) & _allowed_links.map(&:name)).map { |name|
+        _injected_links.find { |l| l.name == name }
       }
 
       expect(links_got.map(&:name)).to eq(links_expected.map(&:name))

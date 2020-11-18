@@ -7,7 +7,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'documents' do
       @setup_helper.set_collection_allowed_options! #probably not needed
       @setup_helper.set_resource_allowed_options!
 
-      @collection = 10.times.map{User.new}
+      @collection = 10.times.map { User.new }
 
       @folder = SimpleAMS::Document::Folder.new(
         SimpleAMS::Options.new(@collection, {
@@ -32,11 +32,11 @@ RSpec.describe SimpleAMS::Document::Folder, 'documents' do
         expect(document.relations.available.count).to eq @setup_helper.expected_relations_count
 
         expect(document.links.map(&:name)).to eq @setup_helper.injected_options[:links].map(&:first).uniq
-        expect(document.links.map(&:value)).to eq @setup_helper.injected_options[:links].uniq(&:first).map{|l| l[1]}
+        expect(document.links.map(&:value)).to eq @setup_helper.injected_options[:links].uniq(&:first).map { |l| l[1] }
         expect(document.links.map(&:options)).to eq @setup_helper.injected_options[:links].uniq(&:first).map(&:last)
 
         expect(document.metas.map(&:name)).to eq @setup_helper.injected_options[:metas].map(&:first).uniq
-        expect(document.metas.map(&:value)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map{|l| l[1]}
+        expect(document.metas.map(&:value)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map { |l| l[1] }
         expect(document.metas.map(&:options)).to eq @setup_helper.injected_options[:metas].uniq(&:first).map(&:last)
       end
     end

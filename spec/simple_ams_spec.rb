@@ -6,11 +6,11 @@ RSpec.describe SimpleAMS do
   end
 
   it "raises error when using a non SimpleAMS class" do
-    expect{SimpleAMS::Renderer.new(
+    expect { SimpleAMS::Renderer.new(
         User.new,
         Helpers.random_options(with: {
           serializer: OpenStruct,
-        }).tap{|h|
+        }).tap { |h|
           h.delete(:name)
         }
       )

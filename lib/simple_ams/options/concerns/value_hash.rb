@@ -1,10 +1,10 @@
-require "simple_ams"
+require 'simple_ams'
 
 class SimpleAMS::Options
   module Concerns
     module ValueHash
       attr_reader :value, :options
-      alias :name :value
+      alias name value
 
       def initialize(value, options = {}, resource:, serializer:)
         if value.respond_to?(:call)
@@ -28,11 +28,12 @@ class SimpleAMS::Options
       end
 
       def volatile?
-        return @volatile || false
+        @volatile || false
       end
 
       private
-        attr_writer :value, :options
+
+      attr_writer :value, :options
     end
   end
 end

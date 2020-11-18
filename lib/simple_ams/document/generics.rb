@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 module SimpleAMS
   class Document::Generics
@@ -12,18 +12,18 @@ module SimpleAMS
     end
 
     def [](key)
-      found = members.find{|generic| generic.name == key}
+      found = members.find { |generic| generic.name == key }
       return nil unless found
 
-      return with_decorator(found)
+      with_decorator(found)
     end
 
-    def each(&block)
+    def each
       return enum_for(:each) unless block_given?
 
-      members.each{ |member|
+      members.each do |member|
         yield with_decorator(member)
-      }
+      end
 
       self
     end
@@ -37,15 +37,15 @@ module SimpleAMS
     end
 
     private
-      attr_reader :members, :options
 
-      def with_decorator(generic)
-        Generic.new(
-          generic.name,
-          generic.respond_to?(:call) ? generic.value.call : generic.value,
-          generic.options
-        )
-      end
+    attr_reader :members, :options
+
+    def with_decorator(generic)
+      Generic.new(
+        generic.name,
+        generic.respond_to?(:call) ? generic.value.call : generic.value,
+        generic.options
+      )
+    end
   end
 end
-

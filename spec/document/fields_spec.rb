@@ -30,7 +30,7 @@ RSpec.describe SimpleAMS::Document, 'fields' do
         SimpleAMS::Options.new(User.new, {
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer
-          }).tap{|h| h.delete(:fields)}
+          }).tap { |h| h.delete(:fields) }
         })
       )
     end
@@ -63,7 +63,7 @@ RSpec.describe SimpleAMS::Document, 'fields' do
         SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer
-          }).tap{|h| h.delete(:fields)}
+          }).tap { |h| h.delete(:fields) }
         })
       )
     end

@@ -116,17 +116,17 @@ RSpec.describe SimpleAMS::DSL, 'relations' do
         expect(UserSerializer.attributes).to eq []
         expect(UserSerializer.relations.count).to eq 3
 
-        relation = UserSerializer.relations.find{|r| r[1] == :microposts}
+        relation = UserSerializer.relations.find { |r| r[1] == :microposts }
         expect(relation).to eq(
           [:has_many, :microposts, @options, UserSerializer::EmbeddedMicropostsOptions_]
         )
 
-        relation = UserSerializer.relations.find{|r| r[1] == :unit}
+        relation = UserSerializer.relations.find { |r| r[1] == :unit }
         expect(relation).to eq(
           [:belongs_to, :unit, @options,  UserSerializer::EmbeddedUnitOptions_]
         )
 
-        relation = UserSerializer.relations.find{|r| r[1] == :follower}
+        relation = UserSerializer.relations.find { |r| r[1] == :follower }
         expect(relation).to eq(
           [:has_one, :follower, @options, UserSerializer::EmbeddedFollowerOptions_]
         )

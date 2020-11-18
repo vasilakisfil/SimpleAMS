@@ -4,7 +4,7 @@ require "spec_helper"
 #but this shouldn't affect the tests' effeciency
 RSpec.describe SimpleAMS::Options, 'name_value_hash' do
   [:generic, :link, :meta, :form].map(&:to_s).each do |element|
-    element.send(:extend, Module.new{
+    element.send(:extend, Module.new {
       def plural
         "#{self.to_s}s"
       end
@@ -16,7 +16,7 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
           @options = SimpleAMS::Options.new(User.new, {
             injected_options: Helpers.random_options(with:{
               serializer: UserSerializer,
-            }).tap{|h| h.delete(element.to_sym)}
+            }).tap { |h| h.delete(element.to_sym) }
           })
         end
 
@@ -35,10 +35,10 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
           @options = SimpleAMS::Options.new(User.new, {
             injected_options: Helpers.random_options(with:{
               serializer: UserSerializer
-            }).tap{|h| h.delete(element.plural.to_sym)}
+            }).tap { |h| h.delete(element.plural.to_sym) }
           })
 
-          @uniq_allowed_elements = @allowed_elements.uniq{|l| l.name}
+          @uniq_allowed_elements = @allowed_elements.uniq { |l| l.name }
         end
 
         it "returns the allowed ones" do
@@ -107,8 +107,8 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             @injected_elements, klass: Object.const_get("#{Elements}::#{element.capitalize}")
           )
 
-          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map{|name|
-            _injected_elements.find{|l| l.name == name}
+          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map { |name|
+            _injected_elements.find { |l| l.name == name }
           }
 
           expect(elements_got.map(&:name)).to eq(elements_expected.map(&:name))
@@ -120,7 +120,7 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
       context "with repeated (allowed) #{element.plural}" do
         before do
           @allowed_elements = Elements.send(element.plural)
-          2.times{
+          2.times {
             @allowed_elements.each do |el|
               UserSerializer.send(element, *el.as_input)
             end
@@ -144,8 +144,8 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             @injected_elements, klass: Object.const_get("#{Elements}::#{element.capitalize}")
           )
 
-          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map{|name|
-            _injected_elements.find{|l| l.name == name}
+          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map { |name|
+            _injected_elements.find { |l| l.name == name }
           }
 
           expect(elements_got.map(&:name)).to eq(elements_expected.map(&:name))
@@ -160,12 +160,12 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             @user = User.new
             @allowed_elements = [
               Object.const_get("#{Elements}::#{element.capitalize}").new(
-                name: :user, value: ->(obj, s){
-                  ["api/v1/users/#{obj.id}", {rel: :user}]
+                name: :user, value: ->(obj, s) {
+                  ["api/v1/users/#{obj.id}", { rel: :user }]
                 }
               ),
               Object.const_get("#{Elements}::#{element.capitalize}").new(
-                name: :root, value: "api/v1/root", options: {rel: :root}
+                name: :root, value: "api/v1/root", options: { rel: :root }
               ),
             ]
             @allowed_elements.each do |el|
@@ -207,7 +207,7 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             end
 
             @injected_elements = [@allowed_elements.first].inject({}) { |memo, el|
-              memo[el.name] = ->(obj, s){ ["/api/v1/#{@user.id}/#{el.name}", rel: el.name] }
+              memo[el.name] = ->(obj, s) { ["/api/v1/#{@user.id}/#{el.name}", rel: el.name] }
               memo
             }
 
@@ -223,7 +223,7 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             expect(@options.send(element.plural).count).to eq(@injected_elements.count)
 
             @options.send(element.plural).each do |el|
-              expect(el.name).to eq(@injected_elements.find{|l| l.first == el.name}[0])
+              expect(el.name).to eq(@injected_elements.find { |l| l.first == el.name }[0])
               expect(el.value).to eq(@injected_elements[el.name].call(@user, nil).first)
             end
           end

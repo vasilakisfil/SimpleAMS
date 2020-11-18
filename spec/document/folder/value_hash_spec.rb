@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
   [:type, :primary_id, :adapter].map(&:to_s).each do |element|
-    element.send(:extend, Module.new{
+    element.send(:extend, Module.new {
       def type?
         self.to_sym == :type
       end
@@ -27,7 +27,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
       end
 
       def default_options
-        return {_explicit: true} if self.to_sym == :type
+        return { _explicit: true } if self.to_sym == :type
         return {}
       end
     })
@@ -76,7 +76,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
 
       context "with no injected #{element}" do
         before do
-          @element = Elements.send(element, value: :an_element, options: {foo: :bar})
+          @element = Elements.send(element, value: :an_element, options: { foo: :bar })
           [@element].each do |el|
             UserSerializer.collection do
               self.send(element, *el.as_input)
@@ -109,7 +109,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
           it "returns the #{element} specified" do
             expect(@folder.send(element).name).to eq :an_element
             expect(@folder.send(element).options).to(
-              eq({foo: :bar}.merge(element.default_options))
+              eq({ foo: :bar }.merge(element.default_options))
             )
           end
         end
@@ -130,12 +130,12 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
             })
           end
 
-          _element = Elements.send(element, value: :an_element, options: {foo: :bar})
+          _element = Elements.send(element, value: :an_element, options: { foo: :bar })
           UserSerializer.collection do
             self.send(element, *_element.as_input)
           end
 
-          @element = Elements.send(element, value: :another_element, options: {bar: :foo})
+          @element = Elements.send(element, value: :another_element, options: { bar: :foo })
           @folder = SimpleAMS::Document::Folder.new(
             SimpleAMS::Options.new(User.array, {
               injected_options: {
@@ -188,9 +188,9 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
               "#{Elements}::#{element.split('_').map(&:capitalize).join}"
             ).new(
               value: if element.primary_id?
-                       ->(obj, s){ [@_user_attr ||= :id, {foo: :bar}] }
+                       ->(obj, s) { [@_user_attr ||= :id, { foo: :bar }] }
                      else
-                       ->(obj, s){ [obj.id, {foo: :bar}] }
+                       ->(obj, s) { [obj.id, { foo: :bar }] }
                      end
             )
             [@allowed_element].each do |el|
@@ -243,9 +243,9 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
             end
 
             if element.primary_id?
-              @injected_element = ->(obj, s){ [@_user_attr ||= obj.class.model_attributes.sample, {foo: :bar}] }
+              @injected_element = ->(obj, s) { [@_user_attr ||= obj.class.model_attributes.sample, { foo: :bar }] }
             else
-              @injected_element = ->(obj, s){ ["/api/v1/#{obj.id}", rel: :foobar] }
+              @injected_element = ->(obj, s) { ["/api/v1/#{obj.id}", rel: :foobar] }
             end
 
             options = SimpleAMS::Options.new(@user, {

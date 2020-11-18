@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 class SimpleAMS::Options
   module Concerns
@@ -28,11 +28,12 @@ class SimpleAMS::Options
       end
 
       def volatile?
-        return @volatile || false
+        @volatile || false
       end
 
       private
-        attr_writer :name, :value, :options
+
+      attr_writer :name, :value, :options
     end
   end
 end

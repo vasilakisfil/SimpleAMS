@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 class SimpleAMS::Options
   class Relations < Array
@@ -8,16 +8,16 @@ class SimpleAMS::Options
       @relations = relations
       @includes = includes
 
-      super(relations.map{|rel| Relations::Relation.new(*rel)})
+      super(relations.map { |rel| Relations::Relation.new(*rel) })
     end
 
     def available
       return @available ||= self if includes.nil?
       return @available ||= [] if includes.empty?
 
-      @available ||= self.select{
-        |relation| includes.include?(relation.name)
-      }
+      @available ||= self.select  do |relation|
+        includes.include?(relation.name)
+      end
     end
 
     class Relation
@@ -28,7 +28,7 @@ class SimpleAMS::Options
         @options = options
         @embedded = embedded
 
-        @many = type == :has_many ? true : false
+        @many = type == :has_many
       end
 
       alias relation name
@@ -46,7 +46,8 @@ class SimpleAMS::Options
       end
 
       private
-        attr_writer :type, :name, :options
+
+      attr_writer :type, :name, :options
     end
   end
 end

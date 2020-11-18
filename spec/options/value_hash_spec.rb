@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe SimpleAMS::Options, 'value_hash' do
   [:type, :primary_id, :adapter].map(&:to_s).each do |element|
-    element.send(:extend, Module.new{
+    element.send(:extend, Module.new {
       def type?
         self.to_sym == :type
       end
@@ -14,7 +14,7 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
       end
 
       def default_options
-        return {_explicit: true} if self.to_sym == :type
+        return { _explicit: true } if self.to_sym == :type
         return {}
       end
     })
@@ -25,7 +25,7 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
           @options = SimpleAMS::Options.new(User.new, {
             injected_options: Helpers.random_options(with:{
               serializer: UserSerializer,
-            }).tap{|h| h.delete(element.to_sym)}
+            }).tap { |h| h.delete(element.to_sym) }
           })
         end
 
@@ -46,7 +46,7 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
           @options = SimpleAMS::Options.new(User.new, {
             injected_options: Helpers.random_options(with:{
               serializer: UserSerializer,
-            }).tap{|h| h.delete(element.to_sym)}
+            }).tap { |h| h.delete(element.to_sym) }
           })
         end
 
@@ -69,7 +69,7 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
           @options = SimpleAMS::Options.new(User.new, {
             injected_options: Helpers.random_options(with:{
               serializer: UserSerializer,
-            }).tap{|h| h.delete(element.to_sym)}
+            }).tap { |h| h.delete(element.to_sym) }
           })
         end
 
@@ -122,7 +122,7 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
             @allowed_element = Object.const_get(
               "#{Elements}::#{element.split('_').map(&:capitalize).join}"
             ).new(
-              value: ->(obj, s){ [obj.id, {foo: :bar}] }
+              value: ->(obj, s) { [obj.id, { foo: :bar }] }
             )
             UserSerializer.send(element, *@allowed_element.as_lambda_input)
 
@@ -149,7 +149,7 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
             @allowed_element = Object.const_get(
               "#{Elements}::#{element.split('_').map(&:capitalize).join}"
             ).new(
-              value: ->(obj, s){obj.id}, options: {foo: :bar}
+              value: ->(obj, s) { obj.id }, options: { foo: :bar }
             )
             UserSerializer.send(element, *@allowed_element.as_lambda_input(explicit_options: true))
 
@@ -176,7 +176,7 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
             @allowed_element = Elements.send(element)
             UserSerializer.send(element, *@allowed_element.as_input)
 
-            @injected_element = ->(obj, s){ ["/api/v1/#{obj.id}", rel: :foobar] }
+            @injected_element = ->(obj, s) { ["/api/v1/#{obj.id}", rel: :foobar] }
 
             @options = SimpleAMS::Options.new(@user, {
               injected_options: Helpers.random_options(with: {

@@ -32,7 +32,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
         SimpleAMS::Options.new(User.new, {
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
-          }).tap{|h|
+          }).tap { |h|
             h.delete(:includes)
             h.delete(:relations)
           }
@@ -61,7 +61,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
         SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
-          }).tap{|h| h.delete(:includes)}
+          }).tap { |h| h.delete(:includes) }
         })
       )
     end
@@ -151,7 +151,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
   context "with repeated includes" do
     before do
       @allowed_relations = User.relations
-      2.times{
+      2.times {
         @allowed_relations.each do |relation|
           UserSerializer.send(relation.type, relation.name, relation.options)
         end
@@ -205,7 +205,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
         SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
-          }).tap{|h| h.delete(:includes)}
+          }).tap { |h| h.delete(:includes) }
         })
       )
     end
@@ -270,7 +270,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
         SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
             serializer: Api::V1::UserSerializer,
-          }).tap{|h| h.delete(:includes)}
+          }).tap { |h| h.delete(:includes) }
         })
       )
     end
@@ -308,7 +308,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
         SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
             serializer: Api::V1::UserSerializer,
-          }).tap{|h| h.delete(:includes)}
+          }).tap { |h| h.delete(:includes) }
         })
       )
     end
@@ -316,7 +316,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
     context "values" do
       it "returns the allowed relations" do
           expect(@document.relations.available).to respond_to(:each)
-          expect{@document.relations.available.map(&:name)}.to raise_error(
+          expect { @document.relations.available.map(&:name) }.to raise_error(
             RuntimeError, /Could not infer serializer/
           )
       end

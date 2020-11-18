@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 module SimpleAMS
   class Document::Forms < Document::Generics

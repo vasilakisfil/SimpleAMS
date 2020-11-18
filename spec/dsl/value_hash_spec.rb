@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe SimpleAMS::DSL, 'value_hash' do
   [:type, :primary_id, :adapter].map(&:to_s).each do |element|
-    element.send(:extend, Module.new{
+    element.send(:extend, Module.new {
       def default_name
         return :user if self.to_sym == :type
         return :id if self.to_sym == :primary_id
@@ -10,7 +10,7 @@ RSpec.describe SimpleAMS::DSL, 'value_hash' do
       end
 
       def default_options
-        return {_explicit: true} if self.to_sym == :type
+        return { _explicit: true } if self.to_sym == :type
         return {}
       end
     })
@@ -41,7 +41,7 @@ RSpec.describe SimpleAMS::DSL, 'value_hash' do
         context "with options" do
           before do
             @element = Elements.send(element, {
-              value: ->(obj, s){Helpers::Options.single}, options: Helpers::Options.hash
+              value: ->(obj, s) { Helpers::Options.single }, options: Helpers::Options.hash
             })
             UserSerializer.send(element, *@element.as_input)
           end

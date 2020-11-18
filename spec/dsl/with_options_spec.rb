@@ -37,15 +37,15 @@ RSpec.describe SimpleAMS::DSL, 'options' do
         when :primary_id
           expect(UserSerializer.options.send(:[], key)).to eq([value, {}])
         when :type
-          expect(UserSerializer.options.send(:[], key)).to eq([value, {_explicit: true}])
+          expect(UserSerializer.options.send(:[], key)).to eq([value, { _explicit: true }])
         when :links, :metas, :forms, :generics
-          expect(UserSerializer.options.send(:[], key)).to eq(value.map{|k, v| [k, v].flatten(1)})
+          expect(UserSerializer.options.send(:[], key)).to eq(value.map { |k, v| [k, v].flatten(1) })
         when :collection
           expect(UserSerializer.options[:collection]).to(
             eq(UserSerializer::Collection_)
           )
           expect(UserSerializer.options[:collection].links).to(
-            eq(value[:links].map{|k, v| [k,v].flatten(1)})
+            eq(value[:links].map { |k, v| [k,v].flatten(1) })
           )
         when :includes
           expect(UserSerializer.options.send(:[], key)).to eq([])
@@ -69,8 +69,8 @@ RSpec.describe SimpleAMS::DSL, 'options' do
       UserSerializer.type(*@type.as_input)
       @attrs = Helpers::Options.array
       UserSerializer.attributes(*@attrs)
-      @links = (rand(10) + 2).times.map{ Elements.link }
-      @links.each{|link|
+      @links = (rand(10) + 2).times.map { Elements.link }
+      @links.each { |link|
         UserSerializer.link(*link.as_input)
       }
       @meta = Elements.meta
@@ -92,7 +92,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
     before do
       #TODO: Figure out what's going on when collection is nil or {},
       #i.e. add tests for these cases
-      @random_options = {foo: :bar}
+      @random_options = { foo: :bar }
       @spy_logger = spy('::Logger')
       SimpleAMS.configure do |config|
         config.logger = @spy_logger

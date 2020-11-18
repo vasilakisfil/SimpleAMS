@@ -11,8 +11,8 @@ RSpec.describe SimpleAMS::DSL, 'collection' do
   context "with attributes specified" do
     before do
       Helpers.define_singleton_for('RandomOptions', {
-        links: (rand(10) + 2).times.map{ Elements.link },
-        metas: (rand(10) + 2).times.map{ Elements.meta }
+        links: (rand(10) + 2).times.map { Elements.link },
+        metas: (rand(10) + 2).times.map { Elements.meta }
       })
       UserSerializer.collection do
         Helpers::RandomOptions.links.each do |l|

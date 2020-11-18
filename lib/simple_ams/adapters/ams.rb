@@ -1,4 +1,4 @@
-require "simple_ams"
+require 'simple_ams'
 
 class SimpleAMS::Adapters::AMS
   attr_reader :document, :options
@@ -19,53 +19,48 @@ class SimpleAMS::Adapters::AMS
     hash.merge!(metas: metas) unless metas.empty?
     hash.merge!(forms: forms) unless forms.empty?
 
-    return {document.name => hash} if options[:root]
-    return hash
+    return { document.name => hash } if options[:root]
+
+    hash
   end
 
   def fields
-    @fields ||= document.fields.inject({}){ |hash, field|
+    @fields ||= document.fields.each_with_object({}) do |field, hash|
       hash[field.key] = field.value
-      hash
-    }
+    end
   end
 
   def links
     return @links ||= {} if document.links.empty?
 
-    @links ||= document.links.inject({}){ |hash, link|
+    @links ||= document.links.each_with_object({}) do |link, hash|
       hash[link.name] = link.value
-      hash
-    }
+    end
   end
 
   def metas
-    @metas ||= document.metas.inject({}){ |hash, meta|
+    @metas ||= document.metas.each_with_object({}) do |meta, hash|
       hash[meta.name] = meta.value
-      hash
-    }
+    end
   end
 
   def forms
-    @forms ||= document.forms.inject({}){ |hash, form|
+    @forms ||= document.forms.each_with_object({}) do |form, hash|
       hash[form.name] = form.value
-      hash
-    }
+    end
   end
 
   def relations
     return @relations = {} if document.relations.available.empty?
 
-    @relations ||= document.relations.available.inject({}){ |hash, relation|
-      if relation.folder?
-        value = relation.map{|doc| self.class.new(doc).as_json}
-      else
-        value = self.class.new(relation).as_json
-      end
+    @relations ||= document.relations.available.each_with_object({}) do |relation, hash|
+      value = if relation.folder?
+                relation.map { |doc| self.class.new(doc).as_json }
+              else
+                self.class.new(relation).as_json
+              end
       hash[relation.name] = value
-
-      hash
-    }
+    end
   end
 
   class Collection < self
@@ -90,23 +85,21 @@ class SimpleAMS::Adapters::AMS
     end
 
     def documents
-      return folder.map{|document|
+      folder.map do |document|
         adapter.new(document).as_json
-      } || []
+      end || []
     end
 
     def metas
-      @metas ||= folder.metas.inject({}){ |hash, meta|
+      @metas ||= folder.metas.each_with_object({}) do |meta, hash|
         hash[meta.name] = meta.value
-        hash
-      }
+      end
     end
 
     def links
-      @links ||= folder.links.inject({}){ |hash, link|
+      @links ||= folder.links.each_with_object({}) do |link, hash|
         hash[link.name] = link.value
-        hash
-      }
+      end
     end
   end
 end

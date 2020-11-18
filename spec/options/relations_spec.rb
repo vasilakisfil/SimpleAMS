@@ -6,7 +6,7 @@ RSpec.describe SimpleAMS::Options, "relations" do
       @options = SimpleAMS::Options.new(User.new, {
         injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
-        }).tap{|h|
+        }).tap { |h|
           h.delete(:includes)
           h.delete(:relations)
         }
@@ -27,7 +27,7 @@ RSpec.describe SimpleAMS::Options, "relations" do
       @options = SimpleAMS::Options.new(User.new, {
         injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
-        }).tap{|h| h.delete(:includes)}
+        }).tap { |h| h.delete(:includes) }
       })
     end
 
@@ -39,7 +39,7 @@ RSpec.describe SimpleAMS::Options, "relations" do
       )
       expect(@options.relations.map(&:single?)).to(
         eq(
-          @allowed_relations.values.map{|t|
+          @allowed_relations.values.map { |t|
             t == :has_many ? false : true
           }
         )
@@ -101,7 +101,7 @@ RSpec.describe SimpleAMS::Options, "relations" do
         injected_options: Helpers.random_options(with:{
           serializer: UserSerializer,
           relations: @injected_relations,
-          includes: @injected_relations.map{|relation| relation[1]}
+          includes: @injected_relations.map { |relation| relation[1] }
         })
       })
     end

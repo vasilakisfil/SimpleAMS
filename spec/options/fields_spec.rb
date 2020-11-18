@@ -6,7 +6,7 @@ RSpec.describe SimpleAMS::Options, 'fields' do
       @options = SimpleAMS::Options.new(User.new, {
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer
-        }).tap{|h| h.delete(:fields)}
+        }).tap { |h| h.delete(:fields) }
       })
     end
 
@@ -22,7 +22,7 @@ RSpec.describe SimpleAMS::Options, 'fields' do
       @options = SimpleAMS::Options.new(User.new, {
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer
-        }).tap{|h| h.delete(:fields)}
+        }).tap { |h| h.delete(:fields) }
       })
     end
 

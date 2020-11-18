@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
   [:generic, :link, :meta, :form].map(&:to_s).each do |element|
-    element.send(:extend, Module.new{
+    element.send(:extend, Module.new {
       def plural
         "#{self.to_s}s"
       end
@@ -22,7 +22,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
           @folder = SimpleAMS::Document::Folder.new(
             SimpleAMS::Options.new(User.array, {
               injected_options: {
-                collection: Helpers.random_options.tap{|h|
+                collection: Helpers.random_options.tap { |h|
                   h.delete(element.to_sym)
                 },
                 serializer: UserSerializer
@@ -61,7 +61,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
           @folder = SimpleAMS::Document::Folder.new(
             SimpleAMS::Options.new(User.array, {
               injected_options: {
-                collection: Helpers.random_options.tap{|h|
+                collection: Helpers.random_options.tap { |h|
                   h.delete(element.plural.to_sym)
                 },
                 serializer: UserSerializer
@@ -69,7 +69,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
             })
           )
 
-          @uniq_allowed_elements = @allowed_elements.uniq{|el| el.name}
+          @uniq_allowed_elements = @allowed_elements.uniq { |el| el.name }
         end
 
         instance_exec(&resource_options)
@@ -186,7 +186,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
           elements_got = @folder.send(element.plural)
           elements_expected = (Elements.as_elements_for(
             @injected_elements, klass: Object.const_get("Elements::#{element.capitalize}")
-          ) + @allowed_elements).uniq{|q| q.name}.select{|l|
+          ) + @allowed_elements).uniq { |q| q.name }.select { |l|
             @allowed_elements.map(&:name).include?(l.name) && @injected_elements.keys.include?(l.name)
           }
 
@@ -200,7 +200,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
       context "with repeated (allowed) #{element.plural}" do
         before do
           @allowed_elements = Elements.send(element.plural)
-          2.times{
+          2.times {
             @allowed_elements.each do |el|
               UserSerializer.collection do
                 self.send(element, *el.as_input)
@@ -230,8 +230,8 @@ RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
             @injected_elements, klass: Object.const_get("Elements::#{element.capitalize}")
           )
 
-          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map{|name|
-            _injected_elements.find{|el| el.name == name}
+          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map { |name|
+            _injected_elements.find { |el| el.name == name }
           }
 
           expect(elements_got.map(&:name)).to eq(elements_expected.map(&:name))
@@ -246,12 +246,12 @@ RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
             @users = User.array
             @allowed_elements = [
               Object.const_get("#{Elements}::#{element.capitalize}").new(
-                name: :user, value: ->(obj, s){
-                  ["api/v1/users/#{obj.count}", {rel: :user}]
+                name: :user, value: ->(obj, s) {
+                  ["api/v1/users/#{obj.count}", { rel: :user }]
                 }
               ),
               Object.const_get("#{Elements}::#{element.capitalize}").new(
-                name: :root, value: "api/v1/root", options: {rel: :root}
+                name: :root, value: "api/v1/root", options: { rel: :root }
               ),
             ]
             @allowed_elements.each do |el|
@@ -302,7 +302,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
             end
 
             @injected_elements = [@allowed_elements.first].inject({}) { |memo, el|
-              memo[el.name] = ->(obj, s){ ["/api/v1/#{obj.count}/#{el.name}", rel: el.name] }
+              memo[el.name] = ->(obj, s) { ["/api/v1/#{obj.count}/#{el.name}", rel: el.name] }
               memo
             }
 
@@ -324,7 +324,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'name_value_hash' do
             expect(@folder.send(element.plural).count).to eq(@injected_elements.count)
 
             @folder.send(element.plural).each do |el|
-              expect(el.name).to eq(@injected_elements.find{|l| l.first == el.name}[0])
+              expect(el.name).to eq(@injected_elements.find { |l| l.first == el.name }[0])
               expect(el.value).to eq(@injected_elements[el.name].call(@folder.collection, nil).first)
             end
           end

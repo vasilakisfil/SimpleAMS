@@ -22,16 +22,16 @@ class Elements
   end
 
   def links
-    (rand(10) + 3).times.map{Link.new}
+    (rand(10) + 3).times.map { Link.new }
   end
 
   def fields
-    (rand(10) + 3).times.map{Field.new}
+    (rand(10) + 3).times.map { Field.new }
   end
   alias attributes fields
 
   def includes
-    (rand(10) + 3).times.map{Include.new}
+    (rand(10) + 3).times.map { Include.new }
   end
 
   def meta(*args)
@@ -39,7 +39,7 @@ class Elements
   end
 
   def metas
-    (rand(10) + 3).times.map{Meta.new}
+    (rand(10) + 3).times.map { Meta.new }
   end
 
   def form(*args)
@@ -47,7 +47,7 @@ class Elements
   end
 
   def forms
-    (rand(10) + 3).times.map{Form.new}
+    (rand(10) + 3).times.map { Form.new }
   end
 
   def generic(*args)
@@ -55,11 +55,11 @@ class Elements
   end
 
   def generics
-    (rand(10) + 3).times.map{Generic.new}
+    (rand(10) + 3).times.map { Generic.new }
   end
 
   def as_elements_for(hash, klass:)
-    hash.map{|key, value|
+    hash.map { |key, value|
       klass.new({
         name: key,
         value: value.is_a?(Array) ? value.first : value,
@@ -69,7 +69,7 @@ class Elements
   end
 
   def as_options_for(elements)
-    elements.inject({}){|memo, element|
+    elements.inject({}) { |memo, element|
       memo[element.name] = [element.value, element.options]
       memo
     }
@@ -117,7 +117,7 @@ class Elements
           [@name, @value]
         end
       else
-        [@name, ->{ [@value, @options] } ]
+        [@name, -> { [@value, @options] } ]
       end
     end
 
@@ -146,7 +146,7 @@ class Elements
     alias :name :value
 
     def as_injected
-      {self.class.to_s.downcase.to_sym => as_input}
+      { self.class.to_s.downcase.to_sym => as_input }
     end
 
     def as_input(extra = {})
@@ -161,7 +161,7 @@ class Elements
           @value
         end
       else
-        ->{ [@value, @options] }
+        -> { [@value, @options] }
       end
     end
   end

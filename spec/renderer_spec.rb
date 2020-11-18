@@ -7,7 +7,7 @@ RSpec.describe SimpleAMS::Renderer, 'name' do
         User.new,
         Helpers.random_options(with: {
           serializer: UserSerializer,
-        }).tap{|h|
+        }).tap { |h|
           h.delete(:name)
         }
       )

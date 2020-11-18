@@ -4,7 +4,8 @@ class SimpleAMS::Options
       Tracked = Struct.new(:value) do
         def volatile?
           return @volatile if defined?(@volatile)
-          return @volatile ||= self.value.volatile?
+
+          @volatile ||= value.volatile?
         end
       end
 
@@ -13,7 +14,7 @@ class SimpleAMS::Options
       end
 
       def clean_volatile_properties!
-        @tracked_properties = @tracked_properties.select{|k, v| !v.volatile?}
+        @tracked_properties = @tracked_properties.select { |_k, v| !v.volatile? }
       end
 
       def tracked(meth)
@@ -22,4 +23,3 @@ class SimpleAMS::Options
     end
   end
 end
-
