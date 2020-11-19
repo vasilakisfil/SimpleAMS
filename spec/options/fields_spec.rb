@@ -1,7 +1,7 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SimpleAMS::Options, 'fields' do
-  context "with no fields in general" do
+  context 'with no fields in general' do
     before do
       @options = SimpleAMS::Options.new(User.new, {
         injected_options: Helpers.random_options(with: {
@@ -10,12 +10,12 @@ RSpec.describe SimpleAMS::Options, 'fields' do
       })
     end
 
-    it "returns an empty array" do
+    it 'returns an empty array' do
       expect(@options.fields).to eq []
     end
   end
 
-  context "with no injected fields" do
+  context 'with no injected fields' do
     before do
       @allowed_fields = Helpers::Options.array
       UserSerializer.attributes(*@allowed_fields)
@@ -26,12 +26,12 @@ RSpec.describe SimpleAMS::Options, 'fields' do
       })
     end
 
-    it "holds the allowed fields only" do
+    it 'holds the allowed fields only' do
       expect(@options.fields).to eq @allowed_fields.uniq
     end
   end
 
-  context "with empty injected fields" do
+  context 'with empty injected fields' do
     before do
       @allowed_fields = Helpers::Options.array
       UserSerializer.attributes(*@allowed_fields)
@@ -43,12 +43,12 @@ RSpec.describe SimpleAMS::Options, 'fields' do
       })
     end
 
-    it "returns an empty array" do
+    it 'returns an empty array' do
       expect(@options.fields).to eq []
     end
   end
 
-  context "with various injected fields" do
+  context 'with various injected fields' do
     before do
       @allowed_fields = Helpers::Options.array
       UserSerializer.attributes(*@allowed_fields)
@@ -56,11 +56,11 @@ RSpec.describe SimpleAMS::Options, 'fields' do
         serializer: UserSerializer
       })
       @options = SimpleAMS::Options.new(User.new, {
-        injected_options: @injected_options,
+        injected_options: @injected_options
       })
     end
 
-    it "holds the union of injected and allowed fields" do
+    it 'holds the union of injected and allowed fields' do
       expect(@options.fields).to(
         eq(
           (UserSerializer.attributes & @injected_options[:fields]).uniq
@@ -69,21 +69,21 @@ RSpec.describe SimpleAMS::Options, 'fields' do
     end
   end
 
-  context "with repeated fields" do
+  context 'with repeated fields' do
     before do
       @allowed_fields = Helpers::Options.array
-      UserSerializer.attributes(*(@allowed_fields.concat(@allowed_fields)))
+      UserSerializer.attributes(*@allowed_fields.concat(@allowed_fields))
       injected_fields = Helpers::Options.array
       @injected_options = Helpers.random_options(with: {
         serializer: UserSerializer,
         fields: injected_fields.concat(injected_fields)
       })
       @options = SimpleAMS::Options.new(User.new, {
-        injected_options: @injected_options,
+        injected_options: @injected_options
       })
     end
 
-    it "holds the uniq union of injected and allowed fields" do
+    it 'holds the uniq union of injected and allowed fields' do
       expect(@options.fields.sort).to(
         eq(
           (@allowed_fields & @injected_options[:fields]).uniq.sort

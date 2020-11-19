@@ -1,6 +1,7 @@
 class SetupHelper
   def initialize(serializer: UserSerializer, model: User)
-    @serializer, @model = serializer, model
+    @serializer = serializer
+    @model = model
   end
 
   def set_collection_allowed_options!
@@ -86,13 +87,14 @@ class SetupHelper
   end
 
   private
-    attr_reader :serializer, :model
 
-    def define_collection_allowed!
-      Helpers.define_singleton_for('RandomOptions', {
-        fields: Elements.fields,
-        links: Elements.links,
-        metas: Elements.metas
-      })
-    end
+  attr_reader :serializer, :model
+
+  def define_collection_allowed!
+    Helpers.define_singleton_for('RandomOptions', {
+      fields: Elements.fields,
+      links: Elements.links,
+      metas: Elements.metas
+    })
+  end
 end

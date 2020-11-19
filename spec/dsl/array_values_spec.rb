@@ -1,16 +1,16 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SimpleAMS::DSL, 'array values' do
   [:attribute].map(&:to_s).each do |element|
-    element.send(:extend, Module.new {
+    element.send(:extend, Module.new do
       def plural
-        "#{self.to_s}s"
+        "#{self}s"
       end
-    })
+    end)
 
     describe "(#{element.plural})" do
-      context "with no relations" do
-        it "returns an empty array" do
+      context 'with no relations' do
+        it 'returns an empty array' do
           expect(UserSerializer.send(element.plural)).to eq []
         end
       end

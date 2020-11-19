@@ -1,21 +1,21 @@
-require "spec_helper"
+require 'spec_helper'
 
-#these tests have been replicated from links, so some options make sense only for links
-#but this shouldn't affect the tests' effeciency
+# these tests have been replicated from links, so some options make sense only for links
+# but this shouldn't affect the tests' effeciency
 RSpec.describe SimpleAMS::Options, 'name_value_hash' do
-  [:generic, :link, :meta, :form].map(&:to_s).each do |element|
-    element.send(:extend, Module.new {
+  %i[generic link meta form].map(&:to_s).each do |element|
+    element.send(:extend, Module.new do
       def plural
-        "#{self.to_s}s"
+        "#{self}s"
       end
-    })
+    end)
 
     describe "(#{element.plural})" do
       context "with no #{element.plural} in general" do
         before do
           @options = SimpleAMS::Options.new(User.new, {
-            injected_options: Helpers.random_options(with:{
-              serializer: UserSerializer,
+            injected_options: Helpers.random_options(with: {
+              serializer: UserSerializer
             }).tap { |h| h.delete(element.to_sym) }
           })
         end
@@ -33,15 +33,15 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
           end
 
           @options = SimpleAMS::Options.new(User.new, {
-            injected_options: Helpers.random_options(with:{
+            injected_options: Helpers.random_options(with: {
               serializer: UserSerializer
             }).tap { |h| h.delete(element.plural.to_sym) }
           })
 
-          @uniq_allowed_elements = @allowed_elements.uniq { |l| l.name }
+          @uniq_allowed_elements = @allowed_elements.uniq(&:name)
         end
 
-        it "returns the allowed ones" do
+        it 'returns the allowed ones' do
           expect(@options.send(element.plural).map(&:name)).to eq @uniq_allowed_elements.map(&:name)
           expect(@options.send(element.plural).map(&:value)).to eq @uniq_allowed_elements.map(&:value)
           expect(@options.send(element.plural).map(&:options)).to eq @uniq_allowed_elements.map(&:options)
@@ -56,7 +56,7 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
           end
 
           @options = SimpleAMS::Options.new(User.new, {
-            injected_options: Helpers.random_options(with:{
+            injected_options: Helpers.random_options(with: {
               serializer: UserSerializer,
               element.plural.to_sym => []
             })
@@ -71,8 +71,8 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
       context "with no allowed #{element.plural} but injected ones" do
         before do
           @options = SimpleAMS::Options.new(User.new, {
-            injected_options: Helpers.random_options(with:{
-              serializer: UserSerializer,
+            injected_options: Helpers.random_options(with: {
+              serializer: UserSerializer
             })
           })
         end
@@ -92,7 +92,7 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             Helpers.pick(@allowed_elements)
           )
 
-          injected_options = Helpers.random_options(with:{
+          injected_options = Helpers.random_options(with: {
             serializer: UserSerializer,
             element.plural.to_sym => @injected_elements
           })
@@ -107,9 +107,9 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             @injected_elements, klass: Object.const_get("#{Elements}::#{element.capitalize}")
           )
 
-          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map { |name|
+          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map do |name|
             _injected_elements.find { |l| l.name == name }
-          }
+          end
 
           expect(elements_got.map(&:name)).to eq(elements_expected.map(&:name))
           expect(elements_got.map(&:value)).to eq(elements_expected.map(&:value))
@@ -120,16 +120,16 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
       context "with repeated (allowed) #{element.plural}" do
         before do
           @allowed_elements = Elements.send(element.plural)
-          2.times {
+          2.times do
             @allowed_elements.each do |el|
               UserSerializer.send(element, *el.as_input)
             end
-          }
+          end
           @injected_elements = Elements.as_options_for(
             Helpers.pick(@allowed_elements)
           )
 
-          injected_options = Helpers.random_options(with:{
+          injected_options = Helpers.random_options(with: {
             serializer: UserSerializer,
             element.plural.to_sym => @injected_elements
           })
@@ -144,9 +144,9 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             @injected_elements, klass: Object.const_get("#{Elements}::#{element.capitalize}")
           )
 
-          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map { |name|
+          elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map do |name|
             _injected_elements.find { |l| l.name == name }
-          }
+          end
 
           expect(elements_got.map(&:name)).to eq(elements_expected.map(&:name))
           expect(elements_got.map(&:value)).to eq(elements_expected.map(&:value))
@@ -154,19 +154,19 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
         end
       end
 
-      context "with lambda" do
+      context 'with lambda' do
         context "allowed #{element.plural}" do
           before do
             @user = User.new
             @allowed_elements = [
               Object.const_get("#{Elements}::#{element.capitalize}").new(
-                name: :user, value: ->(obj, s) {
+                name: :user, value: lambda { |obj, _s|
                   ["api/v1/users/#{obj.id}", { rel: :user }]
                 }
               ),
               Object.const_get("#{Elements}::#{element.capitalize}").new(
-                name: :root, value: "api/v1/root", options: { rel: :root }
-              ),
+                name: :root, value: 'api/v1/root', options: { rel: :root }
+              )
             ]
             @allowed_elements.each do |el|
               UserSerializer.send(element, *el.as_input)
@@ -206,10 +206,9 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
               UserSerializer.send(element, *el.as_input)
             end
 
-            @injected_elements = [@allowed_elements.first].inject({}) { |memo, el|
-              memo[el.name] = ->(obj, s) { ["/api/v1/#{@user.id}/#{el.name}", rel: el.name] }
-              memo
-            }
+            @injected_elements = [@allowed_elements.first].each_with_object({}) do |el, memo|
+              memo[el.name] = ->(_obj, _s) { ["/api/v1/#{@user.id}/#{el.name}", { rel: el.name }] }
+            end
 
             @options = SimpleAMS::Options.new(@user, {
               injected_options: Helpers.random_options(with: {

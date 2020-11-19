@@ -1,18 +1,18 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SimpleAMS::DSL, 'collection' do
-  context "with no collection options" do
-    it "returns a Collection class nested to the serializer" do
+  context 'with no collection options' do
+    it 'returns a Collection class nested to the serializer' do
       expect(UserSerializer.collection).to eq UserSerializer::Collection_
     end
   end
 
-  #that's interesting test case, should blog post
-  context "with attributes specified" do
+  # that's interesting test case, should blog post
+  context 'with attributes specified' do
     before do
       Helpers.define_singleton_for('RandomOptions', {
-        links: (rand(10) + 2).times.map { Elements.link },
-        metas: (rand(10) + 2).times.map { Elements.meta }
+        links: rand(2..11).times.map { Elements.link },
+        metas: rand(2..11).times.map { Elements.meta }
       })
       UserSerializer.collection do
         Helpers::RandomOptions.links.each do |l|
@@ -24,7 +24,7 @@ RSpec.describe SimpleAMS::DSL, 'collection' do
       end
     end
 
-    it "creates the embedded Collection class along with the specified options" do
+    it 'creates the embedded Collection class along with the specified options' do
       expect(UserSerializer::Collection_.class).to eq(Class)
       expect(UserSerializer.collection).to eq(UserSerializer::Collection_)
       expect(UserSerializer.collection.links).to(

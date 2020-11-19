@@ -8,6 +8,7 @@ require 'simple_ams/adapters/ams'
 require 'simple_ams/adapters/jsonapi'
 require 'simple_ams/renderer'
 
+require 'simple_ams/options/concerns/mod'
 require 'simple_ams/options/concerns/filterable'
 require 'simple_ams/options/concerns/name_value_hash'
 require 'simple_ams/options/concerns/value_hash'
@@ -50,7 +51,7 @@ module SimpleAMS
     attr_accessor :logger
 
     def initialize
-      @logger = ::Logger.new(STDOUT)
+      @logger = ::Logger.new($stdout)
     end
   end
 end

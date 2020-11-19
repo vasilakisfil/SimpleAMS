@@ -3,12 +3,12 @@ require 'spec_helper'
 class Address
   class << self
     def model_attributes
-      @attributes ||= self.instance_methods(false)
+      @model_attributes ||= instance_methods(false)
     end
   end
 
   def id
-    @id ||= rand(100000)
+    @id ||= rand(100_000)
   end
 
   def street_name
@@ -36,7 +36,7 @@ class Address
   end
 
   def created_at
-    @cretated_at ||= Faker::Date.backward(100)
+    @created_at ||= Faker::Date.backward(100)
   end
 
   def updated_at

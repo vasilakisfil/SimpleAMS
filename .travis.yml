@@ -1,7 +1,6 @@
 language: ruby
 cache: bundler
 rvm:
-  - 2.3.8
   - 2.4.5
   - 2.5.3
   - 2.6.1
@@ -9,7 +8,9 @@ rvm:
   - ruby-head
 before_install:
   - gem install bundler:2.1.1
-script: bundle exec rspec spec/
+script:
+  - bundle exec rspec
+  - bundle exec rubocop
 matrix:
  allow_failures:
    - rvm: ruby-head

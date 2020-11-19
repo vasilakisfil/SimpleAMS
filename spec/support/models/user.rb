@@ -3,11 +3,11 @@ require 'spec_helper'
 class User
   class << self
     def model_attributes
-      @attributes ||= self.instance_methods(false) - relations.map(&:name)
+      @model_attributes ||= instance_methods(false) - relations.map(&:name)
     end
 
     def relation_names
-      @relations ||= relations.map(&:name)
+      @relation_names ||= relations.map(&:name)
     end
 
     def relations
@@ -28,22 +28,22 @@ class User
     end
 
     def array
-      (rand(10) + 1).times.map { self.new }.send(:extend, Module.new {
+      rand(1..10).times.map { new }.send(:extend, Module.new do
         def id
-          @id ||= rand(100000)
+          @id ||= rand(100_000)
         end
-      })
+      end)
     end
   end
 
   def initialize(opts = {})
-    opts.keys.each do |key|
-      self.instance_variable_set("@#{key}", opts[key])
+    opts.each_key do |key|
+      instance_variable_set("@#{key}", opts[key])
     end
   end
 
   def id
-    @id ||= rand(100000)
+    @id ||= rand(100_000)
   end
 
   def name
@@ -58,11 +58,11 @@ class User
     return @admin if defined?(@admin)
 
     @admin = [false, true].sample
-    return @admin
+    @admin
   end
 
   def created_at
-    @cretated_at ||= Faker::Date.backward(100)
+    @created_at ||= Faker::Date.backward(100)
   end
 
   def updated_at
@@ -78,7 +78,7 @@ class User
   end
 
   def followings_count
-    @followers_count ||= rand(100)
+    @followings_count ||= rand(100)
   end
 
   def microposts_count

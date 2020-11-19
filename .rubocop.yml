@@ -1,8 +1,56 @@
-inherit_from: .rubocop_todo.yml
-
 AllCops:
   NewCops: enable
 Style/FrozenStringLiteralComment:
   Enabled: false
 Style/ClassAndModuleChildren:
   EnforcedStyle: compact
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+Metrics/ModuleLength:
+  Max: 250
+Metrics/ClassLength:
+  Max: 250
+Metrics/MethodLength:
+  Max: 50
+Metrics/BlockLength:
+  Max: 50
+  Exclude:
+    - 'spec/**/*.rb'
+Metrics/AbcSize:
+  Max: 50
+Lint/UnreachableLoop:
+  Exclude:
+    - 'spec/**/*.rb'
+Style/Documentation:
+  Enabled: false
+Lint/UnderscorePrefixedVariableName:
+  Exclude:
+    - 'spec/**/*.rb'
+    - 'lib/simple_ams/options.rb'
+    - 'lib/simple_ams/dsl.rb'
+Naming/MemoizedInstanceVariableName:
+  Exclude:
+    - 'lib/simple_ams/options.rb'
+    - 'lib/simple_ams/dsl.rb'
+Lint/SuppressedException:
+  Exclude:
+    - 'spec/**/*.rb'
+Metrics/PerceivedComplexity:
+  Max: 14
+  Exclude:
+    - 'spec/**/*.rb'
+Metrics/CyclomaticComplexity:
+  Max: 14
+  Exclude:
+    - 'spec/**/*.rb'
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - 'spec/**/*.rb'
+Style/OptionalArguments:
+  Exclude:
+    - 'lib/simple_ams/options/relations.rb'
+Naming/PredicateName:
+  Exclude:
+    - 'lib/simple_ams/dsl.rb'
+Lint/MissingSuper:
+  Enabled: false

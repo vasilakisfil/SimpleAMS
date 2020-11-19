@@ -1,9 +1,9 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SimpleAMS::DSL, 'options' do
-  context "with no options" do
-    it "returns the default" do
-      expect(UserSerializer.options).to eq (
+  context 'with no options' do
+    it 'returns the default' do
+      expect(UserSerializer.options).to eq(
         {
           adapter: [SimpleAMS::Adapters::AMS, {}],
           primary_id: [:id, {}],
@@ -21,7 +21,7 @@ RSpec.describe SimpleAMS::DSL, 'options' do
     end
   end
 
-  context "with multiple options" do
+  context 'with multiple options' do
     before do
       @adapter = Elements.adapter
       UserSerializer.adapter(*@adapter.as_input)
@@ -31,10 +31,10 @@ RSpec.describe SimpleAMS::DSL, 'options' do
       UserSerializer.type(*@type.as_input)
       @attrs = Helpers::Options.array
       UserSerializer.attributes(*@attrs)
-      @links = (rand(10) + 2).times.map { Elements.link }
-      @links.each { |link|
+      @links = rand(2..11).times.map { Elements.link }
+      @links.each do |link|
         UserSerializer.link(*link.as_input)
-      }
+      end
       @meta = Elements.meta
       UserSerializer.meta(*@meta.as_input)
       @form = Elements.form
@@ -43,12 +43,12 @@ RSpec.describe SimpleAMS::DSL, 'options' do
       UserSerializer.generic(*@generic.as_input)
     end
 
-    it "holds the specified options" do
-      expect(UserSerializer.options).to eq (
+    it 'holds the specified options' do
+      expect(UserSerializer.options).to eq(
         {
           adapter: @adapter.as_input,
           primary_id: @primary_id.as_input,
-          type: @type.as_input(_explicit: true ),
+          type: @type.as_input(_explicit: true),
           fields: @attrs.uniq,
           relations: [],
           includes: [],
@@ -62,10 +62,9 @@ RSpec.describe SimpleAMS::DSL, 'options' do
     end
   end
 
-  #TODO: Move that to general tests?
-  it "responds to simple_ams? method" do
+  # TODO: Move that to general tests?
+  it 'responds to simple_ams? method' do
     expect(UserSerializer).to respond_to(:simple_ams?)
     expect(UserSerializer.simple_ams?).to eq true
   end
 end
-

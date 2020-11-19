@@ -1,4 +1,4 @@
-require "spec_helper"
+require 'spec_helper'
 
-RSpec.describe "various integration tests" do
+RSpec.describe 'various integration tests' do
 end

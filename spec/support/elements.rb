@@ -1,11 +1,15 @@
 class Elements
   class << self
     def method_missing(meth, *args)
-      if self.new.respond_to? meth
-        self.new.send(meth, *args)
+      if new.respond_to? meth
+        new.send(meth, *args)
       else
         super
       end
+    end
+
+    def respond_to_missing?(meth, _)
+      new.respond_to?(meth) || super
     end
   end
 
@@ -22,16 +26,16 @@ class Elements
   end
 
   def links
-    (rand(10) + 3).times.map { Link.new }
+    rand(3..12).times.map { Link.new }
   end
 
   def fields
-    (rand(10) + 3).times.map { Field.new }
+    rand(3..12).times.map { Field.new }
   end
   alias attributes fields
 
   def includes
-    (rand(10) + 3).times.map { Include.new }
+    rand(3..12).times.map { Include.new }
   end
 
   def meta(*args)
@@ -39,7 +43,7 @@ class Elements
   end
 
   def metas
-    (rand(10) + 3).times.map { Meta.new }
+    rand(3..12).times.map { Meta.new }
   end
 
   def form(*args)
@@ -47,7 +51,7 @@ class Elements
   end
 
   def forms
-    (rand(10) + 3).times.map { Form.new }
+    rand(3..12).times.map { Form.new }
   end
 
   def generic(*args)
@@ -55,24 +59,23 @@ class Elements
   end
 
   def generics
-    (rand(10) + 3).times.map { Generic.new }
+    rand(3..12).times.map { Generic.new }
   end
 
   def as_elements_for(hash, klass:)
-    hash.map { |key, value|
+    hash.map do |key, value|
       klass.new({
         name: key,
         value: value.is_a?(Array) ? value.first : value,
         options: value.is_a?(Array) ? value.last : {}
       })
-    }
+    end
   end
 
   def as_options_for(elements)
-    elements.inject({}) { |memo, element|
+    elements.each_with_object({}) do |element, memo|
       memo[element.name] = [element.value, element.options]
-      memo
-    }
+    end
   end
 
   def adapter(*args)
@@ -98,11 +101,11 @@ class Elements
     def initialize(name: nil, value: nil, options: nil)
       @name = name || Helpers::Options.single.to_sym
       @value = value || Faker::Lorem.word
-      if @value.is_a?(Proc)
-        @options = options || {}
-      else
-        @options = options == nil ? Helpers::Options.hash : options
-      end
+      @options = if @value.is_a?(Proc)
+                   options || {}
+                 else
+                   options.nil? ? Helpers::Options.hash : options
+                 end
     end
 
     def as_input
@@ -117,11 +120,11 @@ class Elements
           [@name, @value]
         end
       else
-        [@name, -> { [@value, @options] } ]
+        [@name, -> { [@value, @options] }]
       end
     end
 
-    #TODO: do we need that?
+    # TODO: do we need that?
     def value_options
       [@value, @options]
     end
@@ -143,7 +146,7 @@ class Elements
       @options = options == {} ? Helpers::Options.hash : options
     end
 
-    alias :name :value
+    alias name value
 
     def as_injected
       { self.class.to_s.downcase.to_sym => as_input }
