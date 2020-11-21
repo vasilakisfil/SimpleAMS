@@ -1,41 +1,40 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SimpleAMS::Options, 'collection' do
-  context "with no collection properties are injected" do
+  context 'with no collection properties are injected' do
     before do
       @options = SimpleAMS::Options.new(User.new, {
         injected_options: Helpers.random_options(with: {
-          serializer: UserSerializer,
-        }).tap { |h|
-          h.delete(:collection)
-        }
+          serializer: UserSerializer
+        }).tap do |h|
+                            h.delete(:collection)
+                          end
       })
     end
 
-    it "defaults to nil" do
+    it 'defaults to nil' do
       expect(@options.collection_options.fields).to eq []
     end
   end
 
-  context "with injected options only" do
+  context 'with injected options only' do
     before do
       @injected_options = Helpers.random_options(with: {
-        serializer: UserSerializer,
+        serializer: UserSerializer
       })
-
 
       @options = SimpleAMS::Options.new(User.new, {
         injected_options: @injected_options
       })
     end
 
-    it "returns the injected name specified" do
+    it 'returns the injected name specified' do
       expect(@options.collection_options.links).to eq []
       expect(@options.collection_options.metas).to eq []
     end
   end
 
-  context "with injected options that override allowed_options" do
+  context 'with injected options that override allowed_options' do
     before do
       Helpers.define_singleton_for('RandomOptions', {
         allowed_links: Elements.links,
@@ -71,7 +70,7 @@ RSpec.describe SimpleAMS::Options, 'collection' do
       })
     end
 
-    it "holds the uniq union of injected and allowed links" do
+    it 'holds the uniq union of injected and allowed links' do
       _allowed_links = Helpers::RandomOptions.allowed_links
 
       links_got = @options.collection_options.links
@@ -79,9 +78,9 @@ RSpec.describe SimpleAMS::Options, 'collection' do
         @injected_links, klass: Elements::Link
       )
 
-      links_expected = (_injected_links.map(&:name) & _allowed_links.map(&:name)).map { |name|
+      links_expected = (_injected_links.map(&:name) & _allowed_links.map(&:name)).map do |name|
         _injected_links.find { |l| l.name == name }
-      }
+      end
 
       expect(links_got.map(&:name)).to eq(links_expected.map(&:name))
       expect(links_got.map(&:value)).to eq(links_expected.map(&:value))
@@ -89,7 +88,7 @@ RSpec.describe SimpleAMS::Options, 'collection' do
     end
   end
 
-  context "when collection is not an array" do
+  context 'when collection is not an array' do
     let(:collection) do
       Class.new do
         def initialize(arr)
@@ -116,7 +115,7 @@ RSpec.describe SimpleAMS::Options, 'collection' do
 
     let(:options) { SimpleAMS::Options.new(collection) }
 
-    it "infers serialier class correctly" do
+    it 'infers serialier class correctly' do
       expect(options.serializer_class).to eq UserSerializer
     end
   end

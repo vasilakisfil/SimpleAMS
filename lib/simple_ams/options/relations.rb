@@ -22,6 +22,7 @@ class SimpleAMS::Options
 
     class Relation
       attr_reader :type, :name, :options, :embedded
+
       def initialize(type, name, options = {}, embedded)
         @type = type.to_sym
         @name = name.is_a?(String) ? name.to_sym : name

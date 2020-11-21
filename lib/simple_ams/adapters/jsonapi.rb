@@ -7,6 +7,7 @@ class SimpleAMS::Adapters::JSONAPI
   }.freeze
 
   attr_reader :document, :options
+
   def initialize(document, options = {})
     @document = document
     @options = DEFAULT_OPTIONS.merge(options)
@@ -152,9 +153,9 @@ class SimpleAMS::Adapters::JSONAPI
     def documents
       @included = []
       folder.map  do |document|
-        _doc = adapter.new(document, options).as_json
-        @included << _doc[:included]
-        _doc[:data]
+        doc = adapter.new(document, options).as_json
+        @included << doc[:included]
+        doc[:data]
       end || []
     end
 

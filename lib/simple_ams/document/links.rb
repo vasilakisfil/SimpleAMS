@@ -1,13 +1,11 @@
 require 'simple_ams'
 
-module SimpleAMS
-  class Document::Links < Document::Generics
-    def initialize(options)
-      @options = options
-      @members = options.links
-    end
+class SimpleAMS::Document::Links < SimpleAMS::Document::Generics
+  def initialize(options)
+    @options = options
+    @members = options.links
+  end
 
-    class Generic < Document::Generics::Generic
-    end
+  class Generic < SimpleAMS::Document::Generics::Generic
   end
 end

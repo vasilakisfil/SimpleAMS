@@ -1,10 +1,10 @@
-require "spec_helper"
+require 'spec_helper'
 
-#these tests have real relations compared to options/dsl that have random inputs
-#TODO: Add tests for injected relations
-RSpec.describe SimpleAMS::Document, "relations" do
-  let(:document_expecations) {
-    ->(document, overrides, model, allowed = nil) {
+# these tests have real relations compared to options/dsl that have random inputs
+# TODO: Add tests for injected relations
+RSpec.describe SimpleAMS::Document, 'relations' do
+  let(:document_expecations) do
+    lambda { |document, overrides, model, allowed = nil|
       model_attrs = model.class.model_attributes
       model_attrs = allowed if allowed
 
@@ -15,7 +15,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
 
         if overrides.include?(field.key)
           if model.send(model_attrs[index]).respond_to?('*')
-            expect(field.value).to eq(model.send(model_attrs[index])*2)
+            expect(field.value).to eq(model.send(model_attrs[index]) * 2)
           else
             expect(field.value).to eq('Something else')
           end
@@ -24,33 +24,33 @@ RSpec.describe SimpleAMS::Document, "relations" do
         end
       end
     }
-  }
+  end
 
-  context "with no reations in general" do
+  context 'with no reations in general' do
     before do
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(User.new, {
           injected_options: Helpers.random_options(with: {
-            serializer: UserSerializer,
-          }).tap { |h|
-            h.delete(:includes)
-            h.delete(:relations)
-          }
+            serializer: UserSerializer
+          }).tap do |h|
+                              h.delete(:includes)
+                              h.delete(:relations)
+                            end
         })
       )
     end
 
-    describe "values" do
-      it "returns an empty array" do
+    describe 'values' do
+      it 'returns an empty array' do
         expect(@document.relations).to respond_to(:each)
-        @document.relations.each do |field|
-          fail('this should never happen as relations should be empty')
+        @document.relations.each do |_field|
+          raise('this should never happen as relations should be empty')
         end
       end
     end
   end
 
-  context "with no injected includes" do
+  context 'with no injected includes' do
     before do
       @user = User.new
       @allowed_relations = User.relations
@@ -60,34 +60,34 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
-            serializer: UserSerializer,
+            serializer: UserSerializer
           }).tap { |h| h.delete(:includes) }
         })
       )
     end
 
-    context "values" do
-      it "returns the allowed relations" do
-          expect(@document.relations.available).to respond_to(:each)
-          expect(@document.relations.available.map(&:name)).to(
-            eq(
-              @allowed_relations.map(&:name)
-            )
+    context 'values' do
+      it 'returns the allowed relations' do
+        expect(@document.relations.available).to respond_to(:each)
+        expect(@document.relations.available.map(&:name)).to(
+          eq(
+            @allowed_relations.map(&:name)
           )
-          @document.relations.available.each_with_index do |relation, index|
-            if relation.folder? && relation.documents.first
-              expect(relation.documents.first.name).to eq(
-                @allowed_relations[index].options[:serializer].to_s.gsub('Serializer','').downcase.to_sym
-              )
-            else
-              expect(relation.name).to eq(@allowed_relations[index].name)
-            end
+        )
+        @document.relations.available.each_with_index do |relation, index|
+          if relation.folder? && relation.documents.first
+            expect(relation.documents.first.name).to eq(
+              @allowed_relations[index].options[:serializer].to_s.gsub('Serializer', '').downcase.to_sym
+            )
+          else
+            expect(relation.name).to eq(@allowed_relations[index].name)
           end
+        end
       end
     end
   end
 
-  context "with empty injected includes" do
+  context 'with empty injected includes' do
     before do
       @user = User.new
       @allowed_relations = User.relations
@@ -104,22 +104,22 @@ RSpec.describe SimpleAMS::Document, "relations" do
       )
     end
 
-    context "values" do
-      it "returns an empty array" do
+    context 'values' do
+      it 'returns an empty array' do
         expect(@document.relations.available).to respond_to(:each)
         expect(@document.relations.available.map(&:name)).to eq([])
-        @document.relations.available.each do |field|
-          fail('this should never happen as relations should be empty')
+        @document.relations.available.each do |_field|
+          raise('this should never happen as relations should be empty')
         end
       end
     end
   end
 
-  context "with no allowed relations but injected ones" do
+  context 'with no allowed relations but injected ones' do
     pending('Needs implementation')
   end
 
-  context "with various includes" do
+  context 'with various includes' do
     before do
       @allowed_relations = User.relations
       @allowed_relations.each do |relation|
@@ -137,25 +137,25 @@ RSpec.describe SimpleAMS::Document, "relations" do
       )
     end
 
-    context "values" do
-      it "returns the specified relations" do
+    context 'values' do
+      it 'returns the specified relations' do
         expect(@document.relations.available).to respond_to(:each)
         expect(@document.relations.available.map(&:name)).to eq([])
-        @document.relations.available.each do |field|
-          fail('this should never happen as relations should be empty')
+        @document.relations.available.each do |_field|
+          raise('this should never happen as relations should be empty')
         end
       end
     end
   end
 
-  context "with repeated includes" do
+  context 'with repeated includes' do
     before do
       @allowed_relations = User.relations
-      2.times {
+      2.times do
         @allowed_relations.each do |relation|
           UserSerializer.send(relation.type, relation.name, relation.options)
         end
-      }
+      end
       @injected_relations = Helpers.pick(@allowed_relations)
       @user = User.new
       @document = SimpleAMS::Document.new(
@@ -168,18 +168,18 @@ RSpec.describe SimpleAMS::Document, "relations" do
       )
     end
 
-    context "values" do
-      it "returns the specified relations" do
+    context 'values' do
+      it 'returns the specified relations' do
         expect(@document.relations.available).to respond_to(:each)
         expect(@document.relations.available.map(&:name)).to eq([])
-        @document.relations.available.each do |field|
-          fail('this should never happen as relations should be empty')
+        @document.relations.available.each do |_field|
+          raise('this should never happen as relations should be empty')
         end
       end
     end
   end
 
-  context "with overriden relation values" do
+  context 'with overriden relation values' do
     before do
       @user = User.new
       @allowed_relations = User.relations
@@ -189,11 +189,10 @@ RSpec.describe SimpleAMS::Document, "relations" do
           relation.name,
           relation.options
         )
-      end
-      @allowed_relations.each do |relation|
+
         UserSerializer.send(:define_method, relation.name) do
           name = relation.options[:serializer].to_s.gsub('Serializer', '')
-          #TODO: Can you add test error handler here in case you override and return a non-array?
+          # TODO: Can you add test error handler here in case you override and return a non-array?
           if relation.type == :has_many
             [Object.const_get("#{name.capitalize}::Sub#{name.capitalize}").new]
           else
@@ -204,7 +203,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
-            serializer: UserSerializer,
+            serializer: UserSerializer
           }).tap { |h| h.delete(:includes) }
         })
       )
@@ -216,8 +215,8 @@ RSpec.describe SimpleAMS::Document, "relations" do
       end
     end
 
-    context "values" do
-      it "returns the allowed relations" do
+    context 'values' do
+      it 'returns the allowed relations' do
         expect(@document.relations.available).to respond_to(:each)
         expect(@document.relations.available.map(&:name)).to(
           eq(
@@ -227,10 +226,10 @@ RSpec.describe SimpleAMS::Document, "relations" do
         @document.relations.available.each_with_index do |relation, index|
           if relation.folder?
             expect(relation.documents.first.name).to eq(
-              @allowed_relations[index].options[:serializer].to_s.gsub('Serializer','').downcase.to_sym
+              @allowed_relations[index].options[:serializer].to_s.gsub('Serializer', '').downcase.to_sym
             )
             expect(relation.documents.first.send(:resource).class).to(
-               eq(relation.send(:options).resource.first.class)
+              eq(relation.send(:options).resource.first.class)
             )
           else
             expect(relation.send(:resource).class).to(
@@ -243,7 +242,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
         @allowed_relations.each do |relation|
           if relation.type == :has_many
             expect(@document.relations.available[relation.name].documents.first.name).to(
-              eq(relation.options[:serializer].to_s.gsub('Serializer','').downcase.to_sym)
+              eq(relation.options[:serializer].to_s.gsub('Serializer', '').downcase.to_sym)
             )
             expect(@document.relations.available[relation.name].documents.first.send(:resource).class).to(
               eq(@document.relations.available[relation.name].send(:options).resource.first.class)
@@ -259,7 +258,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
     end
   end
 
-  context "with namespaced serializer" do
+  context 'with namespaced serializer' do
     before do
       @user = User.new
       @allowed_relations = User.relations
@@ -269,14 +268,14 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
-            serializer: Api::V1::UserSerializer,
+            serializer: Api::V1::UserSerializer
           }).tap { |h| h.delete(:includes) }
         })
       )
     end
 
-    context "values" do
-      it "returns the allowed relations" do
+    context 'values' do
+      it 'returns the allowed relations' do
         expect(@document.relations.available).to respond_to(:each)
         expect(@document.relations.available.map(&:name)).to(
           eq(
@@ -286,7 +285,7 @@ RSpec.describe SimpleAMS::Document, "relations" do
         @document.relations.available.each_with_index do |relation, index|
           if relation.folder? && relation.documents.first
             expect(relation.documents.first.name).to eq(
-              @allowed_relations[index].options[:serializer].to_s.gsub('Serializer','').downcase.to_sym
+              @allowed_relations[index].options[:serializer].to_s.gsub('Serializer', '').downcase.to_sym
             )
           else
             expect(relation.name).to eq(@allowed_relations[index].name)
@@ -303,22 +302,22 @@ RSpec.describe SimpleAMS::Document, "relations" do
       @allowed_relations.each do |relation|
         Api::V1::UserSerializer.send(relation.type, relation.name)
       end
-      Api::V1::UserSerializer.has_one :id #obviously it doesn't make any sense
+      Api::V1::UserSerializer.has_one :id # obviously it doesn't make any sense
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(@user, {
           injected_options: Helpers.random_options(with: {
-            serializer: Api::V1::UserSerializer,
+            serializer: Api::V1::UserSerializer
           }).tap { |h| h.delete(:includes) }
         })
       )
     end
 
-    context "values" do
-      it "returns the allowed relations" do
-          expect(@document.relations.available).to respond_to(:each)
-          expect { @document.relations.available.map(&:name) }.to raise_error(
-            RuntimeError, /Could not infer serializer/
-          )
+    context 'values' do
+      it 'returns the allowed relations' do
+        expect(@document.relations.available).to respond_to(:each)
+        expect { @document.relations.available.map(&:name) }.to raise_error(
+          RuntimeError, /Could not infer serializer/
+        )
       end
     end
   end

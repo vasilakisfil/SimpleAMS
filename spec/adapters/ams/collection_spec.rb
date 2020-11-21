@@ -1,15 +1,15 @@
-require "spec_helper"
+require 'spec_helper'
 
-RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
-  context "with various options" do
+RSpec.describe SimpleAMS::Adapters::AMS, 'collection' do
+  context 'with various options' do
     before do
       UserSerializer.adapter(SimpleAMS::Adapters::AMS)
       @user_attrs = (Helpers.pick(User.model_attributes, min: 1) + [:id]).uniq
       UserSerializer.attributes(*@user_attrs)
-      (rand(10) + 2).times.map { Elements.link }.each do |link|
+      rand(2..11).times.map { Elements.link }.each do |link|
         UserSerializer.link(*link.as_input)
       end
-      (rand(10) + 2).times.map { Elements.meta }.each do |meta|
+      rand(2..11).times.map { Elements.meta }.each do |meta|
         UserSerializer.meta(*meta.as_input)
       end
       User.relations.each do |relation|
@@ -21,7 +21,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
       @address_attrs = Helpers.pick(Address.model_attributes, min: 1)
       AddressSerializer.attributes(*@address_attrs)
 
-      @includes = [:address, :microposts, :followers]
+      @includes = %i[address microposts followers]
       @collection = rand(10).times.map { User.new }
       @renderer = SimpleAMS::Renderer::Collection.new(@collection, {
         serializer: UserSerializer, includes: @includes
@@ -39,20 +39,20 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
       }
     end
 
-    context "fields" do
-      it "returns the correct fields" do
+    context 'fields' do
+      it 'returns the correct fields' do
         expect(@array_hash.count == @collection.count)
         @array_hash.each do |hash|
           expect(hash.keys.count > 0).to eq true
           expect(
-            hash.keys - [:links, :metas] - User.relations.map(&:name)
+            hash.keys - %i[links metas] - User.relations.map(&:name)
           ).to eq @user_attrs
           expect(hash[:id]).not_to be_nil
 
           user = @collection.find { |u| u.id == hash[:id] }
 
           (
-            hash.keys - [:links, :metas] - User.relations.map(&:name)
+            hash.keys - %i[links metas] - User.relations.map(&:name)
           ).each do |key|
             if user.send(key).is_a? Date
               expect(hash[key]).to eq(user.send(key).to_s)
@@ -64,71 +64,71 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
       end
     end
 
-    context "links and metas" do
-      it "returns the correct links" do
+    context 'links and metas' do
+      it 'returns the correct links' do
         @array_hash.each do |hash|
           document = @folder.find { |d| d.fields[:id].value == hash[:id] }
 
           expect(hash[:links].keys.count > 0).to eq true
 
           expect(hash[:links].keys).to eq document.links.map(&:name)
-          hash[:links].keys.each do |key|
+          hash[:links].each_key do |key|
             expect(hash[:links][key]).to eq(document.links[key].value)
           end
         end
       end
 
-      it "returns the correct metas" do
+      it 'returns the correct metas' do
         @array_hash.each do |hash|
           document = @folder.find { |d| d.fields[:id].value == hash[:id] }
 
           expect(hash[:metas].keys.count > 0).to eq true
 
           expect(hash[:metas].keys).to eq document.metas.map(&:name)
-          hash[:metas].keys.each do |key|
+          hash[:metas].each_key do |key|
             expect(hash[:metas][key]).to eq(document.metas[key].value)
           end
         end
       end
     end
 
-    context "relations" do
-      it "returns the correct relations" do
+    context 'relations' do
+      it 'returns the correct relations' do
         @array_hash.each do |hash|
           expect(
-             (hash.keys - @user_attrs - [:links, :metas]).sort
+            (hash.keys - @user_attrs - %i[links metas]).sort
           ).to eq @includes.sort
 
           expect(
-            @includes.map { |name| hash[name] }.all? { |relation|
+            @includes.map { |name| hash[name] }.all? do |relation|
               relation.is_a?(Array) || relation.is_a?(Hash)
-            }
+            end
           ).to eq true
 
           @includes.map { |name| [name, hash[name]] }.each do |name, relation|
             next if relation.nil? || relation.empty?
-            if relation.is_a?(Array)
-              keys = (relation.first&.keys || []) - [:links, :metas]
-              expect(keys).to eq(@attrs[name] || [])
-            else
-              keys = relation.keys - [:links, :metas]
-              expect(keys).to eq(@attrs[name] || [])
-            end
+
+            keys = if relation.is_a?(Array)
+                     (relation.first&.keys || []) - %i[links metas]
+                   else
+                     relation.keys - %i[links metas]
+                   end
+            expect(keys).to eq(@attrs[name] || [])
           end
         end
       end
     end
   end
 
-  context "with various options and deep nested includes" do
+  context 'with various options and deep nested includes' do
     before do
       UserSerializer.adapter(SimpleAMS::Adapters::AMS)
       @user_attrs = (Helpers.pick(User.model_attributes, min: 1) + [:id]).uniq
       UserSerializer.attributes(*@user_attrs)
-      (rand(10) + 2).times.map { Elements.link }.each do |link|
+      rand(2..11).times.map { Elements.link }.each do |link|
         UserSerializer.link(*link.as_input)
       end
-      (rand(10) + 2).times.map { Elements.meta }.each do |meta|
+      rand(2..11).times.map { Elements.meta }.each do |meta|
         UserSerializer.meta(*meta.as_input)
       end
       User.relations.each do |relation|
@@ -140,7 +140,7 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
       @address_attrs = Helpers.pick(Address.model_attributes, min: 1)
       AddressSerializer.attributes(*@address_attrs)
 
-      @includes = [:address, :microposts, followers: [:microposts, followings: [:microposts]]]
+      @includes = [:address, :microposts, { followers: [:microposts, { followings: [:microposts] }] }]
       @collection = rand(10).times.map { User.new }
       @renderer = SimpleAMS::Renderer::Collection.new(@collection, {
         serializer: UserSerializer, includes: @includes
@@ -149,8 +149,8 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
       @array_hash = JSON.parse(@renderer.to_json, symbolize_names: true)
       @folder = @renderer.folder
 
-      @first_level_includes = [:address, :microposts, :followers]
-      @second_level_includes = [:microposts, :followings]
+      @first_level_includes = %i[address microposts followers]
+      @second_level_includes = %i[microposts followings]
       @third_level_includes = [:microposts]
 
       @attrs = {
@@ -162,20 +162,20 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
       }
     end
 
-    context "fields" do
-      it "returns the correct fields" do
+    context 'fields' do
+      it 'returns the correct fields' do
         expect(@array_hash.count == @collection.count)
         @array_hash.each do |hash|
           expect(hash.keys.count > 0).to eq true
           expect(
-            hash.keys - [:links, :metas] - User.relations.map(&:name)
+            hash.keys - %i[links metas] - User.relations.map(&:name)
           ).to eq @user_attrs
           expect(hash[:id]).not_to be_nil
 
           user = @collection.find { |u| u.id == hash[:id] }
 
           (
-            hash.keys - [:links, :metas] - User.relations.map(&:name)
+            hash.keys - %i[links metas] - User.relations.map(&:name)
           ).each do |key|
             if user.send(key).is_a? Date
               expect(hash[key]).to eq(user.send(key).to_s)
@@ -187,69 +187,71 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
       end
     end
 
-    context "links and metas" do
-      it "returns the correct links" do
+    context 'links and metas' do
+      it 'returns the correct links' do
         @array_hash.each do |hash|
           document = @folder.find { |d| d.fields[:id].value == hash[:id] }
 
           expect(hash[:links].keys.count > 0).to eq true
 
           expect(hash[:links].keys).to eq document.links.map(&:name)
-          hash[:links].keys.each do |key|
+          hash[:links].each_key do |key|
             expect(hash[:links][key]).to eq(document.links[key].value)
           end
         end
       end
 
-      it "returns the correct metas" do
+      it 'returns the correct metas' do
         @array_hash.each do |hash|
           document = @folder.find { |d| d.fields[:id].value == hash[:id] }
 
           expect(hash[:metas].keys.count > 0).to eq true
 
           expect(hash[:metas].keys).to eq document.metas.map(&:name)
-          hash[:metas].keys.each do |key|
+          hash[:metas].each_key do |key|
             expect(hash[:metas][key]).to eq(document.metas[key].value)
           end
         end
       end
     end
 
-    context "relations" do
-      it "returns the correct relations" do
+    context 'relations' do
+      it 'returns the correct relations' do
         @array_hash.each do |hash|
           expect(
-             (hash.keys - @user_attrs - [:links, :metas]).sort
+            (hash.keys - @user_attrs - %i[links metas]).sort
           ).to eq @first_level_includes.sort
 
           expect(
-            @first_level_includes.map { |name| hash[name] }.all? { |relation|
+            @first_level_includes.map { |name| hash[name] }.all? do |relation|
               relation.is_a?(Array) || relation.is_a?(Hash)
-            }
+            end
           ).to eq true
 
           @first_level_includes.map { |name| [name, hash[name]] }.each do |name, relation|
             next if relation.nil? || relation.empty?
-            if relation.is_a?(Array)
-              keys = (relation.first&.keys || []) - [:links, :metas]
-              expect(keys - @second_level_includes).to eq(@attrs[name] || [])
-            else
-              keys = relation.keys - [:links, :metas]
-              expect(keys - @second_level_includes).to eq(@attrs[name] || [])
-            end
+
+            keys = if relation.is_a?(Array)
+                     (relation.first&.keys || []) - %i[links metas]
+                   else
+                     relation.keys - %i[links metas]
+                   end
+
+            expect(keys - @second_level_includes).to eq(@attrs[name] || [])
 
             [
               [:microposts, (hash[:followers].first || {})[:microposts]],
               [:followings, (hash[:followers].first || {})[:followings]]
             ].each do |name2, relation2|
               next if relation2.nil? || relation2.empty?
-              if relation2.is_a?(Array)
-                keys2 = (relation2.first&.keys || []) - [:links, :metas]
-                expect(keys2 - @third_level_includes).to eq(@attrs[name2] || [])
-              else
-                keys2 = relation2.keys - [:links, :metas]
-                expect(keys2 - @third_level_includes).to eq(@attrs[name2] || [])
-              end
+
+              keys2 = if relation2.is_a?(Array)
+                        (relation2.first&.keys || []) - %i[links metas]
+                      else
+                        relation2.keys - %i[links metas]
+                      end
+
+              expect(keys2 - @third_level_includes).to eq(@attrs[name2] || [])
             end
           end
         end
@@ -257,4 +259,3 @@ RSpec.describe SimpleAMS::Adapters::AMS, "collection" do
     end
   end
 end
-

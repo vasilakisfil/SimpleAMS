@@ -168,7 +168,7 @@ module SimpleAMS::DSL
       klass_name = "Embedded#{name.to_s.capitalize}Options_"
       const_set(klass_name, embedded)
       embedded.with_options(
-        default_options.merge(options.select { |k| k != :serializer })
+        default_options.merge(options.reject { |k| k == :serializer })
       )
       embedded.instance_exec(&block) if block
 

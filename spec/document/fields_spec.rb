@@ -1,8 +1,8 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SimpleAMS::Document, 'fields' do
-  let(:document_expecations) {
-    ->(document, overrides, model, allowed = nil) {
+  let(:document_expecations) do
+    lambda { |document, overrides, model, allowed = nil|
       model_attrs = model.class.model_attributes
       model_attrs = allowed if allowed
 
@@ -13,7 +13,7 @@ RSpec.describe SimpleAMS::Document, 'fields' do
 
         if overrides.include?(field.key)
           if model.send(model_attrs[index]).respond_to?('*')
-            expect(field.value).to eq(model.send(model_attrs[index])*2)
+            expect(field.value).to eq(model.send(model_attrs[index]) * 2)
           else
             expect(field.value).to eq('Something else')
           end
@@ -22,9 +22,9 @@ RSpec.describe SimpleAMS::Document, 'fields' do
         end
       end
     }
-  }
+  end
 
-  context "with no fields in general" do
+  context 'with no fields in general' do
     before do
       @document = SimpleAMS::Document.new(
         SimpleAMS::Options.new(User.new, {
@@ -35,8 +35,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       )
     end
 
-    describe "members" do
-      it "returns an empty array" do
+    describe 'members' do
+      it 'returns an empty array' do
         expect(@document.fields.map(&:key)).to eq []
         expect(@document.options.fields).to eq []
         expect(@document.fields.any?).to eq false
@@ -44,17 +44,17 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       end
     end
 
-    describe "values" do
-      it "returns an empty array" do
+    describe 'values' do
+      it 'returns an empty array' do
         expect(@document.fields).to respond_to(:each)
-        @document.fields.each do |field|
-          fail('this should never happen as fields should be empty')
+        @document.fields.each do |_field|
+          raise('this should never happen as fields should be empty')
         end
       end
     end
   end
 
-  describe "with no injected fields" do
+  describe 'with no injected fields' do
     before do
       @user = User.new
 
@@ -72,21 +72,21 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       UserSerializer.undefine_all
     end
 
-    context "members" do
-      it "holds the allowed fields only" do
+    context 'members' do
+      it 'holds the allowed fields only' do
         expect(@document.fields.map(&:key)).to eq User.model_attributes
       end
     end
 
-    context "values" do
-      it "returns the allowed fields" do
+    context 'values' do
+      it 'returns the allowed fields' do
         expect(@document.fields).to respond_to(:each)
         instance_exec(@document, @overrides, @user, &document_expecations)
       end
     end
   end
 
-  context "with empty injected fields" do
+  context 'with empty injected fields' do
     before do
       @user = User.new
       @overrides = Helpers.initialize_with_overrides(UserSerializer)
@@ -104,23 +104,22 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       UserSerializer.undefine_all
     end
 
-
-    describe "members" do
-      it "holds the allowed fields only" do
+    describe 'members' do
+      it 'holds the allowed fields only' do
         expect(@document.fields).to eq []
         expect(@document.options.fields).to eq []
       end
     end
 
-    context "values" do
-      it "returns an empty array" do
+    context 'values' do
+      it 'returns an empty array' do
         expect(@document.fields).to respond_to(:each)
         instance_exec(@document, @overrides, @user, &document_expecations)
       end
     end
   end
 
-  context "with various injected fields" do
+  context 'with various injected fields' do
     before do
       @user = User.new
       @allowed = Helpers.pick(User.model_attributes)
@@ -140,21 +139,22 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       UserSerializer.undefine_all
     end
 
-    describe "members" do
-      it "holds the allowed fields only" do
+    describe 'members' do
+      it 'holds the allowed fields only' do
         expect(@document.fields.map(&:key)).to eq @allowed
       end
     end
 
-    context "values" do
-      it "returns an empty array" do
+    context 'values' do
+      it 'returns an empty array' do
         expect(@document.fields).to respond_to(:each)
         instance_exec(@document, @overrides, @user, @allowed, &document_expecations)
       end
     end
   end
 
-  context "with repeated fields" do
+  context 'with repeated fields' do
+    # rubocop:disable Lint/BinaryOperatorWithIdenticalOperands
     before do
       @user = User.new
       @allowed = Helpers.pick(User.model_attributes)
@@ -169,13 +169,14 @@ RSpec.describe SimpleAMS::Document, 'fields' do
         })
       )
     end
+    # rubocop:enable Lint/BinaryOperatorWithIdenticalOperands
 
     after do
       UserSerializer.undefine_all
     end
 
-    describe "members" do
-      it "holds the allowed fields only" do
+    describe 'members' do
+      it 'holds the allowed fields only' do
         expect(@document.fields.map(&:key)).to eq @allowed
 
         expect(@document.fields.any?).to eq @allowed.any?
@@ -183,19 +184,19 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       end
     end
 
-    context "values" do
-      it "returns an empty array" do
+    context 'values' do
+      it 'returns an empty array' do
         expect(@document.fields).to respond_to(:each)
         instance_exec(@document, @overrides, @user, @allowed, &document_expecations)
       end
     end
   end
 
-  context "with overriden fields by methods" do
-    skip("this is already tested by #with_overrides method")
+  context 'with overriden fields by methods' do
+    skip('this is already tested by #with_overrides method')
   end
 
-  context "accessing a field through Document::Field class" do
+  context 'accessing a field through Document::Field class' do
     before do
       @user = User.new
       @allowed = User.model_attributes
@@ -215,8 +216,8 @@ RSpec.describe SimpleAMS::Document, 'fields' do
       UserSerializer.undefine_all
     end
 
-    describe "members" do
-      it "holds the allowed fields only" do
+    describe 'members' do
+      it 'holds the allowed fields only' do
         fields = (@allowed - User.relations.map(&:name))
 
         expect(@field_klass.any?).to eq fields.any?

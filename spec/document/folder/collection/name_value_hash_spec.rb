@@ -1,12 +1,12 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
-  [:generic, :link, :meta, :form].map(&:to_s).each do |element|
-    element.send(:extend, Module.new {
+  %i[generic link meta form].map(&:to_s).each do |element|
+    element.send(:extend, Module.new do
       def plural
-        "#{self.to_s}s"
+        "#{self}s"
       end
-    })
+    end)
 
     describe "(#{element.plural})" do
       context "with no #{element.plural} in general" do
@@ -14,26 +14,26 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
           @folder = SimpleAMS::Document::Folder.new(
             SimpleAMS::Options.new(User.array, {
               injected_options: Helpers.random_options(with: {
-                serializer: UserSerializer,
+                serializer: UserSerializer
               }).tap { |h| h.delete(element.to_sym) }
             })
           )
         end
 
-        describe "members" do
-          it "returns an empty array" do
+        describe 'members' do
+          it 'returns an empty array' do
             @folder.each do |document|
               expect(document.send(element.plural)).to eq({})
             end
           end
         end
 
-        describe "values" do
-          it "returns an empty array" do
+        describe 'values' do
+          it 'returns an empty array' do
             @folder.each do |document|
               expect(document.send(element.plural)).to respond_to(:each)
-              document.send(element.plural).each do |field|
-                fail('this should never happen as fields should be empty')
+              document.send(element.plural).each do |_field|
+                raise('this should never happen as fields should be empty')
               end
             end
           end
@@ -55,18 +55,18 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
             })
           )
 
-          @uniq_allowed_elements = @allowed_elements.uniq { |el| el.name }
+          @uniq_allowed_elements = @allowed_elements.uniq(&:name)
         end
 
-        describe "members" do
-          it "returns an empty array" do
+        describe 'members' do
+          it 'returns an empty array' do
             @folder.each do |document|
               expect(document.send(element.plural)).not_to eq({})
             end
           end
         end
 
-        it "returns the allowed ones" do
+        it 'returns the allowed ones' do
           @folder.each do |document|
             expect(document.send(element.plural).map(&:name)).to eq @uniq_allowed_elements.map(&:name)
             expect(document.send(element.plural).map(&:value)).to eq @uniq_allowed_elements.map(&:value)
@@ -92,20 +92,20 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
           )
         end
 
-        describe "members" do
-          it "returns an empty array" do
+        describe 'members' do
+          it 'returns an empty array' do
             @folder.each do |document|
               expect(document.send(element.plural)).to(eq({}))
             end
           end
         end
 
-        describe "values" do
-          it "returns an empty array" do
+        describe 'values' do
+          it 'returns an empty array' do
             @folder.each do |document|
               expect(document.send(element.plural)).to respond_to(:each)
-              document.send(element.plural).each do |field|
-                fail('this should never happen as fields should be empty')
+              document.send(element.plural).each do |_field|
+                raise('this should never happen as fields should be empty')
               end
             end
           end
@@ -117,26 +117,26 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
           @folder = SimpleAMS::Document::Folder.new(
             SimpleAMS::Options.new(User.array, {
               injected_options: Helpers.random_options(with: {
-                serializer: UserSerializer,
+                serializer: UserSerializer
               })
             })
           )
         end
 
-        describe "members" do
-          it "returns an empty array" do
+        describe 'members' do
+          it 'returns an empty array' do
             @folder.each do |document|
               expect(document.send(element.plural)).to eq({})
             end
           end
         end
 
-        describe "values" do
-          it "returns an empty array" do
+        describe 'values' do
+          it 'returns an empty array' do
             @folder.each do |document|
               expect(document.send(element.plural)).to respond_to(:each)
-              document.send(element.plural).each do |field|
-                fail('this should never happen as fields should be empty')
+              document.send(element.plural).each do |_field|
+                raise('this should never happen as fields should be empty')
               end
             end
           end
@@ -167,9 +167,9 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
             elements_got = document.send(element.plural)
             elements_expected = (Elements.as_elements_for(
               @injected_elements, klass: Object.const_get("Elements::#{element.capitalize}")
-            ) + @allowed_elements).uniq { |q| q.name }.select { |l|
+            ) + @allowed_elements).uniq(&:name).select do |l|
               @allowed_elements.map(&:name).include?(l.name) && @injected_elements.keys.include?(l.name)
-            }
+            end
 
             expect(elements_got.map(&:name)).to eq(elements_expected.map(&:name))
             expect(elements_got.map(&:value)).to eq(elements_expected.map(&:value))
@@ -182,11 +182,11 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
       context "with repeated (allowed) #{element.plural}" do
         before do
           @allowed_elements = Elements.send(element.plural)
-          2.times {
+          2.times do
             @allowed_elements.each do |el|
               UserSerializer.send(element, *el.as_input)
             end
-          }
+          end
           @injected_elements = Elements.as_options_for(
             Helpers.pick(@allowed_elements)
           )
@@ -207,9 +207,9 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
               @injected_elements, klass: Object.const_get("Elements::#{element.capitalize}")
             )
 
-            elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map { |name|
+            elements_expected = (_injected_elements.map(&:name) & @allowed_elements.map(&:name)).map do |name|
               _injected_elements.find { |el| el.name == name }
-            }
+            end
 
             expect(elements_got.map(&:name)).to eq(elements_expected.map(&:name))
             expect(elements_got.map(&:value)).to eq(elements_expected.map(&:value))
@@ -218,19 +218,19 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
         end
       end
 
-      context "with lambda" do
+      context 'with lambda' do
         context "allowed #{element.plural}" do
           before do
             @users = User.array
             @allowed_elements = [
               Object.const_get("#{Elements}::#{element.capitalize}").new(
-                name: :user, value: ->(obj, s) {
+                name: :user, value: lambda { |obj, _s|
                   ["api/v1/users/#{obj.id}", { rel: :user }]
                 }
               ),
               Object.const_get("#{Elements}::#{element.capitalize}").new(
-                name: :root, value: "api/v1/root", options: { rel: :root }
-              ),
+                name: :root, value: 'api/v1/root', options: { rel: :root }
+              )
             ]
             @allowed_elements.each do |el|
               UserSerializer.send(element, *el.as_input)
@@ -274,10 +274,9 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
               UserSerializer.send(element, *el.as_input)
             end
 
-            @injected_elements = [@allowed_elements.first].inject({}) { |memo, el|
-              memo[el.name] = ->(obj, s) { ["/api/v1/#{obj.id}/#{el.name}", rel: el.name] }
-              memo
-            }
+            @injected_elements = [@allowed_elements.first].each_with_object({}) do |el, memo|
+              memo[el.name] = ->(obj, _s) { ["/api/v1/#{obj.id}/#{el.name}", { rel: el.name }] }
+            end
 
             options = SimpleAMS::Options.new(@users, {
               injected_options: Helpers.random_options(with: {

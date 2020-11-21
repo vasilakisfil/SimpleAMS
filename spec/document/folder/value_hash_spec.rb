@@ -1,39 +1,40 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
-  [:type, :primary_id, :adapter].map(&:to_s).each do |element|
-    element.send(:extend, Module.new {
+  %i[type primary_id adapter].map(&:to_s).each do |element|
+    element.send(:extend, Module.new do
       def type?
-        self.to_sym == :type
+        to_sym == :type
       end
 
       def primary_id?
-        self.to_sym == :primary_id
+        to_sym == :primary_id
       end
 
       def adapter?
-        self.to_sym == :adapter
+        to_sym == :adapter
       end
 
       def default_name(resource: false)
-        if self.to_sym == :type && resource
-          return :user if self.to_sym == :type
-        else
-          return :user_collection if self.to_sym == :type
+        if to_sym == :type && resource
+          return :user if to_sym == :type
+        elsif to_sym == :type
+          return :user_collection
         end
 
-        return :id if self.to_sym == :primary_id
-        return SimpleAMS::Adapters::AMS if self.to_sym == :adapter
+        return :id if to_sym == :primary_id
+        return SimpleAMS::Adapters::AMS if to_sym == :adapter
       end
 
       def default_options
-        return { _explicit: true } if self.to_sym == :type
-        return {}
-      end
-    })
+        return { _explicit: true } if to_sym == :type
 
-    resource_options = -> {
-      it "defaults to class name" do
+        {}
+      end
+    end)
+
+    resource_options = lambda {
+      it 'defaults to class name' do
         @folder.each do |document|
           expect(document.send(element).name).to(
             eq element.default_name(resource: true)
@@ -49,7 +50,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
             SimpleAMS::Options.new(User.array, {
               injected_options: {
                 collection: Helpers.random_options(without: [element.to_sym]),
-                serializer: UserSerializer,
+                serializer: UserSerializer
               }
             })
           )
@@ -57,18 +58,18 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
 
         instance_exec(&resource_options)
 
-        it "defaults to class name" do
+        it 'defaults to class name' do
           expect(@folder.send(element).name).to eq element.default_name
         end
 
         if element.type?
-          it "updates name correctly" do
+          it 'updates name correctly' do
             expect(@folder.name).to eq @folder.send(element).name
           end
         end
 
         if element.primary_id?
-          it "value defaults to resource id" do
+          it 'value defaults to resource id' do
             expect(@folder.send(element).value).to eq @folder.resource.id
           end
         end
@@ -79,7 +80,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
           @element = Elements.send(element, value: :an_element, options: { foo: :bar })
           [@element].each do |el|
             UserSerializer.collection do
-              self.send(element, *el.as_input)
+              send(element, *el.as_input)
             end
           end
 
@@ -87,7 +88,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
             SimpleAMS::Options.new(User.array, {
               injected_options: {
                 collection: Helpers.random_options(without: [element.to_sym]),
-                serializer: UserSerializer,
+                serializer: UserSerializer
               }
             })
           )
@@ -97,9 +98,9 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
 
         if element.adapter?
           it "for #{element}: returns the resource's #{element} specified" do
-          #adapter is taken from resource options and can't be overrided
-          #it doesn't really make any sense,
-          #if you need custom behavior on collection, override the adapter instead
+            # adapter is taken from resource options and can't be overrided
+            # it doesn't really make any sense,
+            # if you need custom behavior on collection, override the adapter instead
             expect(@folder.send(element).name).to eq SimpleAMS::Adapters::AMS
             expect(@folder.send(element).options).to(
               eq({}.merge(element.default_options))
@@ -115,7 +116,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
         end
 
         if element.type?
-          it "updates name correctly" do
+          it 'updates name correctly' do
             expect(@folder.name).to eq @folder.send(element).name
           end
         end
@@ -132,7 +133,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
 
           _element = Elements.send(element, value: :an_element, options: { foo: :bar })
           UserSerializer.collection do
-            self.send(element, *_element.as_input)
+            send(element, *_element.as_input)
           end
 
           @element = Elements.send(element, value: :another_element, options: { bar: :foo })
@@ -168,7 +169,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
         end
 
         if element.type?
-          it "updates name correctly" do
+          it 'updates name correctly' do
             expect(@folder.name).to eq @folder.send(element).name
           end
         end
@@ -180,7 +181,7 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
         end
       end
 
-      context "with lambda" do
+      context 'with lambda' do
         context "allowed #{element}" do
           before do
             @users = User.array
@@ -188,14 +189,14 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
               "#{Elements}::#{element.split('_').map(&:capitalize).join}"
             ).new(
               value: if element.primary_id?
-                       ->(obj, s) { [@_user_attr ||= :id, { foo: :bar }] }
+                       ->(_obj, _s) { [@_user_attr ||= :id, { foo: :bar }] }
                      else
-                       ->(obj, s) { [obj.id, { foo: :bar }] }
+                       ->(obj, _s) { [obj.id, { foo: :bar }] }
                      end
             )
             [@allowed_element].each do |el|
               UserSerializer.collection do
-                self.send(element, *el.as_lambda_input)
+                send(element, *el.as_lambda_input)
               end
             end
 
@@ -238,22 +239,22 @@ RSpec.describe SimpleAMS::Document::Folder, 'value_hash' do
             @allowed_element = Elements.send(element)
             [@allowed_element].each do |el|
               UserSerializer.collection do
-                self.send(element, *el.as_input)
+                send(element, *el.as_input)
               end
             end
 
-            if element.primary_id?
-              @injected_element = ->(obj, s) { [@_user_attr ||= obj.class.model_attributes.sample, { foo: :bar }] }
-            else
-              @injected_element = ->(obj, s) { ["/api/v1/#{obj.id}", rel: :foobar] }
-            end
+            @injected_element = if element.primary_id?
+                                  ->(obj, _s) { [@_user_attr ||= obj.class.model_attributes.sample, { foo: :bar }] }
+                                else
+                                  ->(obj, _s) { ["/api/v1/#{obj.id}", { rel: :foobar }] }
+                                end
 
             options = SimpleAMS::Options.new(@user, {
               injected_options: {
                 collection: Helpers.random_options(with: {
                   element.to_sym => @injected_element
                 }),
-                serializer: UserSerializer,
+                serializer: UserSerializer
               }
             })
 

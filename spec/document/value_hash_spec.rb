@@ -1,27 +1,28 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SimpleAMS::Document, 'value_hash' do
-  [:type, :primary_id, :adapter].map(&:to_s).each do |element|
-    element.send(:extend, Module.new {
+  %i[type primary_id adapter].map(&:to_s).each do |element|
+    element.send(:extend, Module.new do
       def type?
-        self.to_sym == :type
+        to_sym == :type
       end
 
       def primary_id?
-        self.to_sym == :primary_id
+        to_sym == :primary_id
       end
 
       def default_name
-        return :user if self.to_sym == :type
-        return :id if self.to_sym == :primary_id
-        return SimpleAMS::Adapters::AMS if self.to_sym == :adapter
+        return :user if to_sym == :type
+        return :id if to_sym == :primary_id
+        return SimpleAMS::Adapters::AMS if to_sym == :adapter
       end
 
       def default_options
-        return { _explicit: true } if self.to_sym == :type
-        return {}
+        return { _explicit: true } if to_sym == :type
+
+        {}
       end
-    })
+    end)
 
     describe "(#{element})" do
       context "with no #{element} is specified" do
@@ -29,24 +30,24 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
           @document = SimpleAMS::Document.new(
             SimpleAMS::Options.new(User.new, {
               injected_options: Helpers.random_options(with: {
-                serializer: UserSerializer,
+                serializer: UserSerializer
               }, without: [element.to_sym])
             })
           )
         end
 
-        it "defaults to class name" do
+        it 'defaults to class name' do
           expect(@document.send(element).name).to eq element.default_name
         end
 
         if element.type?
-          it "updates name correctly" do
+          it 'updates name correctly' do
             expect(@document.name).to eq @document.send(element).name
           end
         end
 
         if element.primary_id?
-          it "value defaults to resource id" do
+          it 'value defaults to resource id' do
             expect(@document.send(element).value).to eq @document.resource.id
           end
         end
@@ -60,7 +61,7 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
           @document = SimpleAMS::Document.new(
             SimpleAMS::Options.new(User.new, {
               injected_options: Helpers.random_options(with: {
-                serializer: UserSerializer,
+                serializer: UserSerializer
               }, without: [element.to_sym])
             })
           )
@@ -74,7 +75,7 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
         end
 
         if element.type?
-          it "updates name correctly" do
+          it 'updates name correctly' do
             expect(@document.name).to eq @document.send(element).name
           end
         end
@@ -89,7 +90,7 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
             })
           end
 
-          #TODO: add as_options method
+          # TODO: add as_options method
           _element = Elements.send(element, value: :an_element, options: { foo: :bar })
           UserSerializer.send(element, *_element.as_input)
 
@@ -117,7 +118,7 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
         end
 
         if element.type?
-          it "updates name correctly" do
+          it 'updates name correctly' do
             expect(@document.name).to eq @document.send(element).name
           end
         end
@@ -129,7 +130,7 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
         end
       end
 
-      context "with lambda" do
+      context 'with lambda' do
         context "allowed #{element}" do
           before do
             @user = User.new
@@ -137,9 +138,9 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
               "#{Elements}::#{element.split('_').map(&:capitalize).join}"
             ).new(
               value: if element.primary_id?
-                       ->(obj, s) { [@_user_attr ||= obj.class.model_attributes.sample, { foo: :bar }] }
+                       ->(obj, _s) { [@_user_attr ||= obj.class.model_attributes.sample, { foo: :bar }] }
                      else
-                       ->(obj, s) { [obj.id, { foo: :bar }] }
+                       ->(obj, _s) { [obj.id, { foo: :bar }] }
                      end
             )
             UserSerializer.send(element, *@allowed_element.as_lambda_input)
@@ -175,11 +176,11 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
             @allowed_element = Elements.send(element)
             UserSerializer.send(element, *@allowed_element.as_input)
 
-            if element.primary_id?
-              @injected_element = ->(obj, s) { [@_user_attr ||= obj.class.model_attributes.sample, { foo: :bar }] }
-            else
-              @injected_element = ->(obj, s) { ["/api/v1/#{obj.id}", rel: :foobar] }
-            end
+            @injected_element = if element.primary_id?
+                                  ->(obj, _s) { [@_user_attr ||= obj.class.model_attributes.sample, { foo: :bar }] }
+                                else
+                                  ->(obj, _s) { ["/api/v1/#{obj.id}", { rel: :foobar }] }
+                                end
 
             options = SimpleAMS::Options.new(@user, {
               injected_options: Helpers.random_options(with: {

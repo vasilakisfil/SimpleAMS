@@ -9,18 +9,18 @@ module Helpers
   end
 
   def self.recursive_sort(array)
-    array.sort_by { |element|
+    array.sort_by do |element|
       if element.is_a?(Hash)
         element = { element.keys.first => recursive_sort(element.values) }
         element.keys.first
       else
         element
       end
-    }
+    end
   end
 
   def self.initialize_with_overrides(serializer_klass, allowed: nil)
-    model_klass = Object.const_get(serializer_klass.to_s.gsub("Serializer", ""))
+    model_klass = Object.const_get(serializer_klass.to_s.gsub('Serializer', ''))
     overrides = Helpers.pick(allowed || model_klass.model_attributes)
     serializer_klass.with_overrides(overrides)
     serializer_klass.attributes(*(allowed || model_klass.model_attributes))
@@ -32,26 +32,28 @@ module Helpers
     resources = [resources].flatten
 
     resources.each do |resource|
-      resource.relations.each { |r|
+      resource.relations.each do |r|
         next unless r.last.to_s.include?('Embedded')
 
         begin
           resource.send(:remove_const, r.last.to_s.split('::').last)
         rescue NameError => _e
-          #ignore
+          # ignore
         end
-      }
+      end
 
-      [
-        :attributes, :relations, :links, :metas, :adapter, :primary_id, :type,
-        :collection, :forms, :generics
+      %i[
+        attributes relations links metas adapter primary_id type
+        collection forms generics
       ].each do |var|
         resource.remove_instance_variable("@_#{var}") if resource.instance_variable_defined?("@_#{var}")
 
-        resource::Collection_.remove_instance_variable("@_#{var}") if resource::Collection_.instance_variable_defined?("@_#{var}")
+        if resource::Collection_.instance_variable_defined?("@_#{var}")
+          resource::Collection_.remove_instance_variable("@_#{var}")
+        end
       end
 
-      model = const_get(resource.to_s.split("::").last.gsub('Serializer', ''))
+      model = const_get(resource.to_s.split('::').last.gsub('Serializer', ''))
       relations = model.respond_to?(:relations) ? model.relations : []
       relations.map(&:name).each do |name|
         if const_defined?("#{resource}::Embedded#{name.capitalize}Options_")
@@ -61,7 +63,7 @@ module Helpers
     end
   end
 
-  #not that random..
+  # not that random..
   def self.random_options(with: {}, without: [])
     options = {
       type: :user,
@@ -79,7 +81,7 @@ module Helpers
       collection: {
         links: {
           root: '/api/v1/',
-          documentation: '/api/documentation', foobar: [:yes, :no].sample,
+          documentation: '/api/documentation', foobar: %i[yes no].sample,
           status: ->(obj, _s) { ["/status/#{obj.hash}"] }
         },
         meta: Options.hash
@@ -92,9 +94,9 @@ module Helpers
   end
 
   def self.random_relations_with_types
-    User.relations.each_with_object({}) { |relation, memo|
+    User.relations.each_with_object({}) do |relation, memo|
       memo[relation.name] = relation.type
-    }
+    end
   end
 
   class Options
@@ -102,11 +104,15 @@ module Helpers
       undef :hash
 
       def method_missing(meth, *args)
-        if self.new.respond_to? meth
-          self.new.send(meth, *args)
+        if new.respond_to? meth
+          new.send(meth, *args)
         else
           super
         end
+      end
+
+      def respond_to_missing?(meth, _)
+        new.respond_to?(meth.to_s) || super
       end
     end
 
@@ -133,14 +139,14 @@ module Helpers
     private
 
     def random_array
-      rand(10).times.map {
+      rand(10).times.map do
         coin = rand(10) / 10.to_f
         if coin >= 0.9
           { single => random_array }
         else
           single
         end
-      }
+      end
     end
 
     def deep_array
@@ -150,7 +156,7 @@ module Helpers
     end
 
     def random_hash
-      rand(10).times.inject({}) do |memo|
+      rand(10).times.each_with_object({}) do |_, memo|
         coin = rand(10) / 10.to_f
         memo[single] = if coin >= 0.9
                          hash
@@ -170,11 +176,11 @@ module Helpers
   class Adapter1; end
   class Adapter2; end
 
-  #no idea why Singleton is not working, but probably has to do with RSpec
-  #(NameError: uninitialized constant Singleton)
+  # no idea why Singleton is not working, but probably has to do with RSpec
+  # (NameError: uninitialized constant Singleton)
   def self.define_singleton_for(name, opts = {})
     _klass = Class.new(Object) do
-      opts.keys.each do |key|
+      opts.each_key do |key|
         define_singleton_method(key) do
           opts[key]
         end

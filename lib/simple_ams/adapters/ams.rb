@@ -67,6 +67,7 @@ class SimpleAMS::Adapters::AMS
     attr_reader :folder, :adapter, :options
 
     def initialize(folder, options = {})
+      super
       @folder = folder
       @adapter = folder.adapter.value
       @options = options
