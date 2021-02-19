@@ -249,24 +249,22 @@ class SimpleAMS::Options
   def priority_options_for(allowed:, injected:)
     unless injected.nil?
       allowed = injected.class.new(
-        injected.map { |s| s.is_a?(Hash) ? (s.first && s.first[0]) : s }
+        injected.map { |s| s.is_a?(Hash) ? s.keys : s }.flatten
       ) & allowed
     end
 
     allowed
   end
 
-  #       def options_for(allowed:, injected:)
-  #         (allowed || []).concat(injected || [])
-  #       end
-
   def _relation_options
     return @_relation_options if defined?(@_relation_options)
 
+    # TODO: should use 2.7 filter_map soon
     @_relation_options = relations.each_with_object({}) do |relation, memo|
       includes_value = (injected_options[:includes] || {}).find do |incl_hash|
-        incl_hash.is_a?(Hash) &&
-          (incl_hash.first && incl_hash.first[0]).to_s == relation.name.to_s
+        next unless incl_hash.is_a?(Hash)
+
+        incl_hash.keys.include?(relation.name)
       end
       includes_value = if includes_value
                          includes_value[relation.name]
@@ -276,8 +274,9 @@ class SimpleAMS::Options
                        end
 
       fields_value = (injected_options[:fields] || {}).find do |field_hash|
-        field_hash.is_a?(Hash) &&
-          (field_hash.first && field_hash.first[0]).to_s == relation.name.to_s
+        next unless field_hash.is_a?(Hash)
+
+        field_hash.keys.include?(relation.name)
       end
 
       # .. while here just nil will work (pick default fields from serializer)

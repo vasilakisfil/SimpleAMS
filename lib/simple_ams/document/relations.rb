@@ -69,7 +69,7 @@ class SimpleAMS::Document::Relations
     end
   end
 
-  # 4 options are merged:
+  # 3 options are merged:
   # *user injected when instantiating the SimpleAMS class
   # *relation options injected from parent serializer
   # *serializer class options
