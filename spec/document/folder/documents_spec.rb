@@ -10,9 +10,10 @@ RSpec.describe SimpleAMS::Document::Folder, 'documents' do
       @collection = 10.times.map { User.new }
 
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(@collection, {
+        SimpleAMS::Options.new(
+          @collection,
           injected_options: @setup_helper.injected_options
-        })
+        )
       )
     end
 

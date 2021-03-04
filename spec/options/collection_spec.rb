@@ -3,13 +3,14 @@ require 'spec_helper'
 RSpec.describe SimpleAMS::Options, 'collection' do
   context 'with no collection properties are injected' do
     before do
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer
         }).tap do |h|
-                            h.delete(:collection)
-                          end
-      })
+          h.delete(:collection)
+        end
+      )
     end
 
     it 'defaults to nil' do
@@ -23,9 +24,10 @@ RSpec.describe SimpleAMS::Options, 'collection' do
         serializer: UserSerializer
       })
 
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: @injected_options
-      })
+      )
     end
 
     it 'returns the injected name specified' do
@@ -65,9 +67,10 @@ RSpec.describe SimpleAMS::Options, 'collection' do
         }
       })
 
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: injected_options
-      })
+      )
     end
 
     it 'holds the uniq union of injected and allowed links' do

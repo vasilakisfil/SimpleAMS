@@ -13,11 +13,12 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
     describe "(#{element.plural})" do
       context "with no #{element.plural} in general" do
         before do
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: Helpers.random_options(with: {
               serializer: UserSerializer
             }).tap { |h| h.delete(element.to_sym) }
-          })
+          )
         end
 
         it "returns empty #{element.plural} array" do
@@ -32,11 +33,12 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             UserSerializer.send(element, *el.as_input)
           end
 
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: Helpers.random_options(with: {
               serializer: UserSerializer
             }).tap { |h| h.delete(element.plural.to_sym) }
-          })
+          )
 
           @uniq_allowed_elements = @allowed_elements.uniq(&:name)
         end
@@ -55,12 +57,13 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             UserSerializer.send(element, *el.as_input)
           end
 
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: Helpers.random_options(with: {
               serializer: UserSerializer,
               element.plural.to_sym => []
             })
-          })
+          )
         end
 
         it "returns empty #{element.plural} array" do
@@ -70,11 +73,12 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
 
       context "with no allowed #{element.plural} but injected ones" do
         before do
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: Helpers.random_options(with: {
               serializer: UserSerializer
             })
-          })
+          )
         end
 
         it "returns empty #{element.plural} array" do
@@ -96,9 +100,10 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             serializer: UserSerializer,
             element.plural.to_sym => @injected_elements
           })
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: injected_options
-          })
+          )
         end
 
         it "holds the uniq union of injected and allowed #{element.plural}" do
@@ -133,9 +138,10 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
             serializer: UserSerializer,
             element.plural.to_sym => @injected_elements
           })
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: injected_options
-          })
+          )
         end
 
         it "holds the uniq union of injected and allowed #{element.plural}" do
@@ -172,11 +178,12 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
               UserSerializer.send(element, *el.as_input)
             end
 
-            @options = SimpleAMS::Options.new(@user, {
+            @options = SimpleAMS::Options.new(
+              @user,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               }, without: [element.plural.to_sym])
-            })
+            )
           end
 
           it "holds the unwrapped #{element.plural}" do
@@ -210,12 +217,13 @@ RSpec.describe SimpleAMS::Options, 'name_value_hash' do
               memo[el.name] = ->(_obj, _s) { ["/api/v1/#{@user.id}/#{el.name}", { rel: el.name }] }
             end
 
-            @options = SimpleAMS::Options.new(@user, {
+            @options = SimpleAMS::Options.new(
+              @user,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer,
                 element.plural.to_sym => @injected_elements
               })
-            })
+            )
           end
 
           it "holds the injected lambda #{element.plural}" do

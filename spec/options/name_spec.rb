@@ -4,13 +4,14 @@ require 'spec_helper'
 RSpec.describe SimpleAMS::Options, 'name' do
   context 'with no name specified // no name injected' do
     before do
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer
         }).tap do |h|
-                            h.delete(:name)
-                          end
-      })
+          h.delete(:name)
+        end
+      )
     end
 
     it 'defaults to type' do
@@ -22,12 +23,13 @@ RSpec.describe SimpleAMS::Options, 'name' do
     before do
       @name = Helpers::Options.single
 
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
           name: @name
         })
-      })
+      )
     end
 
     it 'returns the injected name specified' do

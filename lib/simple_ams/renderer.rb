@@ -26,9 +26,10 @@ class SimpleAMS::Renderer
   class Collection
     def initialize(collection, options = {})
       @collection = collection
-      @options = SimpleAMS::Options.new(collection, {
+      @options = SimpleAMS::Options.new(
+        collection,
         injected_options: options.merge(_internal: is_collection)
-      })
+      )
     end
 
     def folder

@@ -28,11 +28,12 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
       context "with no #{element} is specified" do
         before do
           @document = SimpleAMS::Document.new(
-            SimpleAMS::Options.new(User.new, {
+            SimpleAMS::Options.new(
+              User.new,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               }, without: [element.to_sym])
-            })
+            )
           )
         end
 
@@ -59,11 +60,12 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
           UserSerializer.send(element, *@element.as_input)
 
           @document = SimpleAMS::Document.new(
-            SimpleAMS::Options.new(User.new, {
+            SimpleAMS::Options.new(
+              User.new,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               }, without: [element.to_sym])
-            })
+            )
           )
         end
 
@@ -96,12 +98,13 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
 
           @element = Elements.send(element, value: :another_element, options: { bar: :foo })
           @document = SimpleAMS::Document.new(
-            SimpleAMS::Options.new(User.new, {
+            SimpleAMS::Options.new(
+              User.new,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer,
                 element.to_sym => @element.as_input
               })
-            })
+            )
           )
         end
 
@@ -145,11 +148,12 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
             )
             UserSerializer.send(element, *@allowed_element.as_lambda_input)
 
-            options = SimpleAMS::Options.new(@user, {
+            options = SimpleAMS::Options.new(
+              @user,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               }, without: [element.to_sym])
-            })
+            )
 
             @document = SimpleAMS::Document.new(options)
           end
@@ -182,12 +186,13 @@ RSpec.describe SimpleAMS::Document, 'value_hash' do
                                   ->(obj, _s) { ["/api/v1/#{obj.id}", { rel: :foobar }] }
                                 end
 
-            options = SimpleAMS::Options.new(@user, {
+            options = SimpleAMS::Options.new(
+              @user,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer,
                 element.to_sym => @injected_element
               })
-            })
+            )
 
             @document = SimpleAMS::Document.new(options)
           end

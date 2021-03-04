@@ -3,14 +3,15 @@ require 'spec_helper'
 RSpec.describe SimpleAMS::Options, 'relations' do
   context 'with no reations in general' do
     before do
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer
         }).tap do |h|
-                            h.delete(:includes)
-                            h.delete(:relations)
-                          end
-      })
+          h.delete(:includes)
+          h.delete(:relations)
+        end
+      )
     end
 
     it 'returns empty array' do
@@ -24,11 +25,12 @@ RSpec.describe SimpleAMS::Options, 'relations' do
       @allowed_relations.each do |rel, type|
         UserSerializer.send(type, rel, Helpers.random_options)
       end
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer
         }).tap { |h| h.delete(:includes) }
-      })
+      )
     end
 
     it 'holds the specified options' do
@@ -53,12 +55,13 @@ RSpec.describe SimpleAMS::Options, 'relations' do
       @allowed_relations.each do |rel, type|
         UserSerializer.send(type, rel, Helpers.random_options)
       end
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
           relations: []
         })
-      })
+      )
     end
 
     it 'holds the specified options' do
@@ -75,12 +78,13 @@ RSpec.describe SimpleAMS::Options, 'relations' do
       @injected_relations = User.relations.map do |relation|
         [relation.type, relation.name, Helpers.random_options]
       end
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
           relations: @injected_relations
         })
-      })
+      )
     end
 
     it 'holds the specified options' do
@@ -97,13 +101,14 @@ RSpec.describe SimpleAMS::Options, 'relations' do
       @injected_relations = User.relations.map do |relation|
         [relation.type, relation.name, Helpers.random_options]
       end
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
           relations: @injected_relations,
           includes: @injected_relations.map { |relation| relation[1] }
         })
-      })
+      )
     end
 
     it 'holds the specified options' do
@@ -124,12 +129,13 @@ RSpec.describe SimpleAMS::Options, 'relations' do
         name = relation_array[1]
         UserSerializer.send(type, name, Helpers.random_options)
       end
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
           relations: @injected_relations
         }, without: [:includes])
-      })
+      )
     end
 
     it 'holds the specified options' do
@@ -150,13 +156,14 @@ RSpec.describe SimpleAMS::Options, 'relations' do
         name = relation_array[1]
         UserSerializer.send(type, name, Helpers.random_options)
       end
-      @options = SimpleAMS::Options.new(User.new, {
+      @options = SimpleAMS::Options.new(
+        User.new,
         injected_options: Helpers.random_options(with: {
           serializer: UserSerializer,
           relations: @injected_relations,
           includes: []
         })
-      })
+      )
     end
 
     it 'holds the specified options' do

@@ -5,13 +5,14 @@ RSpec.describe SimpleAMS::Document, 'name' do
   context 'with no name specified // no name injected' do
     before do
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(User.new, {
+        SimpleAMS::Options.new(
+          User.new,
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer
           }).tap do |h|
-                              h.delete(:name)
-                            end
-        })
+            h.delete(:name)
+          end
+        )
       )
     end
 
@@ -25,12 +26,13 @@ RSpec.describe SimpleAMS::Document, 'name' do
       @name = Helpers::Options.single
 
       @document = SimpleAMS::Document.new(
-        SimpleAMS::Options.new(User.new, {
+        SimpleAMS::Options.new(
+          User.new,
           injected_options: Helpers.random_options(with: {
             serializer: UserSerializer,
             name: @name
           })
-        })
+        )
       )
     end
 

@@ -124,12 +124,13 @@ class SimpleAMS::Document
 
     def options_for(resource)
       if resource_options.serializer_class.respond_to?(:call)
-        SimpleAMS::Options.new(resource, {
+        SimpleAMS::Options.new(
+          resource,
           injected_options: resource_options.injected_options.merge({
             serializer: serializer_for(resource)
           }),
           allowed_options: serializer_for(resource).options
-        })
+        )
       else
         resource_options.with_resource(resource)
       end

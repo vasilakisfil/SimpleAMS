@@ -23,11 +23,12 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
     describe "(#{element})" do
       context "with no #{element} is specified" do
         before do
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: Helpers.random_options(with: {
               serializer: UserSerializer
             }).tap { |h| h.delete(element.to_sym) }
-          })
+          )
         end
 
         it 'defaults to class name' do
@@ -44,11 +45,12 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
       context "when #{element} specified is nil" do
         before do
           UserSerializer.send(element, nil)
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: Helpers.random_options(with: {
               serializer: UserSerializer
             }).tap { |h| h.delete(element.to_sym) }
-          })
+          )
         end
 
         it 'defaults to class name' do
@@ -67,11 +69,12 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
           @element = Elements.send(element)
           UserSerializer.send(element, *@element.as_input)
 
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: Helpers.random_options(with: {
               serializer: UserSerializer
             }).tap { |h| h.delete(element.to_sym) }
-          })
+          )
         end
 
         it "returns the #{element} specified" do
@@ -95,12 +98,13 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
           UserSerializer.send(element, *allowed_element.as_input)
 
           @element = Elements.send(element)
-          @options = SimpleAMS::Options.new(User.new, {
+          @options = SimpleAMS::Options.new(
+            User.new,
             injected_options: Helpers.random_options(with: {
               serializer: UserSerializer,
               element.to_sym => @element.as_input
             })
-          })
+          )
         end
 
         it "returns the injected #{element} specified" do
@@ -126,11 +130,12 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
             )
             UserSerializer.send(element, *@allowed_element.as_lambda_input)
 
-            @options = SimpleAMS::Options.new(@user, {
+            @options = SimpleAMS::Options.new(
+              @user,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               }, without: [element.to_sym])
-            })
+            )
           end
 
           it "holds the unwrapped #{element}" do
@@ -153,11 +158,12 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
             )
             UserSerializer.send(element, *@allowed_element.as_lambda_input(explicit_options: true))
 
-            @options = SimpleAMS::Options.new(@user, {
+            @options = SimpleAMS::Options.new(
+              @user,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               }, without: [element.to_sym])
-            })
+            )
           end
 
           it "holds the unwrapped #{element}" do
@@ -178,12 +184,13 @@ RSpec.describe SimpleAMS::Options, 'value_hash' do
 
             @injected_element = ->(obj, _s) { ["/api/v1/#{obj.id}", { rel: :foobar }] }
 
-            @options = SimpleAMS::Options.new(@user, {
+            @options = SimpleAMS::Options.new(
+              @user,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer,
                 element.to_sym => @injected_element
               })
-            })
+            )
           end
 
           it "holds the injected lambda #{element}" do

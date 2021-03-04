@@ -109,13 +109,15 @@ class SimpleAMS::Options
 
     serializer = _serializer || serializer
 
-    @adapter = Adapter.new(*injected_options.fetch(:adapter, [nil]), {
+    @adapter = Adapter.new(
+      *injected_options.fetch(:adapter, [nil]),
       resource: resource, serializer: serializer
-    })
+    )
     if @adapter.value.nil?
-      @adapter = Adapter.new(*allowed_options.fetch(:adapter, [nil]), {
+      @adapter = Adapter.new(
+        *allowed_options.fetch(:adapter, [nil]),
         resource: resource, serializer: serializer
-      })
+      )
     end
     #       if @adapter.value.nil?
     #         @adapter = Adapter.new(SimpleAMS::Adapters::AMS, {
@@ -202,18 +204,20 @@ class SimpleAMS::Options
     if injected
       injected = collection_klass.new(
         injected.map do |l|
-          item_klass.new(*l.flatten, {
+          item_klass.new(
+            *l.flatten,
             resource: resource, serializer: serializer
-          })
+          )
         end
       )
     end
 
     allowed = collection_klass.new(
       allowed_options.fetch(name).map do |l|
-        item_klass.new(*l, {
+        item_klass.new(
+          *l,
           resource: resource, serializer: serializer
-        })
+        )
       end
     )
 
@@ -228,9 +232,10 @@ class SimpleAMS::Options
     _options = injected_options.fetch(name, nil)
     _options ||= allowed_options.fetch(name, nil)
 
-    klass.new(*_options, {
+    klass.new(
+      *_options,
       resource: resource, serializer: serializer
-    })
+    )
   end
 
   def array_of_items_for(klass, name)

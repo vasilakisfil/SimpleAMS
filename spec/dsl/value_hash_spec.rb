@@ -26,9 +26,8 @@ RSpec.describe SimpleAMS::DSL, 'value_hash' do
       context 'when specified' do
         context 'without options' do
           before do
-            @element = Elements.send(element, {
-              value: Helpers::Options.single, options: Helpers::Options.hash
-            })
+            @element = Elements.send(element,
+                                     value: Helpers::Options.single, options: Helpers::Options.hash)
             UserSerializer.send(element, @element)
           end
 
@@ -41,9 +40,8 @@ RSpec.describe SimpleAMS::DSL, 'value_hash' do
 
         context 'with options' do
           before do
-            @element = Elements.send(element, {
-              value: ->(_obj, _s) { Helpers::Options.single }, options: Helpers::Options.hash
-            })
+            @element = Elements.send(element,
+                                     value: ->(_obj, _s) { Helpers::Options.single }, options: Helpers::Options.hash)
             UserSerializer.send(element, *@element.as_input)
           end
 
@@ -59,9 +57,8 @@ RSpec.describe SimpleAMS::DSL, 'value_hash' do
 
         context "with lambda #{element}" do
           before do
-            @element = Elements.send(element, {
-              value: Helpers::Options.single, options: Helpers::Options.hash
-            })
+            @element = Elements.send(element,
+                                     value: Helpers::Options.single, options: Helpers::Options.hash)
             UserSerializer.send(element, *@element.as_lambda_input)
           end
 
