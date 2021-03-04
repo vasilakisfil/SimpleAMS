@@ -1,4 +1,4 @@
-**master**
+**0.2.6**
 * [#45](https://github.com/vasilakisfil/SimpleAMS/pull/45) add changelog
 * [#44](https://github.com/vasilakisfil/SimpleAMS/pull/44) add Ruby 3.0 support
 * [#42](https://github.com/vasilakisfil/SimpleAMS/pull/42) fix bug when more than 1 nested relations where specified on Renderer
