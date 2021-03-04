@@ -12,11 +12,12 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
       context "with no #{element.plural} in general" do
         before do
           @folder = SimpleAMS::Document::Folder.new(
-            SimpleAMS::Options.new(User.array, {
+            SimpleAMS::Options.new(
+              User.array,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               }).tap { |h| h.delete(element.to_sym) }
-            })
+            )
           )
         end
 
@@ -48,11 +49,12 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
           end
 
           @folder = SimpleAMS::Document::Folder.new(
-            SimpleAMS::Options.new(User.array, {
+            SimpleAMS::Options.new(
+              User.array,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               }).tap { |h| h.delete(element.plural.to_sym) }
-            })
+            )
           )
 
           @uniq_allowed_elements = @allowed_elements.uniq(&:name)
@@ -83,12 +85,13 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
           end
 
           @folder = SimpleAMS::Document::Folder.new(
-            SimpleAMS::Options.new(User.array, {
+            SimpleAMS::Options.new(
+              User.array,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer,
                 element.plural.to_sym => []
               })
-            })
+            )
           )
         end
 
@@ -115,11 +118,12 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
       context "with no allowed #{element.plural} but injected ones" do
         before do
           @folder = SimpleAMS::Document::Folder.new(
-            SimpleAMS::Options.new(User.array, {
+            SimpleAMS::Options.new(
+              User.array,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               })
-            })
+            )
           )
         end
 
@@ -236,11 +240,12 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
               UserSerializer.send(element, *el.as_input)
             end
 
-            options = SimpleAMS::Options.new(@users, {
+            options = SimpleAMS::Options.new(
+              @users,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer
               }, without: [element.plural.to_sym])
-            })
+            )
 
             @folder = SimpleAMS::Document::Folder.new(options)
           end
@@ -278,12 +283,13 @@ RSpec.describe SimpleAMS::Document::Folder, '(collection) name_value_hash' do
               memo[el.name] = ->(obj, _s) { ["/api/v1/#{obj.id}/#{el.name}", { rel: el.name }] }
             end
 
-            options = SimpleAMS::Options.new(@users, {
+            options = SimpleAMS::Options.new(
+              @users,
               injected_options: Helpers.random_options(with: {
                 serializer: UserSerializer,
                 element.plural.to_sym => @injected_elements
               })
-            })
+            )
 
             @folder = SimpleAMS::Document::Folder.new(options)
           end

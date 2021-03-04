@@ -13,16 +13,16 @@ class Elements
     end
   end
 
-  def primary_id(*args)
-    PrimaryId.new(*args)
+  def primary_id(args = {})
+    PrimaryId.new(**args)
   end
 
-  def type(*args)
-    Type.new(*args)
+  def type(args = {})
+    Type.new(**args)
   end
 
-  def link(*args)
-    Link.new(*args)
+  def link(args = {})
+    Link.new(**args)
   end
 
   def links
@@ -38,38 +38,46 @@ class Elements
     rand(3..12).times.map { Include.new }
   end
 
-  def meta(*args)
-    Meta.new(*args)
+  def meta(args = {})
+    Meta.new(**args)
   end
 
   def metas
     rand(3..12).times.map { Meta.new }
   end
 
-  def form(*args)
-    Form.new(*args)
+  def form(args = {})
+    Form.new(**args)
   end
 
   def forms
     rand(3..12).times.map { Form.new }
   end
 
-  def generic(*args)
-    Generic.new(*args)
+  def generic(args = {})
+    Generic.new(**args)
   end
 
   def generics
     rand(3..12).times.map { Generic.new }
   end
 
+  def self.as_elements_for(hash, klass:)
+    new.as_elements_for(hash, klass: klass)
+  end
+
   def as_elements_for(hash, klass:)
     hash.map do |key, value|
-      klass.new({
+      klass.new(
         name: key,
         value: value.is_a?(Array) ? value.first : value,
         options: value.is_a?(Array) ? value.last : {}
-      })
+      )
     end
+  end
+
+  def self.as_options_for(elements)
+    new.as_options_for(elements)
   end
 
   def as_options_for(elements)
@@ -78,8 +86,8 @@ class Elements
     end
   end
 
-  def adapter(*args)
-    Adapter.new(*args)
+  def adapter(args = {})
+    Adapter.new(**args)
   end
 
   class Field

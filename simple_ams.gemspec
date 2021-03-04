@@ -18,12 +18,12 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
-  spec.required_ruby_version = '~> 2.4'
+  spec.required_ruby_version = '>= 2.4'
 
-  spec.add_development_dependency 'faker', '~> 1.8.5'
-  spec.add_development_dependency 'pry', '~> 0.11.3'
+  spec.add_development_dependency 'faker', '~> 2.16'
+  spec.add_development_dependency 'pry', '~> 0.14.0'
   spec.add_development_dependency 'rake', '>= 12.3.3'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'rubocop', '~> 0.93.1'
-  spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'simplecov', '~> 0.21.2'
 end

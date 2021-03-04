@@ -36,11 +36,11 @@ class Address
   end
 
   def created_at
-    @created_at ||= Faker::Date.backward(100)
+    @created_at ||= Faker::Date.backward(days: 100)
   end
 
   def updated_at
-    @updated_at ||= Faker::Date.between(created_at, Date.today)
+    @updated_at ||= Faker::Date.between(from: created_at, to: Date.today)
   end
 
   class SubAddress < self

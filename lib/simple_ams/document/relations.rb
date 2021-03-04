@@ -47,15 +47,14 @@ class SimpleAMS::Document::Relations
 
     renderer_klass_for(relation, relation_value).new(
       SimpleAMS::Options.new(
-        relation_value, relation_options_for(relation, relation_value)
+        relation_value, **relation_options_for(relation, relation_value)
       ),
       SimpleAMS::Options.new(
-        resource, {
-          injected_options: {
-            serializer: relation.embedded
-          },
-          allowed_options: relation.embedded.options
-        }
+        resource,
+        injected_options: {
+          serializer: relation.embedded
+        },
+        allowed_options: relation.embedded.options
       )
     )
   end

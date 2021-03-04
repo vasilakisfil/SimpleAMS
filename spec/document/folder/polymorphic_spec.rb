@@ -13,11 +13,12 @@ RSpec.describe SimpleAMS::Document::Folder, 'polymorphic collections' do
     it 'raises an error regarding collection serializer' do
       expect do
         SimpleAMS::Document::Folder.new(
-          SimpleAMS::Options.new(@collection, {
+          SimpleAMS::Options.new(
+            @collection,
             injected_options: @setup_helper.injected_options.merge({
               serializer: ->(obj) { obj.id < 5 ? UserSerializer : Api::V1::UserSerializer }
             })
-          })
+          )
         )
       end.to raise_error(/specify a collection_serializer/i)
     end
@@ -34,12 +35,13 @@ RSpec.describe SimpleAMS::Document::Folder, 'polymorphic collections' do
       class Api::V1::UserSimpleSerializer < UserSerializer; end
 
       @folder = SimpleAMS::Document::Folder.new(
-        SimpleAMS::Options.new(@collection, {
+        SimpleAMS::Options.new(
+          @collection,
           injected_options: @setup_helper.injected_options.merge({
             serializer: ->(obj) { obj.id < 5 ? UserSerializer : Api::V1::UserSimpleSerializer },
             collection_serializer: UserSerializer
           })
-        })
+        )
       )
     end
 
