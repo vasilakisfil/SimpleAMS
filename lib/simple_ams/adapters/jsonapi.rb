@@ -66,7 +66,7 @@ class SimpleAMS::Adapters::JSONAPI
       embedded_relation_links = embedded_relation_links_for(relation)
       hash.merge!(links: embedded_relation_links_for(relation)) unless embedded_relation_links.empty?
 
-      hash.merge!(relation.name => hash) unless hash.empty?
+      hash.merge!(transform_key(relation.name) => hash) unless hash.empty?
     end
   end
 
@@ -76,13 +76,13 @@ class SimpleAMS::Adapters::JSONAPI
     if relation.folder?
       relation.each.map do |doc|
         {
-          doc.primary_id.name => doc.primary_id.value.to_s,
+          transform_key(doc.primary_id.name) => doc.primary_id.value.to_s,
           type: doc.type.name
         }
       end
     else
       {
-        relation.primary_id.name => relation.primary_id.value.to_s,
+        transform_key(relation.primary_id.name) => relation.primary_id.value.to_s,
         type: relation.type.name
       }
     end
@@ -92,7 +92,7 @@ class SimpleAMS::Adapters::JSONAPI
     return {} if relation.embedded.links.empty?
 
     relation.embedded.links.each_with_object({}) do |link, hash|
-      hash[link.name] = link.value
+      hash[transform_key(link.name)] = link.value
     end
   end
 
@@ -100,19 +100,19 @@ class SimpleAMS::Adapters::JSONAPI
     return @links ||= {} if document.links.empty?
 
     @links ||= document.links.each_with_object({}) do |link, hash|
-      hash[link.name] = link.value
+      hash[transform_key(link.name)] = link.value
     end
   end
 
   def metas
     @metas ||= document.metas.each_with_object({}) do |meta, hash|
-      hash[meta.name] = meta.value
+      hash[transform_key(meta.name)] = meta.value
     end
   end
 
   def forms
     @forms ||= document.forms.each_with_object({}) do |form, hash|
-      hash[form.name] = form.value
+      hash[transform_key(form.name)] = form.value
     end
   end
 

@@ -1,11 +1,15 @@
 require 'simple_ams'
 
 class SimpleAMS::Adapters::AMS
+  DEFAULT_OPTIONS = {
+    key_transform: nil
+  }.freeze
+
   attr_reader :document, :options
 
   def initialize(document, options = {})
     @document = document
-    @options = options
+    @options = DEFAULT_OPTIONS.merge(options)
   end
 
   def as_json
@@ -26,7 +30,7 @@ class SimpleAMS::Adapters::AMS
 
   def fields
     @fields ||= document.fields.each_with_object({}) do |field, hash|
-      hash[field.key] = field.value
+      hash[transform_key(field.key)] = field.value
     end
   end
 
@@ -34,19 +38,19 @@ class SimpleAMS::Adapters::AMS
     return @links ||= {} if document.links.empty?
 
     @links ||= document.links.each_with_object({}) do |link, hash|
-      hash[link.name] = link.value
+      hash[transform_key(link.name)] = link.value
     end
   end
 
   def metas
     @metas ||= document.metas.each_with_object({}) do |meta, hash|
-      hash[meta.name] = meta.value
+      hash[transform_key(meta.name)] = meta.value
     end
   end
 
   def forms
     @forms ||= document.forms.each_with_object({}) do |form, hash|
-      hash[form.name] = form.value
+      hash[transform_key(form.name)] = form.value
     end
   end
 
@@ -59,7 +63,20 @@ class SimpleAMS::Adapters::AMS
               else
                 self.class.new(relation).as_json
               end
-      hash[relation.name] = value
+      hash[transform_key(relation.name)] = value
+    end
+  end
+
+  def transform_key(key)
+    case options[:key_transform]
+    when :camel
+      key.to_s.split('_').map(&capitalize).join
+    when :kebab
+      key.to_s.gsub('_', '-')
+    when :snake
+      key
+    else
+      key
     end
   end
 
@@ -93,13 +110,13 @@ class SimpleAMS::Adapters::AMS
 
     def metas
       @metas ||= folder.metas.each_with_object({}) do |meta, hash|
-        hash[meta.name] = meta.value
+        hash[transform_key(meta.name)] = meta.value
       end
     end
 
     def links
       @links ||= folder.links.each_with_object({}) do |link, hash|
-        hash[link.name] = link.value
+        hash[transform_key(link.name)] = link.value
       end
     end
   end
